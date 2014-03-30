@@ -1,0 +1,98 @@
+%Copyright (c) 2013, Arnaud Poret
+%All rights reserved.
+
+\documentclass[notitlepage,oneside,onecolumn,a4paper]{article}
+
+\usepackage{algorithmic}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\algsetup{indent=2em}
+\algsetup{linenodelimiter=}
+
+\begin{document}
+
+\section*{Additional file: the algorithm in one block}
+Below is the algorithm in one block\footnote{Copyright (c) 2013, Arnaud Poret. All rights reserved. arnaud.poret@gmail.com}.
+\begin{algorithmic}[1]
+\STATE ask for $size(D)$
+\STATE $size(D)=min(size(D),2^n)$
+\STATE generate $D\subseteq S$
+\STATE $H=\lbrace \rbrace$
+\STATE $A_{physio}=\lbrace \rbrace$
+\FOR{$x_0\in D$}
+    \STATE $k=1$
+    \STATE $\boldsymbol{x}(1)=x_0$
+    \WHILE{$1$}
+        \IF{$\exists w\in H: \boldsymbol{x}(k)\in w$}
+            \STATE \textbf{break}
+        \ENDIF
+        \STATE $\boldsymbol{x}(k+1)=\boldsymbol{f}_{physio}(\boldsymbol{x}(k))$
+        \IF{$\exists k'\in [\![1,k]\!]: \boldsymbol{x}(k+1)=\boldsymbol{x}(k')$}
+            \STATE $A_{physio}=A_{physio}\cup \lbrace (\boldsymbol{x}(k'),\dots ,\boldsymbol{x}(k))\rbrace$
+            \STATE \textbf{break}
+        \ENDIF
+        \STATE $k=k+1$
+    \ENDWHILE
+    \STATE $H=H\cup \lbrace (\boldsymbol{x}(1),\dots ,\boldsymbol{x}(k))\rbrace$
+\ENDFOR
+\RETURN $A_{physio}$
+\STATE ask for $r_{min},r_{max},max_{targ},max_{moda}$
+\STATE $r_{max}=min(r_{max},n)$
+\STATE $golden\_set=\lbrace \rbrace$
+\STATE $silver\_set=\lbrace \rbrace$
+\FOR{$r\in [\![r_{min},r_{max}]\!]$}
+    \STATE $max_{targ}^{r}=min(max_{targ},n!/(r!\cdot (n-r)!))$
+    \STATE $max_{moda}^{r}=min(max_{moda},2^{r})$
+    \STATE $C_{targ}=\lbrace \rbrace$
+    \STATE $C_{moda}=\lbrace \rbrace$
+    \WHILE{$size(C_{targ})<max_{targ}^{r}$}
+        \STATE generate $c_{targ}\notin C_{targ}$
+        \STATE $C_{targ}=C_{targ}\cup \lbrace c_{targ}\rbrace$
+    \ENDWHILE
+    \WHILE{$size(C_{moda})<max_{moda}^{r}$}
+        \STATE generate $c_{moda}\notin C_{moda}$
+        \STATE $C_{moda}=C_{moda}\cup \lbrace c_{moda}\rbrace$
+    \ENDWHILE
+    \FOR{$c_{targ}\in C_{targ}$}
+        \FOR{$c_{moda}\in C_{moda}$}
+            \STATE $H=\lbrace \rbrace$
+            \STATE $A_{patho}=\lbrace \rbrace$
+            \FOR{$x_0\in D$}
+                \STATE $k=1$
+                \STATE $\boldsymbol{x}(1)=x_0$
+                \WHILE{$1$}
+                    \IF{$\exists w\in H: \boldsymbol{x}(k)\in w$}
+                        \STATE \textbf{break}
+                    \ENDIF
+                    \STATE $\boldsymbol{x}(k+1)=\boldsymbol{f}_{patho}(\boldsymbol{x}(k))$
+                    \FOR{$targ_i\in c_{targ}$}
+                        \FOR{$v_j\in V$}
+                            \IF{$v_j=targ_i$}
+                                \STATE $x_j(k+1)=moda_i$
+                            \ENDIF
+                        \ENDFOR
+                    \ENDFOR
+                    \IF{$\exists k'\in [\![1,k]\!]: \boldsymbol{x}(k+1)=\boldsymbol{x}(k')$}
+                        \STATE $A_{patho}=A_{patho}\cup \lbrace (\boldsymbol{x}(k'),\dots ,\boldsymbol{x}(k))\rbrace$
+                        \STATE \textbf{break}
+                    \ENDIF
+                    \STATE $k=k+1$
+                \ENDWHILE
+                \STATE $H=H\cup \lbrace (\boldsymbol{x}(1),\dots ,\boldsymbol{x}(k))\rbrace$
+            \ENDFOR
+            \IF{$A_{patho}\subseteq A_{physio}$}
+                \IF{$A_{patho}=A_{physio}$}
+                    \STATE $golden\_set=golden\_set\cup \lbrace (c_{targ},c_{moda})\rbrace$
+                \ELSE
+                    \STATE $silver\_set=silver\_set\cup \lbrace (c_{targ},c_{moda})\rbrace$
+                \ENDIF
+            \ENDIF
+        \ENDFOR
+    \ENDFOR
+\ENDFOR
+\RETURN $golden\_set$
+\RETURN $silver\_set$
+\end{algorithmic}
+
+\end{document}
