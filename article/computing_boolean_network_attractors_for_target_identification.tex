@@ -15,7 +15,7 @@
 
 \title{Computing boolean network attractors for target identification}
 \author{Arnaud Poret\footnote{Copyright (c) 2013, Arnaud Poret. All rights reserved. arnaud.poret@gmail.com}}
-%\date{\today}
+\date{}
 \pagestyle{headings}
 
 \begin{document}
@@ -280,7 +280,7 @@ Having the example network, two variants of it are needed: the physiological one
 $Rb$ was chosen because its inactivation occurs in many cancers \cite{sherr2002rb} and hence a network bearing a constitutive inactivation of it should be a good example of a pathological variant.
 
 \subsection*{The implementation}
-The algorithm was implemented in GNU Octave\footnote{\url{http://www.gnu.org/software/octave/}}, a free software under the GNU General Public License for numerical computation. The implementation of the algorithm is left free to the interested reader but, if any, the GNU Octave sources are available on demand by email to the author.
+The algorithm was implemented in Fortran 95 and compiled with GFortran\footnote{\url{https://www.gnu.org/software/gcc/fortran/}}. The sources can be found on GitHub\footnote{\url{https://github.com/}} at \url{https://github.com/arnaudporet/kali-targ}.
 
 \section*{Results and discussion}
 This section exposes the results of the five main steps of the algorithm applied on the physiological and pathological variants of the working example.
