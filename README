@@ -10,3 +10,5 @@ I recommend you to read my article, at least the Definitions section, available 
 The article abstract can be found on the wiki page Article of the present project.
 
 The example network is an implementation of a boolean model of the mammalian cell cycle published by Adrien Faure et al: Aurelien Naldi, Claudine Chaouiya, and Denis Thieffry. Dynamical analysis of a generic boolean model for the control of the mammalian cell cycle. Bioinformatics, 22(14):e124–e131, 2006.
+
+The algorithm was developed in octave for more convenience and then implemented in fortran for more performance. The octave implementation is available in the octave folder of the present project.

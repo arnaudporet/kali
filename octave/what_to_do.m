@@ -6,7 +6,16 @@
 function what_to_do(f,V,size_D,max_targ,max_moda,value)
     todo=menu("what to do: ","compute attractors","compute pathological attractors","compute therapeutic bullets");
     if todo!=2
-        D=generate_arrangement(value,numel(V),size_D)';
+        if all(value==[0,1],2)
+            disp(strcat("size(S)=",num2str(2**numel(V))))
+            if yes_or_no("comprehensive D? ")
+                D=generate_state_space(numel(V))';
+            else
+                D=generate_arrangement(value,numel(V),size_D)';
+            endif
+        else
+            D=generate_arrangement(value,numel(V),size_D)';
+        endif
     endif
     switch todo
         case {1}

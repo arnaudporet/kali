@@ -1,7 +1,7 @@
 !Copyright (c) 2013, Arnaud Poret
 !All rights reserved.
 
-!read the following comments, fill the following template, open a terminal, past this command and press Enter: cd ~/kali/kali-targ/ && gfortran lib.f95 example_network.f95 -o example_network && ./example_network
+!read the following comments, fill the following template, open a terminal, past this command and press Enter: cd ~/kali-targ/ && gfortran lib.f95 example_network.f95 -o example_network && ./example_network
 
 !I recommend you to read my article, at least the Definitions section, available in the article folder of the present project
 
