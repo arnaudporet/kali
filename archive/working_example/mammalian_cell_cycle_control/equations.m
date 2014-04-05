@@ -1,0 +1,10 @@
+CycD;#CycD
+or(and(not(CycD),not(CycE),not(CycA),not(CycB)),and(p27,not(CycD),not(CycB)));#Rb
+or(and(not(Rb),not(CycA),not(CycB)),and(p27,not(Rb),not(CycB)));#E2F
+and(E2F,not(Rb));#CycE
+or(and(E2F,not(Rb),not(Cdc20),not(and(Cdh1,UbcH10))),and(CycA,not(Rb),not(Cdc20),not(and(Cdh1,UbcH10))));#CycA
+or(and(not(CycD),not(CycE),not(CycA),not(CycB)),and(p27,not(and(CycE,CycA)),not(CycB),not(CycD)));#p27
+CycB;#Cdc20
+or(and(not(CycA),not(CycB)),Cdc20,and(p27,not(CycB)));#Cdh1
+or(not(Cdh1),and(Cdh1,UbcH10,or(Cdc20,CycA,CycB)));#UbcH10
+and(not(Cdc20),not(Cdh1));#CycB
