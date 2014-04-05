@@ -421,6 +421,34 @@ module lib
         deallocate(set_name)
     end function load_attractor_set
     !##########################################################################!
+    !##########################    print_license    ###########################!
+    !##########################################################################!
+    subroutine print_license()
+        implicit none
+        write (unit=*,fmt="(a)") new_line("a")//'Copyright (c) 2013, Arnaud Poret'//new_line("a")//&
+        'All rights reserved.'//new_line("a")//new_line("a")//&
+        'Redistribution and use in source and binary forms, with or without modification,'//new_line("a")//&
+        'are permitted provided that the following conditions are met:'//new_line("a")//new_line("a")//&
+        '1. Redistributions of source code must retain the above copyright notice, this'//new_line("a")//&
+        'list of conditions and the following disclaimer.'//new_line("a")//new_line("a")//&
+        '2. Redistributions in binary form must reproduce the above copyright notice,'//new_line("a")//&
+        'this list of conditions and the following disclaimer in the documentation and/or'//new_line("a")//&
+        'other materials provided with the distribution.'//new_line("a")//new_line("a")//&
+        '3. Neither the name of the copyright holder nor the names of its contributors'//new_line("a")//&
+        'may be used to endorse or promote products derived from this software without'//new_line("a")//&
+        'specific prior written permission.'//new_line("a")//new_line("a")//&
+        'THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND'//new_line("a")//&
+        'ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED'//new_line("a")//&
+        'WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE'//new_line("a")//&
+        'DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR'//new_line("a")//&
+        'ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES'//new_line("a")//&
+        '(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;'//new_line("a")//&
+        'LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON'//new_line("a")//&
+        'ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT'//new_line("a")//&
+        '(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS'//new_line("a")//&
+        'SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.'//new_line("a")
+    end subroutine print_license
+    !##########################################################################!
     !#############################    rand_int    #############################!
     !##########################################################################!
     function rand_int(a,b) result(y)
@@ -610,8 +638,9 @@ module lib
                 real,dimension(size(x,1),1)::y
             end function f
         end interface
-        call cpu_time(start)
+        call print_license()
         call init_random_seed()
+        call cpu_time(start)
         write (unit=*,fmt="(a)") "what to do: "//new_line("a")//"    (1) compute attractors"//new_line("a")//&
         "    (2) compute pathological attractors"//new_line("a")//"    (3) compute therapeutic bullets"
         read (unit=*,fmt=*) to_do
