@@ -3,8 +3,6 @@
 
 !read the following comments, fill the following template, open a terminal, past this command and press Enter: cd ~/kali-targ/ && gfortran lib.f95 example_network.f95 -o example_network && ./example_network
 
-!I recommend you to read my article, at least the Definitions section, available in the article folder of the present project
-
 !at line 31, allocate to V the number of nodes
 
 !value: the domain of the variables, for example [0.0,1.0] for boolean logic and [0.0,0.5,1.0] for three valued logic
@@ -20,6 +18,8 @@
 !f_physio: the boolean transition function of the physiological variant
 
 !f_patho: the boolean transition function of the pathological variant
+
+!to cope with boolean and multivalued logic, the Zadeh fuzzy logic operators are used
 
 !at line 46, pass either f_physio or f_patho to the subroutine what_to_do
 

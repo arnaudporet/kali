@@ -1,7 +1,27 @@
 #Copyright (c) 2013, Arnaud Poret
 #All rights reserved.
 
-#run("~/kali-targ/octave/example_network.m")
+#read the following comments, fill the following template, open a terminal, lauch octave, past this command and press Enter: run("~/kali-targ/octave/example_network.m")
+
+#value: the domain of the variables, for example [0,1] for boolean logic and [0,0.5,1] for three valued logic
+
+#max_targ: the maximum number of target combinations to test
+
+#max_moda: the maximum number of modality arrangements to test for each target combination
+
+#size_D: the size of the subset of the state space to start from
+
+#V: the node names
+
+#f_physio: the boolean transition function of the physiological variant
+
+#f_patho: the boolean transition function of the pathological variant
+
+#to cope with boolean and multivalued logic, the Zadeh fuzzy logic operators are used
+
+#at line 69, pass either f_physio or f_patho to the function what_to_do
+
+#this example network is an implementation of a boolean model of the mammalian cell cycle proposed by Adrien Faure et al: Aurelien Naldi, Claudine Chaouiya, and Denis Thieffry. Dynamical analysis of a generic boolean model for the control of the mammalian cell cycle. Bioinformatics, 22(14):e124–e131, 2006.
 
 clear all
 clc
@@ -34,7 +54,7 @@ endfunction
 function y=f_patho(x,k)
     y=[
     x(1,k);#CycD
-    max([min([1-x(1,k),1-x(4,k),1-x(5,k),1-x(10,k)]),min([x(6,k),1-x(1,k),1-x(10,k)])]);#Rb
+    0;#Rb
     max([min([1-x(2,k),1-x(5,k),1-x(10,k)]),min([x(6,k),1-x(2,k),1-x(10,k)])]);#E2F
     min([x(3,k),1-x(2,k)]);#CycE
     max([min([x(3,k),1-x(2,k),1-x(7,k),1-min([x(8,k),x(9,k)])]),min([x(5,k),1-x(2,k),1-x(7,k),1-min([x(8,k),x(9,k)])])]);#CycA
