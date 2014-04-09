@@ -1,4 +1,4 @@
-!Copyright (c) 2013, Arnaud Poret
+!Copyright (c) 2013-2014, Arnaud Poret
 !All rights reserved.
 module lib
     implicit none
@@ -425,7 +425,7 @@ module lib
     !##########################################################################!
     subroutine print_license()
         implicit none
-        write (unit=*,fmt="(a)") new_line("a")//'Copyright (c) 2013, Arnaud Poret'//new_line("a")//&
+        write (unit=*,fmt="(a)") new_line("a")//'Copyright (c) 2013-2014, Arnaud Poret'//new_line("a")//&
         'All rights reserved.'//new_line("a")//new_line("a")//&
         'Redistribution and use in source and binary forms, with or without modification,'//new_line("a")//&
         'are permitted provided that the following conditions are met:'//new_line("a")//new_line("a")//&
@@ -692,7 +692,7 @@ end module lib
 !#############################    BSD 3-Clause    #############################!
 !##############################################################################!
 
-!Copyright (c) 2013, Arnaud Poret
+!Copyright (c) 2013-2014, Arnaud Poret
 !All rights reserved.
 
 !Redistribution and use in source and binary forms, with or without modification,

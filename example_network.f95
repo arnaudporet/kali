@@ -1,4 +1,4 @@
-!Copyright (c) 2013, Arnaud Poret
+!Copyright (c) 2013-2014, Arnaud Poret
 !All rights reserved.
 
 !read the following comments, fill the following template, open a terminal, past this command and press Enter: cd ~/kali-targ/ && gfortran lib.f95 example_network.f95 -o example_network && ./example_network
@@ -93,7 +93,7 @@ end program example_network
 !#############################    BSD 3-Clause    #############################!
 !##############################################################################!
 
-!Copyright (c) 2013, Arnaud Poret
+!Copyright (c) 2013-2014, Arnaud Poret
 !All rights reserved.
 
 !Redistribution and use in source and binary forms, with or without modification,

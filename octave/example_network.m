@@ -1,4 +1,4 @@
-#Copyright (c) 2013, Arnaud Poret
+#Copyright (c) 2013-2014, Arnaud Poret
 #All rights reserved.
 
 #read the following comments, fill the following template, open a terminal, lauch octave, past this command and press Enter: run("~/kali-targ/octave/example_network.m")
@@ -73,7 +73,7 @@ what_to_do("f_physio",V,size_D,max_targ,max_moda,value)
 ##############################    BSD 3-Clause    ##############################
 ################################################################################
 
-#Copyright (c) 2013, Arnaud Poret
+#Copyright (c) 2013-2014, Arnaud Poret
 #All rights reserved.
 
 #Redistribution and use in source and binary forms, with or without modification,
