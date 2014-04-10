@@ -31,7 +31,7 @@ The algorithm was tested on a published boolean model of the mammalian cell cycl
 Under the assumption linking dynamical system attractors and biological network phenotypes, the results showed that the algorithm succeeds in performing the proposed \textit{in silico} target identification. However, as with any \textit{in silico} evidence, it should be considered as such: there is a bridge to cross between theory and practice. Nevertheless, it is expected that the algorithm will take its place in, and contribute to, work done in target identification.
 \end{abstract}
 
-\section*{Background}
+\section{Background}
 Target discovery aims at identifying new effective drugs against diseases. This process can be segmented into three steps \cite{lindsay2003target}: i) disease model provision, where experimental models of the disease are developed, ii) target identification, where new therapeutic targets are proposed and iii) target validation, where the proposed therapeutic targets are assessed. The present work focuses on the second step of target discovery: target identification.
 
 Given an organism suffering from a disease, it aims at finding where to act among its multitude of biomolecules in order to alleviate, or ultimately to cure, the physiological consequences of the disease, hence improving the life quality or quantity of the ill organism \cite{knowles2003target}. These biomolecules on which perturbations should be applied are called targets and are targeted by drugs \cite{imming2006drugs}. This raises two questions: which target should be therapeutically perturbed and what type of perturbation should be applied to it. These two questions can be unified by stating that the perturbation aims at modifying the biological function of the target thanks to its interaction with a drug. Broadly, the functional modification of a target by a drug can be either activating or inactivating, regardless of the way the drug achieves it.
@@ -44,14 +44,14 @@ For a biological network involved in a disease pathophysiology, two possible var
 
 The primary goal of the algorithm is to identify, in the pathological variant, target combinations together with the kind of perturbation to apply to them, here called bullets, which make it unable to produce pathological phenotypes. The secondary goal is to classify the obtained bullets according to their ability to make the pathological variant produce the lost physiological phenotypes, if any.
 
-\section*{Methods}
-\subsection*{Preliminaries}
+\section{Methods}
+\subsection{Preliminaries}
 This section briefly introduces biological networks \cite{zhu2007getting} and boolean networks \cite{saadatpour2012boolean}.
 
-\subsubsection*{Biological networks}
+\subsubsection{Biological networks}
 A network can be seen as a graph $G=(V,E)$ where $V=\lbrace v_1,\dots,v_n\rbrace$ is the set of size $n$ containing exactly all the nodes $v_i$ of the network and where $E=\lbrace (v_{i,1},v_{j,1}),\dots,(v_{i,m},v_{j,m})\rbrace \subseteq V^2$ is the set of size $m$ containing exactly all the edges $(v_{i},v_{j})$ of the network. In practice, nodes represent things and edges represent binary relations $R\subseteq V^2$ involving these things: $v_{i}$ $R$ $v_{j}$. In biological networks, nodes should represent biological entities and edges should represent biological relations. For example, in gene regulatory networks, nodes represent gene products and edges represent gene expression modulation.
 
-\subsubsection*{Boolean networks}
+\subsubsection{Boolean networks}
 A boolean network is a network where nodes are boolean variables $x_i$ and where edges $(x_{i},x_{j})$ represent the binary $is\ input\ of$ relation: $x_{i}$ $is\ input\ of$ $x_{j}$. Each $x_i$ has $b_i\in [\![0,n]\!]$ inputs $x_{i,1},\dots,x_{i,b_i}$ and the variables which are not input of $x_{i}$ have no direct influence on it. In the case where $b_{i}=0$, $x_i$ is a parameter: it does not depend on other variables. At each iteration $k\in [\![k_0,k_{end}]\!]$ of the computation, the value $x_{i}(k)\in \lbrace 0,1\rbrace$ of each $x_i$ is updated to the value $x_{i}(k+1)$ thanks to a boolean function $f_i$ and to the values $x_{i,1}(k),\dots,x_{i,b_i}(k)$ of its inputs:
 \begin{algorithmic}[1]
 \FOR{$k\in [\![k_0,k_{end}-1]\!]$}
@@ -74,7 +74,7 @@ This iterative computation can be seen as the discretization of a time interval:
 
 The set $A=\lbrace a_1,\dots,a_p\rbrace$ of size $p$ containing exactly all the attractors $a_i$ is the attractor set. Due to the determinism of synchronous boolean networks, all the attractors are cycles. A cycle is a sequence $(\boldsymbol{x}_{1},\dots,\boldsymbol{x}_{q})$ of length $q$ such that $\forall j\in [\![1,q]\!]$, $\boldsymbol{x}_{j+1}=\boldsymbol{f}(\boldsymbol{x}_{j})$ and $\boldsymbol{x}_{q+1}=\boldsymbol{x}_{1}$: once the system reach a state $\boldsymbol{x}_{j}$ belonging to a cycle, it will successively visit its states $\boldsymbol{x}_{j+1},\dots,\boldsymbol{x}_{q},\boldsymbol{x}_{1},\dots,\boldsymbol{x}_{j}$ for infinity. In the particular case where $q=1$, the cycle is a point attractor. The set $B_i\subseteq S$ containing exactly all the $\boldsymbol{x}\in S$ from which $a_i$ can be reached is its basin of attraction. With deterministic dynamical systems such as synchronous boolean networks, the family of sets $(B_1,\dots,B_p)$ is a partition of $S$.
 
-\subsection*{Definitions}
+\subsection{Definitions}
 Some particular concepts used in this work should be formally defined. Given a synchronous boolean network modeling the dynamic of a biological network bore by an organism:
 \begin{itemize}
 \item \emph{physiological phenotype}: a phenotype which does not impair the quantity or quality of life of the organism which exhibits it.
@@ -99,7 +99,7 @@ Some particular concepts used in this work should be formally defined. Given a s
 
 The assumed link between phenotypes and attractors is the reason why attractors are qualified as either physiological or pathological according to the phenotype they produce and the reason why target identification aims at manipulating the attractor set of the pathological variant.
 
-\subsection*{The main steps of the algorithm}
+\subsection{The main steps of the algorithm}
 The algorithm has two goals: i) finding therapeutic bullets and ii) classifying them as either golden or silver. A therapeutic bullet is intended to make the pathological variant unable to reach pathological attractors, that is to make $A_{patho}\subseteq A_{physio}$. If such a bullet is applied to the pathological variant, the organism bearing it no longer exhibits the associated pathological phenotypes: this is the primary goal. However, a therapeutic bullet does not necessarily preserve or restore all the physiological attractors. If a therapeutic bullet preserves or restores all the physiological attractors, that is if $A_{patho}=A_{physio}$, it is a golden one but if $A_{patho}\varsubsetneq A_{physio}$ it is a silver one: this classification is the secondary goal.
 
 To do this, given a physiological and a pathological variant, that is $\boldsymbol{f}_{physio}$ and $\boldsymbol{f}_{patho}$, the algorithm follows five main steps:
@@ -127,7 +127,7 @@ which can be written:
 \ENDFOR
 \end{algorithmic}
 
-\subsubsection*{Step 1: computing $A_{physio}$}
+\subsubsection{Step 1: computing $A_{physio}$}
 First of all, $A_{physio}$ has to be computed since it is used as the control and hence determines what is pathological and what is not. To this end, runs are performed with $\boldsymbol{f}_{physio}$ and the reached $a_i$ are stored in $A_{physio}$. However, $\boldsymbol{x}_0\in S$ and $size(S)$ increases exponentially with $n$. Even for a reasonable $n$, $size(S)$ explodes: more than one million of possible $\boldsymbol{x}_0$ for $n=20$. One solution ensuring that all the possible $a_i$ are reached is to start a run from each of the possible $\boldsymbol{x}_0$, that is from each of the $\boldsymbol{x}\in S$. In practice this is not feasible for an arbitrary $n$ because the required computational resources can be too demanding. For example, assuming that a run requires one second of computation and assuming that $n=50$, performing a run starting from each of the $2^{50}$ $\boldsymbol{x}\in S$ requires nearly 36 million years, definitively not a practical duration. However, given that with deterministic dynamical systems such as synchronous boolean networks $(B_1,\dots,B_p)$ is a partition of $S$, a solution is to randomly select a subset $D\subseteq S$ of a given size containing the $\boldsymbol{x}_0$ to start from. In order to avoid bias in the random selection, a uniform distribution should be used. The stumbling block of this solution is that it does not ensure that at least one $\boldsymbol{x}_0$ per $B_i$ is selected and then it does not ensure that all the $a_i$ are reached. This stumbling block holds only if $size(D)<size(S)$.
 
 Again given that synchronous boolean networks are deterministic, if a run visits a state which has already been visited during a previous run, its destination, that is the attractor it will reach, has already been found. Hence, the run can be immediately stopped and the algorithm can directly jump to the next one. To implement this, the previous trajectories are stored in a set $H$, the history, and at each $k$ the algorithm checks if $\exists w\in H: \boldsymbol{x}(k)\in w$. If this check is positive then the algorithm jumps to the next run.
@@ -162,7 +162,7 @@ This step can be written:
 \end{algorithmic}
 Line 2 catches the mistake $size(D)>size(S)$. It should be noted that more sophisticated algorithms intended to find boolean network attractors are already available, such as the ones proposed by Zheng \textit{et al} \cite{zheng2013efficient}.
 
-\subsubsection*{Step 2: generating bullets}
+\subsubsection{Step 2: generating bullets}
 The bullets are the candidate perturbations to apply to the pathological variant to make it unable to reach pathological attractors and hence to make it unable to produce pathological phenotypes. Generating a bullet is to choose some $targ_i\in V$ and to choose for each of them a $moda_i\in \lbrace 0,1\rbrace$. In this work there is no time sequencing in the target engagement nor in the modality choice. This means that, given a bullet and during a run, all the $targ_i$ are engaged simultaneously and constantly and that the $moda_i$ do not change during the run. Hence, in this setting, choosing more than once the same $targ_i$ is senseless while it is possible to choose the same $moda_i$ for more than one $targ_i$. Therefore, a bullet is a combination $c_{targ}$ without repetition of $targ_i$ together with an arrangement $c_{moda}$ with repetition of $moda_i$. If bullets containing $r$ targets have to be generated then there are $n!/(r!\cdot (n-r)!)$ possible $c_{targ}$ and for each of them there are $2^{r}$ possible $c_{moda}$. This raises the same computational problem as with the state space size explosion since there are $(n!\cdot 2^{r})/(r!\cdot (n-r)!)$ possible bullets. For example, assuming that $n=50$ and that $r=3$, there are more than 150 thousand possible bullets. Knowing that the algorithm, as explained below, computes one attractor set per bullet, the computation time becomes practically unfeasible. To overcome this, the algorithm asks for $r$ as an interval $[\![r_{min},r_{max}]\!]$, asks for a maximum number $max_{targ}$ of $c_{targ}$ to generate and a maximum number $max_{moda}$ of $c_{moda}$ to test for each $c_{targ}$. Then the algorithm generates a set $C_{targ}$ of $c_{targ}$ with $size(C_{targ})\leq max_{targ}$ by randomly selecting, along a uniform distribution and without repetition, entities in the network. In the same way, the algorithm generates a set $C_{moda}$ of $c_{moda}$ with $size(C_{moda})\leq max_{moda}$ by randomly choosing, along a uniform distribution and with repetition, modalities as either activating ($=1$) or inactivating ($=0$). The result is the bullets: per $r\in[\![r_{min},r_{max}]\!]$, a $C_{targ}$ together with a $C_{moda}$. As with the state space size explosion, the stumbling block of this method is that it does not ensure that all the possible $c_{targ}$ together with all the possible $c_{moda}$ are tested. This stumbling block holds only if $max_{targ}<n!/(r!\cdot (n-r)!)$ or $max_{moda}<2^{r}$.
 
 This step can be written:
@@ -191,7 +191,7 @@ This step can be written:
 \end{algorithmic}
 Line 2 catches the mistake $r>n$. Lines 3--4 create the sets in which the therapeutic bullets which will be found during the step 4 will be classified as either golden or silver during the step 5. Lines 6--7 catch the mistake where $max_{targ}$ or $max_{moda}$ is greater than its maximum, which depends on $r$ hence the creation of $max_{targ}^{r}$ or $max_{moda}^{r}$ to preserve the original supplied value. Lines 11,15 ensure that only novel $c_{targ}$ and $c_{moda}$ are generated.
 
-\subsubsection*{Step 3: computing $A_{patho}$}
+\subsubsection{Step 3: computing $A_{patho}$}
 Having the control attractor set $A_{physio}$ and a bullet $(c_{targ},c_{moda})\in C_{targ}\times C_{moda}$, the algorithm computes the variant attractor set $A_{patho}$ under the effect of the bullet by almost the same way $A_{physio}$ was computed during the step 1. However, in this step, $\boldsymbol{f}_{patho}$ is used instead of $\boldsymbol{f}_{physio}$ and the bullet is applied: at each $k$, $f_j(\boldsymbol{x}(k))$ is overwritten by $moda_i\in c_{moda}$, that is $x_j(k+1)=moda_i$, provided that $v_j=targ_i\in c_{targ}$.
 
 In order to apply all the generated bullets, the algorithm uses two nested $for$ loops: for each $c_{targ}\in C_{targ}$ it uses successively all the $c_{moda}\in C_{moda}$: $C_{moda}$ contains all the $c_{moda}$ to test for each $c_{targ}\in C_{targ}$. For each of these couples $(c_{targ},c_{moda})$ the algorithm computes the corresponding $A_{patho}$ and does the steps 4 and 5.
@@ -231,7 +231,7 @@ This step can be written:
 \end{algorithmic}
 Lines 13--19 are where the bullet is applied.
 
-\subsubsection*{Step 4: identifying therapeutic bullets}
+\subsubsection{Step 4: identifying therapeutic bullets}
 To identify therapeutic bullets among the generated ones, for each tested bullet in the step 3 and once the corresponding $A_{patho}$ is obtained, the algorithm compares it with $A_{physio}$ to check if $A_{patho}\subseteq A_{physio}$. This check ensures that, under the effect of the bullet, all the pathological attractors were removed and ensures that if new attractors have appeared they are physiological ones. If this check is positive then the bullet is a therapeutic one and the algorithm pursues with the step 5.
 
 This step can be written:
@@ -241,7 +241,7 @@ This step can be written:
 \ENDIF
 \end{algorithmic}
 
-\subsubsection*{Step 5: assessing therapeutic bullets}
+\subsubsection{Step 5: assessing therapeutic bullets}
 The therapeutic bullets are qualified as either silver or golden according to their ability at making the pathological variant able to reach the physiological attractors. Indeed, all therapeutic bullets, either golden or silver, are primarily intended to remove all the pathological attractors without creating new ones, that is to make $A_{patho}\subseteq A_{physio}$. However, this does not imply that all the therapeutic bullets preserve or restore the physiological attractors. This is why they are classified as either golden or silver. A golden bullet preserves or restores all the physiological attractors: $A_{patho}=A_{physio}$ while a silver bullet does not: $A_{patho}\varsubsetneq A_{physio}$.
 
 Hence, in the setting of synchronous boolean modeling, golden bullets are perfect therapies while silver bullets are not. However, since precious things are rare and since gold is rarer than silver, finding a golden bullet is less likely than finding a silver one. Indeed, given that more constraints are required for a therapeutic bullet to be a golden one, it is more likely that the identified therapeutic bullets are silver ones.
@@ -257,7 +257,7 @@ This step can be written:
 \ENDIF
 \end{algorithmic}
 
-\subsection*{The working example}
+\subsection{The working example}
 To test the algorithm and to illustrate its capacities, it was applied on a published boolean model of the mammalian cell cycle \cite{faure2006dynamical}. This model was chosen for several reasons: i) the authors have done a synchronous computation of their boolean network: synchronous boolean networks are the study objects of the present work, ii) their boolean network models a mammalian biological system: the closer to human physiology the model is the better it illustrates the intended applications, iii) the cell cycle is a biological system at the heart of cancer, a widespread and severe disease in human health: this makes the working example more relevant, iv) their network comprises ten nodes: easily computable in the face of the corresponding state space and v) the authors have already computed the attractors of their boolean network: useful to validate the algorithm in computing attractors.
 
 Below are the boolean functions describing their boolean network where, for the sake of readability, $x_i$ stands for $x_{i}(k)$ and $x_{i+}$ stands for $x_{i}(k+1)$.
@@ -279,13 +279,13 @@ CycB_{+}&=&\lnot Cdc20 \land \lnot Cdh1
 Having the example network, two variants of it are needed: the physiological one and the pathological one. The physiological variant is the network as is while the pathological variant is the network plus a constitutive activation or inactivation of at least one of its entities. For simplicity, and given the relatively small number of entities in the network, only one was chosen: the retinoblastoma protein $Rb$ for which a constitutive inactivation is applied. To implement this in the pathological variant, the corresponding $f_i$ becomes $Rb_{+}=0$ in $\boldsymbol{f}_{patho}$.
 $Rb$ was chosen because its inactivation occurs in many cancers \cite{sherr2002rb} and hence a network bearing a constitutive inactivation of it should be a good example of a pathological variant.
 
-\subsection*{The implementation}
+\subsection{The implementation}
 The algorithm was implemented in Fortran 95 and compiled with GFortran\footnote{\url{https://www.gnu.org/software/gcc/fortran/}}. The sources can be found on GitHub\footnote{\url{https://github.com/}} at \url{https://github.com/arnaudporet/kali-targ}.
 
-\section*{Results and discussion}
+\section{Results and discussion}
 This section exposes the results of the five main steps of the algorithm applied on the physiological and pathological variants of the working example.
 
-\subsection*{Results of step 1}
+\subsection{Results of step 1}
 $size(D)$ was set to $50$ and the algorithm returned the two following attractors:
 \begin{equation*}
 a_{1}=
@@ -321,7 +321,7 @@ CycB:&0
 The attractors are represented as matrices where, for an attractor of length $q$, lines correspond to the $x_i(k), k\in [\![1,q]\!]$ and where columns correspond to the $\boldsymbol{x}(k)$.
 Hence $A_{physio}=\lbrace a_{1},a_{2}\rbrace$ which corresponds to what the authors have computed. By the way, $a_{1}$ and $a_{2}$ are the two physiological attractors. In term of phenotypes, $a_{1}$ corresponds to the accomplishment of a normal cell cycle while $a_{2}$ corresponds to quiescence.
 
-\subsection*{Results of steps 2 to 5}
+\subsection{Results of steps 2 to 5}
 The results of the steps 2 to 5 were grouped because only the therapeutic bullets found in the step 4 and classified in the step 5 are returned to the user by the algorithm. The algorithm was launched with $r_{min}=1$, $r_{max}=2$, $max_{targ}=50$, $max_{moda}=50$ and returned the following therapeutic bullets:
 \begin{equation*}
 \begin{matrix}
@@ -384,7 +384,7 @@ CycB:&0
 \end{equation*}
 which is $a_{2}$. Hence, as expected for a therapeutic bullet, the pathological attractor $a_{3}$ was removed, but the physiological attractor $a_{1}$ was not restored: the third bullet is then a silver one. Consequently, with this bullet, no cell cycle occurs, being normal or degenerated, and the only reachable phenotype is quiescence. While disabling the cell cycle of cancer cells is beneficial to the ill organism, what about disabling the cell cycle of its normal cell. As mentioned above, with silver bullets this is a matter of choice between a silver bullet and no therapeutic bullet.
 
-\section*{Conclusions}
+\section{Conclusions}
 Under the assumption stating that dynamical system attractors and biological network phenotypes are linked when the first one models the second one, the results have shown that the algorithm succeed in performing the proposed \textit{in silico} target identification by returning four effective therapeutic bullets for a pathological variant of the mammalian cell cycle relevant in diseases such as cancer. Consequently, it can be used on other synchronous boolean models of biological networks involved in disease pathophysiologies for \textit{in silico} target identification provided that the physiological and pathological variants are known. However, one should keep in mind that the findings produced by the algorithm are conditional upon the validity of the assumption linking attractors and phenotypes.
 
 It should be noted that target identification, being \textit{in silico} or not, is a piece belonging to a wider machinery: target discovery. Indeed, having an \textit{in silico} demonstrated potential target implies that further work has to be done to obtain a drug which will be effective \textit{in vivo}. Among other characteristics, such a drug has to be absorbed by the organism, has to reach its target and has to be non-toxic at therapeutic dosages. Furthermore, as with any \textit{in silico} evidence, it should be validated in practice: there is a bridge to cross between theory and practice. Nevertheless, the present algorithm is expected to find a place in, and to contribute to, the endeavors done in therapeutic researches.
