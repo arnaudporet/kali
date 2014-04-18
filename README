@@ -16,6 +16,6 @@ cell cycle published by Adrien Faure et al: Aurelien Naldi, Claudine Chaouiya,
 and Denis Thieffry. Dynamical analysis of a generic boolean model for the
 control of the mammalian cell cycle. Bioinformatics, 22(14):e124–e131, 2006.
 
-The algorithm was developed in octave for more convenience and then implemented
-in fortran for more performance. The octave implementation is available in the
+The algorithm was developed in GNU Octave for convenience and then implemented
+in Fortran for performance. The GNU Octave implementation is available in the
 octave folder of the present project.
