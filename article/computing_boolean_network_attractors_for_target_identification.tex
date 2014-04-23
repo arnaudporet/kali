@@ -99,7 +99,7 @@ Some particular concepts used in this work should be formally defined. Given a s
 
 The assumed link between phenotypes and attractors is the reason why attractors are qualified as either physiological or pathological according to the phenotype they produce and the reason why target identification aims at manipulating the attractor set of the pathological variant.
 
-\subsection{The main steps of the algorithm}
+\subsection{Steps of the algorithm}
 The algorithm has two goals: i) finding therapeutic bullets and ii) classifying them as either golden or silver. A therapeutic bullet is intended to make the pathological variant unable to reach pathological attractors, that is to make $A_{patho}\subseteq A_{physio}$. If such a bullet is applied to the pathological variant, the organism bearing it no longer exhibits the associated pathological phenotypes: this is the primary goal. However, a therapeutic bullet does not necessarily preserve or restore all the physiological attractors. If a therapeutic bullet preserves or restores all the physiological attractors, that is if $A_{patho}=A_{physio}$, it is a golden one but if $A_{patho}\varsubsetneq A_{physio}$ it is a silver one: this classification is the secondary goal.
 
 To do this, given a physiological and a pathological variant, that is $\boldsymbol{f}_{physio}$ and $\boldsymbol{f}_{patho}$, the algorithm follows five main steps:
@@ -257,7 +257,7 @@ This step can be written:
 \ENDIF
 \end{algorithmic}
 
-\subsection{The working example}
+\subsection{Working example}
 To test the algorithm and to illustrate its capacities, it was applied on a published boolean model of the mammalian cell cycle \cite{faure2006dynamical}. This model was chosen for several reasons: i) the authors have done a synchronous computation of their boolean network: synchronous boolean networks are the study objects of the present work, ii) their boolean network models a mammalian biological system: the closer to human physiology the model is the better it illustrates the intended applications, iii) the cell cycle is a biological system at the heart of cancer, a widespread and severe disease in human health: this makes the working example more relevant, iv) their network comprises ten nodes: easily computable in the face of the corresponding state space and v) the authors have already computed the attractors of their boolean network: useful to validate the algorithm in computing attractors.
 
 Below are the boolean functions describing their boolean network where, for the sake of readability, $x_i$ stands for $x_{i}(k)$ and $x_{i+}$ stands for $x_{i}(k+1)$.
@@ -279,14 +279,14 @@ CycB_{+}&=&\lnot Cdc20 \land \lnot Cdh1
 Having the example network, two variants of it are needed: the physiological one and the pathological one. The physiological variant is the network as is while the pathological variant is the network plus a constitutive activation or inactivation of at least one of its entities. For simplicity, and given the relatively small number of entities in the network, only one was chosen: the retinoblastoma protein $Rb$ for which a constitutive inactivation is applied. To implement this in the pathological variant, the corresponding $f_i$ becomes $Rb_{+}=0$ in $\boldsymbol{f}_{patho}$.
 $Rb$ was chosen because its inactivation occurs in many cancers \cite{sherr2002rb} and hence a network bearing a constitutive inactivation of it should be a good example of a pathological variant.
 
-\subsection{The implementation}
+\subsection{Implementation}
 The algorithm was implemented in Fortran 95 and compiled with GFortran\footnote{\url{https://www.gnu.org/software/gcc/fortran/}}. The sources can be found on GitHub\footnote{\url{https://github.com/}} at \url{https://github.com/arnaudporet/kali-targ}.
 
 \section{Results and discussion}
-This section exposes the results of the five main steps of the algorithm applied on the physiological and pathological variants of the working example.
+This section exposes the results of the five steps of the algorithm applied to the physiological and pathological variants of the working example.
 
 \subsection{Results of step 1}
-$size(D)$ was set to $50$ and the algorithm returned the two following attractors:
+Thanks to the relatively small size of $S$ in this example, $size(D)$ was set to $size(S)=1024$. The algorithm returned the two following attractors:
 \begin{equation*}
 a_{1}=
 \begin{matrix}
