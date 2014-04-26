@@ -9,16 +9,21 @@
 \usepackage{amssymb}
 \usepackage{algorithmic}
 \usepackage{url}
+\usepackage{IEEEtrantools}
+\usepackage[utf8]{inputenc}
 
 \algsetup{indent=2em}
 \algsetup{linenodelimiter=}
+
+\renewcommand{\algorithmicrequire}{\textbf{input}}
+\renewcommand{\algorithmicensure}{\textbf{output}}
+
+\begin{document}
 
 \title{Computing boolean network attractors for target identification}
 \author{Arnaud Poret\footnote{Copyright (c) 2013-2014, Arnaud Poret. All rights reserved. arnaud.poret@gmail.com}}
 \date{}
 \pagestyle{headings}
-
-\begin{document}
 
 \maketitle
 \tableofcontents
@@ -26,7 +31,7 @@
 \begin{abstract}
 Target identification aims at identifying, in pathologically disturbed biological systems, biomolecules whose function should be therapeutically modified in order to alleviate, or ultimately cure, the physiological consequences of the corresponding pathology. In an attempt to improve the efforts made in this area thanks to \textit{in silico} tools, an algorithm based on the computation of boolean network attractors is proposed. It assumes that the attractors of a dynamical system, such as a boolean network, correspond to the phenotypes produced by the modeled biological network. Under this assumption, the algorithm identifies target combinations together with the therapeutic modifications to be applied to them, here called bullets, which allow pathologically disturbed biological networks to avoid attractors responsible for pathological phenotypes.
 
-The algorithm was tested on a published boolean model of the mammalian cell cycle where the retinoblastoma protein was constituvely inactivated as seen in diseases such as cancer. It returned four effective bullets able to remove the attractors responsible for pathological phenotypes, that is the attractors not reached by the non-pathologically disturbed biological network.
+The algorithm was tested on a published boolean model of the mammalian cell cycle where the retinoblastoma protein was constitutively inactivated as seen in diseases such as cancer. It returned four effective bullets able to remove the attractors responsible for pathological phenotypes, that is the attractors not reached by the non-pathologically disturbed biological network.
 
 Under the assumption linking dynamical system attractors and biological network phenotypes, the results showed that the algorithm succeeds in performing the proposed \textit{in silico} target identification. However, as with any \textit{in silico} evidence, it should be considered as such: there is a bridge to cross between theory and practice. Nevertheless, it is expected that the algorithm will take its place in, and contribute to, work done in target identification.
 \end{abstract}
@@ -136,7 +141,7 @@ Identifying the attractors is relatively easy with deterministic dynamical syste
 
 This step can be written:
 \begin{algorithmic}[1]
-\STATE ask for $size(D)$
+\REQUIRE $size(D)$
 \STATE $size(D)=min(size(D),2^n)$
 \STATE generate $D\subseteq S$
 \STATE $H=\lbrace \rbrace$
@@ -157,7 +162,7 @@ This step can be written:
     \ENDWHILE
     \STATE $H=H\cup \lbrace (\boldsymbol{x}(1),\dots ,\boldsymbol{x}(k))\rbrace$
 \ENDFOR
-\RETURN $A_{physio}$
+\ENSURE $A_{physio}$
 \STATE do step 2
 \end{algorithmic}
 Line 2 catches the mistake $size(D)>size(S)$. It should be noted that more sophisticated algorithms intended to find boolean network attractors are already available, such as the ones proposed by Zheng \textit{et al} \cite{zheng2013efficient}.
@@ -167,7 +172,7 @@ The bullets are the candidate perturbations to apply to the pathological variant
 
 This step can be written:
 \begin{algorithmic}[1]
-\STATE ask for $r_{min},r_{max},max_{targ},max_{moda}$
+\REQUIRE $r_{min},r_{max},max_{targ},max_{moda}$
 \STATE $r_{max}=min(r_{max},n)$
 \STATE $golden\_set=\lbrace \rbrace$
 \STATE $silver\_set=\lbrace \rbrace$
@@ -186,8 +191,8 @@ This step can be written:
     \ENDWHILE
     \STATE do steps 3 to 5
 \ENDFOR
-\RETURN $golden\_set$
-\RETURN $silver\_set$
+\ENSURE $golden\_set$
+\ENSURE $silver\_set$
 \end{algorithmic}
 Line 2 catches the mistake $r>n$. Lines 3--4 create the sets in which the therapeutic bullets which will be found during the step 4 will be classified as either golden or silver during the step 5. Lines 6--7 catch the mistake where $max_{targ}$ or $max_{moda}$ is greater than its maximum, which depends on $r$ hence the creation of $max_{targ}^{r}$ or $max_{moda}^{r}$ to preserve the original supplied value. Lines 11,15 ensure that only novel $c_{targ}$ and $c_{moda}$ are generated.
 
@@ -257,12 +262,95 @@ This step can be written:
 \ENDIF
 \end{algorithmic}
 
+\subsection{The algorithm in one block}
+The algorithm was described step by step for the sake of clarity. Below is the algorithm in one block.
+\begin{algorithmic}[1]
+\REQUIRE $size(D)$
+\STATE $size(D)=min(size(D),2^n)$
+\STATE generate $D\subseteq S$
+\STATE $H=\lbrace \rbrace$
+\STATE $A_{physio}=\lbrace \rbrace$
+\FOR{$x_0\in D$}
+    \STATE $k=1$
+    \STATE $\boldsymbol{x}(1)=x_0$
+    \WHILE{$1$}
+        \IF{$\exists w\in H: \boldsymbol{x}(k)\in w$}
+            \STATE \textbf{break}
+        \ENDIF
+        \STATE $\boldsymbol{x}(k+1)=\boldsymbol{f}_{physio}(\boldsymbol{x}(k))$
+        \IF{$\exists k'\in [\![1,k]\!]: \boldsymbol{x}(k+1)=\boldsymbol{x}(k')$}
+            \STATE $A_{physio}=A_{physio}\cup \lbrace (\boldsymbol{x}(k'),\dots ,\boldsymbol{x}(k))\rbrace$
+            \STATE \textbf{break}
+        \ENDIF
+        \STATE $k=k+1$
+    \ENDWHILE
+    \STATE $H=H\cup \lbrace (\boldsymbol{x}(1),\dots ,\boldsymbol{x}(k))\rbrace$
+\ENDFOR
+\ENSURE $A_{physio}$
+\REQUIRE $r_{min},r_{max},max_{targ},max_{moda}$
+\STATE $r_{max}=min(r_{max},n)$
+\STATE $golden\_set=\lbrace \rbrace$
+\STATE $silver\_set=\lbrace \rbrace$
+\FOR{$r\in [\![r_{min},r_{max}]\!]$}
+    \STATE $max_{targ}^{r}=min(max_{targ},n!/(r!\cdot (n-r)!))$
+    \STATE $max_{moda}^{r}=min(max_{moda},2^{r})$
+    \STATE $C_{targ}=\lbrace \rbrace$
+    \STATE $C_{moda}=\lbrace \rbrace$
+    \WHILE{$size(C_{targ})<max_{targ}^{r}$}
+        \STATE generate $c_{targ}\notin C_{targ}$
+        \STATE $C_{targ}=C_{targ}\cup \lbrace c_{targ}\rbrace$
+    \ENDWHILE
+    \WHILE{$size(C_{moda})<max_{moda}^{r}$}
+        \STATE generate $c_{moda}\notin C_{moda}$
+        \STATE $C_{moda}=C_{moda}\cup \lbrace c_{moda}\rbrace$
+    \ENDWHILE
+    \FOR{$c_{targ}\in C_{targ}$}
+        \FOR{$c_{moda}\in C_{moda}$}
+            \STATE $H=\lbrace \rbrace$
+            \STATE $A_{patho}=\lbrace \rbrace$
+            \FOR{$x_0\in D$}
+                \STATE $k=1$
+                \STATE $\boldsymbol{x}(1)=x_0$
+                \WHILE{$1$}
+                    \IF{$\exists w\in H: \boldsymbol{x}(k)\in w$}
+                        \STATE \textbf{break}
+                    \ENDIF
+                    \STATE $\boldsymbol{x}(k+1)=\boldsymbol{f}_{patho}(\boldsymbol{x}(k))$
+                    \FOR{$targ_i\in c_{targ}$}
+                        \FOR{$v_j\in V$}
+                            \IF{$v_j=targ_i$}
+                                \STATE $x_j(k+1)=moda_i$
+                            \ENDIF
+                        \ENDFOR
+                    \ENDFOR
+                    \IF{$\exists k'\in [\![1,k]\!]: \boldsymbol{x}(k+1)=\boldsymbol{x}(k')$}
+                        \STATE $A_{patho}=A_{patho}\cup \lbrace (\boldsymbol{x}(k'),\dots ,\boldsymbol{x}(k))\rbrace$
+                        \STATE \textbf{break}
+                    \ENDIF
+                    \STATE $k=k+1$
+                \ENDWHILE
+                \STATE $H=H\cup \lbrace (\boldsymbol{x}(1),\dots ,\boldsymbol{x}(k))\rbrace$
+            \ENDFOR
+            \IF{$A_{patho}\subseteq A_{physio}$}
+                \IF{$A_{patho}=A_{physio}$}
+                    \STATE $golden\_set=golden\_set\cup \lbrace (c_{targ},c_{moda})\rbrace$
+                \ELSE
+                    \STATE $silver\_set=silver\_set\cup \lbrace (c_{targ},c_{moda})\rbrace$
+                \ENDIF
+            \ENDIF
+        \ENDFOR
+    \ENDFOR
+\ENDFOR
+\ENSURE $golden\_set$
+\ENSURE $silver\_set$
+\end{algorithmic}
+
 \subsection{Working example}
 To test the algorithm and to illustrate its capacities, it was applied on a published boolean model of the mammalian cell cycle \cite{faure2006dynamical}. This model was chosen for several reasons: i) the authors have done a synchronous computation of their boolean network: synchronous boolean networks are the study objects of the present work, ii) their boolean network models a mammalian biological system: the closer to human physiology the model is the better it illustrates the intended applications, iii) the cell cycle is a biological system at the heart of cancer, a widespread and severe disease in human health: this makes the working example more relevant, iv) their network comprises ten nodes: easily computable in the face of the corresponding state space and v) the authors have already computed the attractors of their boolean network: useful to validate the algorithm in computing attractors.
 
 Below are the boolean functions describing their boolean network where, for the sake of readability, $x_i$ stands for $x_{i}(k)$ and $x_{i+}$ stands for $x_{i}(k+1)$.
 {\tiny
-\begin{eqnarray*}
+\begin{IEEEeqnarray*}{lLl}
 CycD_{+}&=&CycD\\
 Rb_{+}&=&(\lnot CycD \land \lnot CycE \land \lnot CycA \land \lnot CycB) \lor (p27 \land \lnot CycD \land \lnot CycB)\\
 E2F_{+}&=&(\lnot Rb \land \lnot CycA \land \lnot CycB) \lor (p27 \land \lnot Rb \land \lnot CycB)\\
@@ -273,7 +361,7 @@ Cdc20_{+}&=&CycB\\
 Cdh1_{+}&=&(\lnot CycA \land \lnot CycB) \lor Cdc20 \lor (p27 \land \lnot CycB)\\
 UbcH10_{+}&=&\lnot Cdh1 \lor (Cdh1 \land UbcH10 \land (Cdc20 \lor CycA \lor CycB))\\
 CycB_{+}&=&\lnot Cdc20 \land \lnot Cdh1
-\end{eqnarray*}
+\end{IEEEeqnarray*}
 }
 
 Having the example network, two variants of it are needed: the physiological one and the pathological one. The physiological variant is the network as is while the pathological variant is the network plus a constitutive activation or inactivation of at least one of its entities. For simplicity, and given the relatively small number of entities in the network, only one was chosen: the retinoblastoma protein $Rb$ for which a constitutive inactivation is applied. To implement this in the pathological variant, the corresponding $f_i$ becomes $Rb_{+}=0$ in $\boldsymbol{f}_{patho}$.
@@ -385,7 +473,7 @@ CycB:&0
 which is $a_{2}$. Hence, as expected for a therapeutic bullet, the pathological attractor $a_{3}$ was removed, but the physiological attractor $a_{1}$ was not restored: the third bullet is then a silver one. Consequently, with this bullet, no cell cycle occurs, being normal or degenerated, and the only reachable phenotype is quiescence. While disabling the cell cycle of cancer cells is beneficial to the ill organism, what about disabling the cell cycle of its normal cell. As mentioned above, with silver bullets this is a matter of choice between a silver bullet and no therapeutic bullet.
 
 \section{Conclusions}
-Under the assumption stating that dynamical system attractors and biological network phenotypes are linked when the first one models the second one, the results shown that the algorithm succeed in performing the proposed \textit{in silico} target identification by returning four effective therapeutic bullets for a pathological variant of the mammalian cell cycle relevant in diseases such as cancer. Consequently, it can be used on other synchronous boolean models of biological networks involved in disease pathophysiologies for \textit{in silico} target identification provided that the physiological and pathological variants are known. However, one should keep in mind that the findings produced by the algorithm are conditional upon the validity of the assumption linking attractors and phenotypes.
+Under the assumption stating that dynamical system attractors and biological network phenotypes are linked when the first one models the second one, the results showed that the algorithm succeed in performing the proposed \textit{in silico} target identification by returning four effective therapeutic bullets for a pathological variant of the mammalian cell cycle relevant in diseases such as cancer. Consequently, it can be used on other synchronous boolean models of biological networks involved in disease pathophysiologies for \textit{in silico} target identification provided that the physiological and pathological variants are known. However, one should keep in mind that the findings produced by the algorithm are conditional upon the validity of the assumption linking attractors and phenotypes.
 
 It should be noted that target identification, being \textit{in silico} or not, is a piece belonging to a wider machinery: target discovery. Indeed, having an \textit{in silico} demonstrated potential target implies that further work has to be done to obtain a drug which will be effective \textit{in vivo}. Among other characteristics, such a drug has to be absorbed by the organism, has to reach its target and has to be non-toxic at therapeutic dosages. Furthermore, as with any \textit{in silico} evidence, it should be validated in practice: there is a bridge to cross between theory and practice. Nevertheless, the present algorithm is expected to find a place in, and to contribute to, the endeavors done in therapeutic researches.
 
