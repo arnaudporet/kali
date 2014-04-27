@@ -400,9 +400,9 @@ module lib
         integer::i1,i2,z,n,m
         select case (setting)
             case (1)
-                set_name="set_physio.txt"
+                set_name="set_physio"
             case (2)
-                set_name="set_patho.txt"
+                set_name="set_patho"
         end select
         open (unit=1,file=set_name,status="old")
         read (unit=1,fmt=*) z
@@ -515,19 +515,19 @@ module lib
         report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//&
         " cycles)"
         write (unit=*,fmt="(a)") report
-        write (unit=*,fmt="(a)") "save="
+        write (unit=*,fmt="(a)") "save? (1/0)"
         read (unit=*,fmt=*) save_
         if (save_==1) then
             select case (setting)
                 case (1)
-                    set_name="set_physio.txt"
-                    report_name="report_physio.txt"
+                    set_name="set_physio"
+                    report_name="report_physio"
                 case (2)
-                    set_name="set_patho.txt"
-                    report_name="report_patho.txt"
+                    set_name="set_patho"
+                    report_name="report_patho"
                 case (3)
-                    set_name="set_physio_versus_patho.txt"
-                    report_name="report_physio_versus_patho.txt"
+                    set_name="set_physio_versus_patho"
+                    report_name="report_physio_versus_patho"
             end select
             s=int2char(size(A_set))//new_line("a")
             do i1=1,size(A_set)
@@ -549,6 +549,7 @@ module lib
             open (unit=1,file=report_name,status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
+            write (unit=*,fmt="(a)") "set saved as: "//set_name//new_line("a")//"report saved as: "//report_name
             deallocate(s,set_name,report_name)
         end if
         deallocate(report)
@@ -583,9 +584,10 @@ module lib
         write (unit=*,fmt="(a)") "save="
         read (unit=*,fmt=*) save_
         if (save_==1) then
-            open (unit=1,file="report_therapeutic_bullet.txt",status="replace")
+            open (unit=1,file="report_therapeutic_bullet",status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
+            write (unit=*,fmt="(a)") "report saved as: report_therapeutic_bullet"
         end if
         deallocate(report)
     end subroutine report_therapeutic_bullet_set
@@ -641,12 +643,14 @@ module lib
         call print_license()
         call init_random_seed()
         call cpu_time(start)
-        write (unit=*,fmt="(a)") "what to do: "//new_line("a")//"    (1) compute attractors"//new_line("a")//&
-        "    (2) compute pathological attractors"//new_line("a")//"    (3) compute therapeutic bullets"
+        write (unit=*,fmt="(a)") "To compute step 2, step 1 has to be already computed with both f_physio and f_patho."//&
+        new_line("a")//"To compute step 3, step 1 has to be already computed with f_physio."//new_line("a")//"What to do: "//&
+        new_line("a")//"    (1) compute attractors"//new_line("a")//"    (2) compute pathological attractors"//new_line("a")//&
+        "    (3) compute therapeutic bullets"//new_line("a")//"    (4) help"
         read (unit=*,fmt=*) to_do
-        if (to_do/=2) then
+        if (to_do/=2 .and. to_do/=4) then
             if (all(value==[0.0,1.0])) then
-                write (unit=*,fmt="(a,es10.3e3,a)") "size(S)=",real(2,8)**real(size(V),8),new_line("a")//"comprehensive_D="
+                write (unit=*,fmt="(a,es10.3e3,a)") "size(S)=",real(2,8)**real(size(V),8),new_line("a")//"comprehensive_D? (1/0)"
                 read (unit=*,fmt=*) comprehensive_D
                 select case (comprehensive_D)
                     case (1)
@@ -682,6 +686,9 @@ module lib
                 therapeutic_bullet_set=compute_therapeutic_bullet(r_min,r_max,max_targ,max_moda,A_physio,f,V,D,value)
                 call report_therapeutic_bullet_set(therapeutic_bullet_set,V)
                 deallocate(A_physio,therapeutic_bullet_set,D)
+            case (4)
+                write (unit=*,fmt="(a)") "1) do step 1 with f_physio"//new_line("a")//"2) do step 1 with f_patho"//new_line("a")//&
+                "3) eventually do step 2"//new_line("a")//"4) do step 3 with f_patho (ensure that 1) and 2) are already done)"
         end select
         call cpu_time(finish)
         write (unit=*,fmt="(a)") "done in "//int2char(int(finish-start))//" seconds"

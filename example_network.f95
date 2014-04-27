@@ -21,7 +21,7 @@
 
 !to cope with boolean and multivalued logic, the Zadeh fuzzy logic operators are used
 
-!at line 46, pass either f_physio or f_patho to the subroutine what_to_do
+!at line 46, pass either f_physio (for computing the physiological attractor set) or f_patho (for computing the phathological attractor set or to compute therapeutic bullets) to the subroutine what_to_do
 
 !this example network is an implementation of a boolean model of the mammalian cell cycle proposed by Adrien Faure et al: Aurelien Naldi, Claudine Chaouiya, and Denis Thieffry. Dynamical analysis of a generic boolean model for the control of the mammalian cell cycle. Bioinformatics, 22(14):e124–e131, 2006.
 
@@ -43,7 +43,7 @@ program example_network
     V(8)="Cdh1"
     V(9)="UbcH10"
     V(10)="CycB"
-    call what_to_do(f_physio,V,max_targ,max_moda,size_D,value)
+    call what_to_do(f_patho,V,max_targ,max_moda,size_D,value)
     deallocate(value,V)
     contains
     !##########################################################################!
