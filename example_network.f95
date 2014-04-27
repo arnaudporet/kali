@@ -19,7 +19,7 @@
 
 !f_patho: the boolean transition function of the pathological variant
 
-!to cope with boolean and multivalued logic, the Zadeh fuzzy logic operators are used
+!to cope with both boolean and multivalued logic, the Zadeh fuzzy logic operators are used
 
 !at line 46, pass either f_physio (for computing the physiological attractor set) or f_patho (for computing the phathological attractor set or to compute therapeutic bullets) to the subroutine what_to_do
 
@@ -43,7 +43,7 @@ program example_network
     V(8)="Cdh1"
     V(9)="UbcH10"
     V(10)="CycB"
-    call what_to_do(f_patho,V,max_targ,max_moda,size_D,value)
+    call what_to_do(f_physio,V,max_targ,max_moda,size_D,value)
     deallocate(value,V)
     contains
     !##########################################################################!

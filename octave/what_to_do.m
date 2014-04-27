@@ -4,8 +4,9 @@
 ###############################    what_to_do    ###############################
 ################################################################################
 function what_to_do(f,V,size_D,max_targ,max_moda,value)
-    todo=menu("what to do: ","compute attractors","compute pathological attractors","compute therapeutic bullets");
-    if todo!=2
+    print_license()
+    todo=menu("what to do: ","compute attractors","compute pathological attractors","compute therapeutic bullets","help");
+    if and(todo!=2,todo!=4)
         if all(value==[0,1],2)
             disp(strcat("size(S)=",num2str(2**numel(V))))
             if yes_or_no("comprehensive D? ")
@@ -32,6 +33,8 @@ function what_to_do(f,V,size_D,max_targ,max_moda,value)
             r_max=input("r_max: ");
             [Targ,Moda,Metal]=compute_therapeutic_bullet(r_min,r_max,max_targ,max_moda,A_physio,f,V,D,value);
             report_therapeutic_bullet_set(Targ,Moda,Metal,V)
+        case {4}
+            disp("1) do step 1 with f_physio\n2) do step 1 with f_patho\n3) eventually do step 2\n4) do step 3 with f_patho (ensure that 1) and 2) are already done)")
     endswitch
 endfunction
 ################################################################################
@@ -229,6 +232,12 @@ function _set=load_set(prompt)
     name=input(prompt,"s");
     load("-binary",name,name)
     eval(cstrcat("_set=",name,";"))
+endfunction
+################################################################################
+#############################    print_license    ##############################
+################################################################################
+function print_license()
+    disp("\nCopyright (c) 2013-2014, Arnaud Poret\nAll rights reserved.\n\nRedistribution and use in source and binary forms, with or without modification,\nare permitted provided that the following conditions are met:\n\n1. Redistributions of source code must retain the above copyright notice, this\nlist of conditions and the following disclaimer.\n\n2. Redistributions in binary form must reproduce the above copyright notice,\nthis list of conditions and the following disclaimer in the documentation and/or\nother materials provided with the distribution.\n\n3. Neither the name of the copyright holder nor the names of its contributors\nmay be used to endorse or promote products derived from this software without\nspecific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND\nANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED\nWARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\nDISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR\nANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\nLOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON\nANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\nSOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n")
 endfunction
 ################################################################################
 ##########################    report_attractor_set    ##########################
