@@ -19,15 +19,15 @@
 
 #to cope with both boolean and multivalued logic, the Zadeh fuzzy logic operators are used
 
-#at line 69, pass either f_physio (for computing the physiological attractor set) or f_patho (for computing the phathological attractor set or to compute therapeutic bullets) to the subroutine what_to_do
+#at line 69, pass either f_physio (for computing the physiological attractor set) or f_patho (for computing the phathological attractor set or to compute therapeutic bullets) to the function what_to_do
 
 #this example network is an implementation of a boolean model of the mammalian cell cycle proposed by Adrien Faure et al: Aurelien Naldi, Claudine Chaouiya, and Denis Thieffry. Dynamical analysis of a generic boolean model for the control of the mammalian cell cycle. Bioinformatics, 22(14):e124–e131, 2006.
 
 clear all
 clc
 more off
-addpath("~/kali-targ/octave/")
-cd("~/kali-targ/octave/")
+addpath("~/Downloads/kali-targ/octave/")
+cd("~/Downloads/kali-targ/octave/")
 
 V={"CycD","Rb","E2F","CycE","CycA","p27","Cdc20","Cdh1","UbcH10","CycB"};
 
@@ -66,7 +66,7 @@ function y=f_patho(x,k)
     ];
 endfunction
 
-what_to_do("f_patho",V,size_D,max_targ,max_moda,value)
+what_to_do("f_physio",V,size_D,max_targ,max_moda,value)
 
 ################################################################################
 ##############################      LICENSE       ##############################

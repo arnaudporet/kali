@@ -3,7 +3,7 @@
 
 !read the following comments, fill the following template, open a terminal, past this command and press Enter: cd ~/kali-targ/ && gfortran lib.f95 example_network.f95 -o example_network && ./example_network
 
-!at line 31, allocate to V the number of nodes
+!at line 33, allocate to V the number of nodes
 
 !value: the domain of the variables, for example [0.0,1.0] for boolean logic and [0.0,0.5,1.0] for three valued logic
 
@@ -21,7 +21,9 @@
 
 !to cope with both boolean and multivalued logic, the Zadeh fuzzy logic operators are used
 
-!at line 46, pass either f_physio (for computing the physiological attractor set) or f_patho (for computing the phathological attractor set or to compute therapeutic bullets) to the subroutine what_to_do
+!at line 48, pass either f_physio (for computing the physiological attractor set) or f_patho (for computing the phathological attractor set or to compute therapeutic bullets) to the subroutine what_to_do
+
+!do not forget to recompile the sources (see comment line 4) if you modify them as, for example, when f_physio is replaced by f_patho
 
 !this example network is an implementation of a boolean model of the mammalian cell cycle proposed by Adrien Faure et al: Aurelien Naldi, Claudine Chaouiya, and Denis Thieffry. Dynamical analysis of a generic boolean model for the control of the mammalian cell cycle. Bioinformatics, 22(14):e124–e131, 2006.
 

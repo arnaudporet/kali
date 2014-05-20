@@ -23,12 +23,12 @@ function what_to_do(f,V,size_D,max_targ,max_moda,value)
             A=compute_attractor(f,[],[],D);
             report_attractor_set(A,V)
         case {2}
-            A_physio=load_set("A_physio: ");
-            A_patho=load_set("A_patho: ");
+            load("-binary","A_physio","A_physio")
+            load("-binary","A_patho","A_patho")
             a_patho_set=compute_pathological_attractor(A_physio,A_patho);
             report_attractor_set(a_patho_set,V)
         case {3}
-            A_physio=load_set("A_physio: ");
+            load("-binary","A_physio","A_physio")
             r_min=input("r_min: ");
             r_max=input("r_max: ");
             [Targ,Moda,Metal]=compute_therapeutic_bullet(r_min,r_max,max_targ,max_moda,A_physio,f,V,D,value);
@@ -223,15 +223,6 @@ function S=generate_state_space(n)
         S=z;
         z=[];
     endfor
-endfunction
-################################################################################
-################################    load_set    ################################
-################################################################################
-function _set=load_set(prompt)
-    ls()
-    name=input(prompt,"s");
-    load("-binary",name,name)
-    eval(cstrcat("_set=",name,";"))
 endfunction
 ################################################################################
 #############################    print_license    ##############################

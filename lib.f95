@@ -687,8 +687,11 @@ module lib
                 call report_therapeutic_bullet_set(therapeutic_bullet_set,V)
                 deallocate(A_physio,therapeutic_bullet_set,D)
             case (4)
-                write (unit=*,fmt="(a)") "1) do step 1 with f_physio"//new_line("a")//"2) do step 1 with f_patho"//new_line("a")//&
-                "3) eventually do step 2"//new_line("a")//"4) do step 3 with f_patho (ensure that 1) and 2) are already done)"
+                write (unit=*,fmt="(a)") "1) do step 1 with f_physio"//new_line("a")//&
+                "2) do step 1 with f_patho"//new_line("a")//&
+                "3) eventually do step 2"//new_line("a")//&
+                "4) do step 3 with f_patho (ensure that 1) and 2) are already done)"//new_line("a")//&
+                "do not forget to recompile the sources if you modify them (see comment line 26 in example_network.f95)"
         end select
         call cpu_time(finish)
         write (unit=*,fmt="(a)") "done in "//int2char(int(finish-start))//" seconds"
