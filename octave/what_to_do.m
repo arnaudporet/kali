@@ -21,20 +21,21 @@ function what_to_do(f,V,size_D,max_targ,max_moda,value)
     switch todo
         case {1}
             A=compute_attractor(f,[],[],D);
-            report_attractor_set(A,V)
+            setting=menu("setting: ","physiological","pathological");
+            report_attractor_set(A,V,setting)
         case {2}
             load("-binary","A_physio","A_physio")
             load("-binary","A_patho","A_patho")
             a_patho_set=compute_pathological_attractor(A_physio,A_patho);
-            report_attractor_set(a_patho_set,V)
+            report_attractor_set(a_patho_set,V,3)
         case {3}
             load("-binary","A_physio","A_physio")
             r_min=input("r_min: ");
             r_max=input("r_max: ");
             [Targ,Moda,Metal]=compute_therapeutic_bullet(r_min,r_max,max_targ,max_moda,A_physio,f,V,D,value);
-            report_therapeutic_bullet_set(Targ,Moda,Metal,V)
+            report_therapeutic_bullet_set(Targ,Moda,Metal,V,4)
         case {4}
-            disp("1) do step 1 with f_physio\n2) do step 1 with f_patho\n3) eventually do step 2\n4) do step 3 with f_patho (ensure that 1) and 2) are already done)")
+            disp("1) do step 1 with f_physio\n2) do step 1 with f_patho\n3) eventually do step 2\n4) do step 3 with f_patho")
     endswitch
 endfunction
 ################################################################################
@@ -233,7 +234,7 @@ endfunction
 ################################################################################
 ##########################    report_attractor_set    ##########################
 ################################################################################
-function report_attractor_set(A,V)
+function report_attractor_set(A,V,setting)
     name_len=[];
     for i_V=1:numel(V)
         name_len(1,i_V)=numel(V{i_V});
@@ -262,12 +263,12 @@ function report_attractor_set(A,V)
     endfor
     report=cstrcat(report,"found attractors: ",num2str(numel(A))," (",num2str(n_point)," points, ",num2str(n_cycle)," cycles)");
     disp(report)
-    save_report(A,report)
+    save_report(A,report,setting)
 endfunction
 ################################################################################
 #####################    report_therapeutic_bullet_set    ######################
 ################################################################################
-function report_therapeutic_bullet_set(Targ,Moda,Metal,V)
+function report_therapeutic_bullet_set(Targ,Moda,Metal,V,setting)
     n_gold=0;
     n_silv=0;
     sep="--------------------------------------------------------------------------------";
@@ -285,19 +286,32 @@ function report_therapeutic_bullet_set(Targ,Moda,Metal,V)
     endfor
     report=cstrcat(report,"found therapeutic bullets: ",num2str(numel(Targ))," (",num2str(n_gold)," golden bullets, ",num2str(n_silv)," silver bullets)");
     disp(report)
-    save_report({Targ,Moda,Metal},report)
+    save_report({Targ,Moda,Metal},report,setting)
 endfunction
 ################################################################################
 ##############################    save_report    ###############################
 ################################################################################
-function save_report(_set,report)
+function save_report(_set,report,setting)
     if yes_or_no("save? ")
-        ls()
-        name=input("name: ","s");
-        eval(cstrcat(name,"=_set;"))
-        save("-binary",name,name)
-        eval(cstrcat(name,"=report;"))
-        save("-text",cstrcat(name,".txt"),name)
+        switch setting
+            case {1}
+                set_name="A_physio";
+                report_name="report_A_physio";
+            case {2}
+                set_name="A_patho";
+                report_name="report_A_patho";
+            case {3}
+                set_name="A_physio_versus_patho";
+                report_name="report_A_physio_versus_patho";
+            case {4}
+                set_name="therapeutic_bullets";
+                report_name="report_therapeutic_bullets";
+        endswitch
+        eval(cstrcat(set_name,"=_set;"))
+        eval(cstrcat(report_name,"=report;"))
+        save("-binary",set_name,set_name)
+        save("-text",report_name,report_name)
+        disp(cstrcat("set saved as: ",set_name,"\n","report saved as: ",report_name))
     endif
 endfunction
 ################################################################################

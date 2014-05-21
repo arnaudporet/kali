@@ -515,7 +515,7 @@ module lib
         report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//&
         " cycles)"
         write (unit=*,fmt="(a)") report
-        write (unit=*,fmt="(a)") "save? (1/0)"
+        write (unit=*,fmt="(a)") "save? [1/0]"
         read (unit=*,fmt=*) save_
         if (save_==1) then
             select case (setting)
@@ -581,7 +581,7 @@ module lib
         report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))//" ("//int2char(n_gold)//&
         " golden bullets, "//int2char(n_silv)//" silver bullets)"
         write (unit=*,fmt="(a)") report
-        write (unit=*,fmt="(a)") "save="
+        write (unit=*,fmt="(a)") "save? [1/0]"
         read (unit=*,fmt=*) save_
         if (save_==1) then
             open (unit=1,file="report_therapeutic_bullet",status="replace")
@@ -643,14 +643,13 @@ module lib
         call print_license()
         call init_random_seed()
         call cpu_time(start)
-        write (unit=*,fmt="(a)") "To compute step 2, step 1 has to be already computed with both f_physio and f_patho."//&
-        new_line("a")//"To compute step 3, step 1 has to be already computed with f_physio."//new_line("a")//"What to do: "//&
-        new_line("a")//"    (1) compute attractors"//new_line("a")//"    (2) compute pathological attractors"//new_line("a")//&
-        "    (3) compute therapeutic bullets"//new_line("a")//"    (4) help"
+        write (unit=*,fmt="(a)") "What to do: "//new_line("a")//"    [1] compute attractors"//new_line("a")//&
+        "    [2] compute pathological attractors"//new_line("a")//"    [3] compute therapeutic bullets"//new_line("a")//&
+        "    [4] help"
         read (unit=*,fmt=*) to_do
         if (to_do/=2 .and. to_do/=4) then
             if (all(value==[0.0,1.0])) then
-                write (unit=*,fmt="(a,es10.3e3,a)") "size(S)=",real(2,8)**real(size(V),8),new_line("a")//"comprehensive_D? (1/0)"
+                write (unit=*,fmt="(a,es10.3e3,a)") "size(S)=",real(2,8)**real(size(V),8),new_line("a")//"comprehensive_D? [1/0]"
                 read (unit=*,fmt=*) comprehensive_D
                 select case (comprehensive_D)
                     case (1)
@@ -667,7 +666,7 @@ module lib
                 allocate(c_targ(0))
                 allocate(c_moda(0))
                 A_set=compute_attractor(f,c_targ,c_moda,D)
-                write (unit=*,fmt="(a)") "setting:"//new_line("a")//"    (1) physiological"//new_line("a")//"    (2) pathological"
+                write (unit=*,fmt="(a)") "setting:"//new_line("a")//"    [1] physiological"//new_line("a")//"    [2] pathological"
                 read (unit=*,fmt=*) setting
                 call report_attractor_set(A_set,V,setting)
                 deallocate(A_set,c_targ,c_moda,D)
@@ -690,7 +689,7 @@ module lib
                 write (unit=*,fmt="(a)") "1) do step 1 with f_physio"//new_line("a")//&
                 "2) do step 1 with f_patho"//new_line("a")//&
                 "3) eventually do step 2"//new_line("a")//&
-                "4) do step 3 with f_patho (ensure that 1) and 2) are already done)"//new_line("a")//&
+                "4) do step 3 with f_patho"//new_line("a")//&
                 "do not forget to recompile the sources if you modify them (see comment line 26 in example_network.f95)"
         end select
         call cpu_time(finish)
