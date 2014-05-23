@@ -4,11 +4,10 @@
 ###############################    what_to_do    ###############################
 ################################################################################
 function what_to_do(f,V,size_D,max_targ,max_moda,value)
-    print_license()
-    todo=menu("what to do: ","compute attractors","compute pathological attractors","compute therapeutic bullets","help");
-    if and(todo!=2,todo!=4)
+    todo=menu("what to do: ","compute attractors","compute pathological attractors","compute therapeutic bullets","help","license");
+    if and(todo!=2,todo!=4,todo!=5)
         if all(value==[0,1],2)
-            disp(strcat("size(S)=",num2str(2**numel(V))))
+            disp(strcat("\nsize(S)=",num2str(2**numel(V))))
             if yes_or_no("comprehensive D? ")
                 D=generate_state_space(numel(V))';
             else
@@ -21,7 +20,7 @@ function what_to_do(f,V,size_D,max_targ,max_moda,value)
     switch todo
         case {1}
             A=compute_attractor(f,[],[],D);
-            setting=menu("setting: ","physiological","pathological");
+            setting=menu("\nsetting: ","physiological","pathological");
             report_attractor_set(A,V,setting)
         case {2}
             load("-binary","A_physio","A_physio")
@@ -30,12 +29,14 @@ function what_to_do(f,V,size_D,max_targ,max_moda,value)
             report_attractor_set(a_patho_set,V,3)
         case {3}
             load("-binary","A_physio","A_physio")
-            r_min=input("r_min: ");
-            r_max=input("r_max: ");
+            r_min=input("\nr_min: ");
+            r_max=input("\nr_max: ");
             [Targ,Moda,Metal]=compute_therapeutic_bullet(r_min,r_max,max_targ,max_moda,A_physio,f,V,D,value);
             report_therapeutic_bullet_set(Targ,Moda,Metal,V,4)
         case {4}
-            disp("1) do step 1 with f_physio\n2) do step 1 with f_patho\n3) eventually do step 2\n4) do step 3 with f_patho")
+            disp("\n1) do step 1 with f_physio\n2) do step 1 with f_patho\n3) eventually do step 2\n4) do step 3 with f_patho\n")
+        case {5}
+            disp("\nCopyright (c) 2013-2014, Arnaud Poret\nAll rights reserved.\n\nRedistribution and use in source and binary forms, with or without modification,\nare permitted provided that the following conditions are met:\n\n1. Redistributions of source code must retain the above copyright notice, this\nlist of conditions and the following disclaimer.\n\n2. Redistributions in binary form must reproduce the above copyright notice,\nthis list of conditions and the following disclaimer in the documentation and/or\nother materials provided with the distribution.\n\n3. Neither the name of the copyright holder nor the names of its contributors\nmay be used to endorse or promote products derived from this software without\nspecific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND\nANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED\nWARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\nDISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR\nANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\nLOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON\nANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\nSOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n")
     endswitch
 endfunction
 ################################################################################
@@ -226,12 +227,6 @@ function S=generate_state_space(n)
     endfor
 endfunction
 ################################################################################
-#############################    print_license    ##############################
-################################################################################
-function print_license()
-    disp("\nCopyright (c) 2013-2014, Arnaud Poret\nAll rights reserved.\n\nRedistribution and use in source and binary forms, with or without modification,\nare permitted provided that the following conditions are met:\n\n1. Redistributions of source code must retain the above copyright notice, this\nlist of conditions and the following disclaimer.\n\n2. Redistributions in binary form must reproduce the above copyright notice,\nthis list of conditions and the following disclaimer in the documentation and/or\nother materials provided with the distribution.\n\n3. Neither the name of the copyright holder nor the names of its contributors\nmay be used to endorse or promote products derived from this software without\nspecific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND\nANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED\nWARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\nDISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR\nANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\nLOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON\nANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\nSOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n")
-endfunction
-################################################################################
 ##########################    report_attractor_set    ##########################
 ################################################################################
 function report_attractor_set(A,V,setting)
@@ -262,7 +257,7 @@ function report_attractor_set(A,V,setting)
         report=cstrcat(report,sep,"\n");
     endfor
     report=cstrcat(report,"found attractors: ",num2str(numel(A))," (",num2str(n_point)," points, ",num2str(n_cycle)," cycles)");
-    disp(report)
+    disp(cstrcat("\n",report,"\n"))
     save_report(A,report,setting)
 endfunction
 ################################################################################
@@ -285,7 +280,7 @@ function report_therapeutic_bullet_set(Targ,Moda,Metal,V,setting)
         report=cstrcat(report,"(",Metal{i_targ}," bullet)","\n",sep,"\n");
     endfor
     report=cstrcat(report,"found therapeutic bullets: ",num2str(numel(Targ))," (",num2str(n_gold)," golden bullets, ",num2str(n_silv)," silver bullets)");
-    disp(report)
+    disp(cstrcat("\n",report,"\n"))
     save_report({Targ,Moda,Metal},report,setting)
 endfunction
 ################################################################################
@@ -311,7 +306,7 @@ function save_report(_set,report,setting)
         eval(cstrcat(report_name,"=report;"))
         save("-binary",set_name,set_name)
         save("-text",report_name,report_name)
-        disp(cstrcat("set saved as: ",set_name,"\n","report saved as: ",report_name))
+        disp(cstrcat("\n","set saved as: ",set_name,"\n","report saved as: ",report_name,"\n"))
     endif
 endfunction
 ################################################################################
@@ -322,15 +317,15 @@ endfunction
 #Copyright (c) 2013-2014, Arnaud Poret
 #All rights reserved.
 
-#Redistribution and use in source and binary forms, with or without modification,
-#are permitted provided that the following conditions are met:
+#Redistribution and use in source and binary forms, with or without
+#modification, are permitted provided that the following conditions are met:
 
 #1. Redistributions of source code must retain the above copyright notice, this
 #list of conditions and the following disclaimer.
 
 #2. Redistributions in binary form must reproduce the above copyright notice,
-#this list of conditions and the following disclaimer in the documentation and/or
-#other materials provided with the distribution.
+#this list of conditions and the following disclaimer in the documentation
+#and/or other materials provided with the distribution.
 
 #3. Neither the name of the copyright holder nor the names of its contributors
 #may be used to endorse or promote products derived from this software without
@@ -339,10 +334,10 @@ endfunction
 #THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 #ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 #WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-#DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-#ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-#(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-#LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-#ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-#(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-#SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+#FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+#DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+#SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+#CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+#OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+#OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

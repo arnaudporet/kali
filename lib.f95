@@ -421,34 +421,6 @@ module lib
         deallocate(set_name)
     end function load_attractor_set
     !##########################################################################!
-    !##########################    print_license    ###########################!
-    !##########################################################################!
-    subroutine print_license()
-        implicit none
-        write (unit=*,fmt="(a)") new_line("a")//'Copyright (c) 2013-2014, Arnaud Poret'//new_line("a")//&
-        'All rights reserved.'//new_line("a")//new_line("a")//&
-        'Redistribution and use in source and binary forms, with or without modification,'//new_line("a")//&
-        'are permitted provided that the following conditions are met:'//new_line("a")//new_line("a")//&
-        '1. Redistributions of source code must retain the above copyright notice, this'//new_line("a")//&
-        'list of conditions and the following disclaimer.'//new_line("a")//new_line("a")//&
-        '2. Redistributions in binary form must reproduce the above copyright notice,'//new_line("a")//&
-        'this list of conditions and the following disclaimer in the documentation and/or'//new_line("a")//&
-        'other materials provided with the distribution.'//new_line("a")//new_line("a")//&
-        '3. Neither the name of the copyright holder nor the names of its contributors'//new_line("a")//&
-        'may be used to endorse or promote products derived from this software without'//new_line("a")//&
-        'specific prior written permission.'//new_line("a")//new_line("a")//&
-        'THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND'//new_line("a")//&
-        'ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED'//new_line("a")//&
-        'WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE'//new_line("a")//&
-        'DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR'//new_line("a")//&
-        'ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES'//new_line("a")//&
-        '(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;'//new_line("a")//&
-        'LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON'//new_line("a")//&
-        'ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT'//new_line("a")//&
-        '(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS'//new_line("a")//&
-        'SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.'//new_line("a")
-    end subroutine print_license
-    !##########################################################################!
     !#############################    rand_int    #############################!
     !##########################################################################!
     function rand_int(a,b) result(y)
@@ -477,7 +449,7 @@ module lib
         real::x
         character(3)::y
         if (x<0.0 .or. x>1.0) then
-            write (unit=*,fmt="(a)") "real2char(x): x<0.0 .or. x>1.0 unsupported"!FIXME
+            write (unit=*,fmt="(a)") "real2char(x): x<0.0 or x>1.0 unsupported"!FIXME
             stop
         end if
         write (unit=y,fmt="(f3.1)") x
@@ -514,8 +486,8 @@ module lib
         end do
         report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//&
         " cycles)"
-        write (unit=*,fmt="(a)") report
-        write (unit=*,fmt="(a)") "save? [1/0]"
+        write (unit=*,fmt="(a)") new_line("a")//report//new_line("a")
+        write (unit=*,fmt="(a)") "save? [1/0]"//new_line("a")
         read (unit=*,fmt=*) save_
         if (save_==1) then
             select case (setting)
@@ -549,7 +521,8 @@ module lib
             open (unit=1,file=report_name,status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
-            write (unit=*,fmt="(a)") "set saved as: "//set_name//new_line("a")//"report saved as: "//report_name
+            write (unit=*,fmt="(a)") new_line("a")//"set saved as: "//set_name//new_line("a")//"report saved as: "//report_name//&
+            new_line("a")
             deallocate(s,set_name,report_name)
         end if
         deallocate(report)
@@ -580,14 +553,14 @@ module lib
         end do
         report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))//" ("//int2char(n_gold)//&
         " golden bullets, "//int2char(n_silv)//" silver bullets)"
-        write (unit=*,fmt="(a)") report
-        write (unit=*,fmt="(a)") "save? [1/0]"
+        write (unit=*,fmt="(a)") new_line("a")//report//new_line("a")
+        write (unit=*,fmt="(a)") "save? [1/0]"//new_line("a")
         read (unit=*,fmt=*) save_
         if (save_==1) then
             open (unit=1,file="report_therapeutic_bullet",status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
-            write (unit=*,fmt="(a)") "report saved as: report_therapeutic_bullet"
+            write (unit=*,fmt="(a)") new_line("a")//"report saved as: report_therapeutic_bullet"//new_line("a")
         end if
         deallocate(report)
     end subroutine report_therapeutic_bullet_set
@@ -640,16 +613,16 @@ module lib
                 real,dimension(size(x,1),1)::y
             end function f
         end interface
-        call print_license()
         call init_random_seed()
         call cpu_time(start)
-        write (unit=*,fmt="(a)") "What to do: "//new_line("a")//"    [1] compute attractors"//new_line("a")//&
-        "    [2] compute pathological attractors"//new_line("a")//"    [3] compute therapeutic bullets"//new_line("a")//&
-        "    [4] help"
+        write (unit=*,fmt="(a)") new_line("a")//"what to do: "//new_line("a")//new_line("a")//"    [1] compute attractors"//&
+        new_line("a")//"    [2] compute pathological attractors"//new_line("a")//"    [3] compute therapeutic bullets"//&
+        new_line("a")//"    [4] help"//new_line("a")//"    [5] license"//new_line("a")
         read (unit=*,fmt=*) to_do
-        if (to_do/=2 .and. to_do/=4) then
+        if (to_do/=2 .and. to_do/=4 .and. to_do/=5) then
             if (all(value==[0.0,1.0])) then
-                write (unit=*,fmt="(a,es10.3e3,a)") "size(S)=",real(2,8)**real(size(V),8),new_line("a")//"comprehensive_D? [1/0]"
+                write (unit=*,fmt="(a,es10.3e3,a)") new_line("a")//"size(S)=",real(2,8)**real(size(V),8),new_line("a")//&
+                "comprehensive_D? [1/0]"//new_line("a")
                 read (unit=*,fmt=*) comprehensive_D
                 select case (comprehensive_D)
                     case (1)
@@ -666,7 +639,8 @@ module lib
                 allocate(c_targ(0))
                 allocate(c_moda(0))
                 A_set=compute_attractor(f,c_targ,c_moda,D)
-                write (unit=*,fmt="(a)") "setting:"//new_line("a")//"    [1] physiological"//new_line("a")//"    [2] pathological"
+                write (unit=*,fmt="(a)") new_line("a")//"setting:"//new_line("a")//new_line("a")//"    [1] physiological"//&
+                new_line("a")//"    [2] pathological"//new_line("a")
                 read (unit=*,fmt=*) setting
                 call report_attractor_set(A_set,V,setting)
                 deallocate(A_set,c_targ,c_moda,D)
@@ -678,22 +652,43 @@ module lib
                 deallocate(A_physio,A_patho,a_patho_set)
             case (3)
                 A_physio=load_attractor_set(1)
-                write (unit=*,fmt="(a)") "r_min="
+                write (unit=*,fmt="(a)") new_line("a")//"r_min="//new_line("a")
                 read (unit=*,fmt=*) r_min
-                write (unit=*,fmt="(a)") "r_max="
+                write (unit=*,fmt="(a)") new_line("a")//"r_max="//new_line("a")
                 read (unit=*,fmt=*) r_max
                 therapeutic_bullet_set=compute_therapeutic_bullet(r_min,r_max,max_targ,max_moda,A_physio,f,V,D,value)
                 call report_therapeutic_bullet_set(therapeutic_bullet_set,V)
                 deallocate(A_physio,therapeutic_bullet_set,D)
             case (4)
-                write (unit=*,fmt="(a)") "1) do step 1 with f_physio"//new_line("a")//&
-                "2) do step 1 with f_patho"//new_line("a")//&
-                "3) eventually do step 2"//new_line("a")//&
-                "4) do step 3 with f_patho"//new_line("a")//&
-                "do not forget to recompile the sources if you modify them (see comment line 26 in example_network.f95)"
+                write (unit=*,fmt="(a)") new_line("a")//"1) do step 1 with f_physio"//new_line("a")//"2) do step 1 with f_patho"//&
+                new_line("a")//"3) eventually do step 2"//new_line("a")//"4) do step 3 with f_patho"//new_line("a")//&
+                new_line("a")//"do not forget to recompile the sources following any "//"modification"//new_line("a")
+            case (5)
+                write (unit=*,fmt="(a)") new_line("a")//'Copyright (c) 2013-2014, Arnaud Poret'//new_line("a")//&
+                'All rights reserved.'//new_line("a")//new_line("a")//&
+                'Redistribution and use in source and binary forms, with or without modification,'//new_line("a")//&
+                'are permitted provided that the following conditions are met:'//new_line("a")//new_line("a")//&
+                '1. Redistributions of source code must retain the above copyright notice, this'//new_line("a")//&
+                'list of conditions and the following disclaimer.'//new_line("a")//new_line("a")//&
+                '2. Redistributions in binary form must reproduce the above copyright notice,'//new_line("a")//&
+                'this list of conditions and the following disclaimer in the documentation and/or'//new_line("a")//&
+                'other materials provided with the distribution.'//new_line("a")//new_line("a")//&
+                '3. Neither the name of the copyright holder nor the names of its contributors'//new_line("a")//&
+                'may be used to endorse or promote products derived from this software without'//new_line("a")//&
+                'specific prior written permission.'//new_line("a")//new_line("a")//&
+                'THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND'//new_line("a")//&
+                'ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED'//new_line("a")//&
+                'WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE'//new_line("a")//&
+                'DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR'//new_line("a")//&
+                'ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES'//new_line("a")//&
+                '(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;'//new_line("a")//&
+                'LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON'//new_line("a")//&
+                'ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT'//new_line("a")//&
+                '(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS'//new_line("a")//&
+                'SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.'//new_line("a")
         end select
         call cpu_time(finish)
-        write (unit=*,fmt="(a)") "done in "//int2char(int(finish-start))//" seconds"
+        write (unit=*,fmt="(a)") "done in "//int2char(int(finish-start))//" seconds"//new_line("a")
     end subroutine what_to_do
 end module lib
 !##############################################################################!
@@ -704,15 +699,15 @@ end module lib
 !Copyright (c) 2013-2014, Arnaud Poret
 !All rights reserved.
 
-!Redistribution and use in source and binary forms, with or without modification,
-!are permitted provided that the following conditions are met:
+!Redistribution and use in source and binary forms, with or without
+!modification, are permitted provided that the following conditions are met:
 
 !1. Redistributions of source code must retain the above copyright notice, this
 !list of conditions and the following disclaimer.
 
 !2. Redistributions in binary form must reproduce the above copyright notice,
-!this list of conditions and the following disclaimer in the documentation and/or
-!other materials provided with the distribution.
+!this list of conditions and the following disclaimer in the documentation
+!and/or other materials provided with the distribution.
 
 !3. Neither the name of the copyright holder nor the names of its contributors
 !may be used to endorse or promote products derived from this software without
@@ -721,10 +716,10 @@ end module lib
 !THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 !ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 !WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-!DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-!ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-!(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-!LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-!ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-!(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-!SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+!DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+!FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+!DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+!SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+!CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+!OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+!OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
