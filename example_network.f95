@@ -5,6 +5,9 @@
 !     4) past this command: cd ~/kali-targ/ && gfortran lib.f95 example_network.f95 -o example_network && ./example_network
 !     5) press Enter
 
+! GFortran (https://www.gnu.org/software/gcc/fortran/) is the Fortran compiler
+! front end and run-time libraries for GCC, the GNU Compiler Collection.
+
 ! Do not forget to recompile the sources following any modification.
 
 ! The example network is a boolean model of the mammalian cell cycle [1].
