@@ -1,16 +1,19 @@
 ################################################################################
-###################    Target identification in networks    ####################
+#####    Computing boolean network attractors for target identification    #####
 ################################################################################
 
-1. clone the project in your home directory: ~/
-2. open the template file: ~/kali-targ/example_network.f95
+How to:
+    1) clone the project in your home directory: ~/
+    2) open the template file: ~/kali-targ/example_network.f95
 
-The example network is an implementation of a boolean model of the mammalian
-cell cycle published by Adrien Faure et al: Aurelien Naldi, Claudine Chaouiya,
-and Denis Thieffry. Dynamical analysis of a generic boolean model for the
-control of the mammalian cell cycle. Bioinformatics, 22(14):e124–e131, 2006.
+The example network is a boolean model of the mammalian cell cycle [1].
 
-The algorithm was developed in GNU Octave for convenience and then implemented
-in Fortran 95 compiled with GFortran for performance. The GNU Octave
-implementation is available in the octave folder of the present project.
+[1] Fauré, A., Naldi, A., Chaouiya, C., & Thieffry, D. (2006). Dynamical
+analysis of a generic Boolean model for the control of the mammalian cell cycle.
+Bioinformatics, 22(14), e124-e131.
 
+The algorithm was firstly implemented in Octave
+(https://www.gnu.org/software/octave/) for convenience and then in Fortran 95
+compiled with GFortran (https://www.gnu.org/software/gcc/fortran/) for
+performance. The GNU Octave implementation is available in the octave folder of
+the present project.
