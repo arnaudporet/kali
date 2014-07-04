@@ -1,33 +1,34 @@
-!how to:
-!    1) read the comments
-!    2) fill the template
-!    3) open a terminal
-!    4) past: cd ~/kali-targ/ && gfortran lib.f95 example_network.f95 -o example_network && ./example_network
-!    5) press Enter
+! How to:
+!     1) read the comments
+!     2) fill the template
+!     3) open a terminal
+!     4) past this command: cd ~/kali-targ/ && gfortran lib.f95 example_network.f95 -o example_network && ./example_network
+!     5) press Enter
 
-!do not forget to recompile the sources following any modification
+! Do not forget to recompile the sources following any modification.
 
-!this example network is an implementation of a boolean model of the mammalian
-!cell cycle proposed by Adrien Faure et al: Aurelien Naldi, Claudine Chaouiya,
-!and Denis Thieffry. Dynamical analysis of a generic boolean model for the
-!control of the mammalian cell cycle. Bioinformatics, 22(14):e124–e131, 2006.
+! The example network is a boolean model of the mammalian cell cycle [1].
+
+! [1] Fauré, A., Naldi, A., Chaouiya, C., & Thieffry, D. (2006). Dynamical
+! analysis of a generic Boolean model for the control of the mammalian cell
+! cycle. Bioinformatics, 22(14), e124-e131.
 
 program example_network
     use lib
     implicit none
-    !allocate the number of nodes
+    ! allocate the number of nodes
     allocate(V(10))
-    !the domain of values, for example [0.0,1.0] for boolean logic and
-    ![0.0,0.5,1.0] for three valued logic
+    ! the domain of values, for example [0.0,1.0] for boolean logic and
+    ! [0.0,0.5,1.0] for three valued logic
     value=[0.0,1.0]
-    !the maximum number of target combinations to test
+    ! the maximum number of target combinations to test
     max_targ=1e4
-    !the maximum number of modality arrangements to test for each target
-    !combination
+    ! the maximum number of modality arrangements to test for each target
+    ! combination
     max_moda=1e4
-    !the size of the subset of the state space to start from
+    ! the size of the subset of the state space to start from
     size_D=1e4
-    !the node names
+    ! the node names
     V(1)="CycD"
     V(2)="Rb"
     V(3)="E2F"
@@ -38,18 +39,18 @@ program example_network
     V(8)="Cdh1"
     V(9)="UbcH10"
     V(10)="CycB"
-    !pass either f_physio (for computing the physiological attractor set) or
-    !f_patho (for computing the phathological attractor set or to compute
-    !therapeutic bullets)
+    ! pass either f_physio (for computing the physiological attractor set) or
+    ! f_patho (for computing the phathological attractor set or to compute
+    ! therapeutic bullets)
     call what_to_do(f_physio,V,max_targ,max_moda,size_D,value)
     deallocate(value,V)
     contains
     !##########################################################################!
     !#############################    f_physio    #############################!
     !##########################################################################!
-    !the boolean transition function of the physiological variant
-    !to cope with both boolean and multivalued logic, the Zadeh fuzzy logic
-    !operators are used
+    ! the boolean transition function of the physiological variant
+    ! to cope with both boolean and multivalued logic, the Zadeh fuzzy logic
+    ! operators are used
     function f_physio(x,k) result(y)
         implicit none
         real,dimension(:,:)::x
@@ -70,9 +71,9 @@ program example_network
     !##########################################################################!
     !#############################    f_patho    ##############################!
     !##########################################################################!
-    !the boolean transition function of the pathological variant
-    !to cope with both boolean and multivalued logic, the Zadeh fuzzy logic
-    !operators are used
+    ! the boolean transition function of the pathological variant
+    ! to cope with both boolean and multivalued logic, the Zadeh fuzzy logic
+    ! operators are used
     function f_patho(x,k) result(y)
         implicit none
         real,dimension(:,:)::x
@@ -91,4 +92,3 @@ program example_network
         y(10,1)=min(1.0-x(7,k),1.0-x(8,k))!CycB
     end function f_patho
 end program example_network
-
