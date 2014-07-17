@@ -5,7 +5,8 @@
 
 How to:
     1) read my article (preprint version available at
-    http://hal.archives-ouvertes.fr/hal-01024788), at least the Method section
+    http://hal.archives-ouvertes.fr/hal-01024788 and
+    http://arxiv.org/abs/1407.4374), at least the Method section
     1) clone the project in your home directory: ~/
     2) open the template file: ~/kali-targ/example_network.f95
 
@@ -20,4 +21,3 @@ The algorithm was firstly implemented in Octave
 compiled with GFortran (https://www.gnu.org/software/gcc/fortran/) for
 performance. The GNU Octave implementation is available in the octave folder of
 the present project.
-
