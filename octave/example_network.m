@@ -1,9 +1,8 @@
 # How to:
 #    1) read the comments
 #    2) fill the template
-#    3) open a terminal
-#    4) launch octave: cd ~/kali-targ/octave/ && octave
-#    5) run the example network: run("~/kali-targ/octave/example_network.m")
+#    3) launch octave: cd ~/kali-targ/octave/ && octave
+#    4) run: run("~/kali-targ/octave/example_network.m")
 
 # GNU Octave (http://www.gnu.org/software/octave/) is a high-level interpreted
 # language, primarily intended for numerical computations. 
