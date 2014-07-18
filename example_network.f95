@@ -1,8 +1,7 @@
 ! How to:
 !     1) read the comments
 !     2) fill the template
-!     3) open a terminal
-!     4) compile and execute the example network: cd ~/kali-targ/ && gfortran lib.f95 example_network.f95 -o example_network && ./example_network
+!     3) compile and execute: cd ~/kali-targ/ && gfortran lib.f95 example_network.f95 -o example_network && ./example_network
 
 ! GFortran (https://www.gnu.org/software/gcc/fortran/) is the Fortran compiler
 ! front end and run-time libraries for GCC, the GNU Compiler Collection.
