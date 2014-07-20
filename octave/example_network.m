@@ -37,7 +37,7 @@ max_moda=50;
 
 # the boolean transition function of the physiological variant
 # to cope with both boolean and multivalued logic, the Zadeh fuzzy logic
-# operators are used
+# operators are used: x AND y = min(x,y), x OR y = max(x,y), NOT x = 1-x
 function y=f_physio(x,k)
     y=[
     x(1,k);#CycD
@@ -55,7 +55,7 @@ endfunction
 
 # the boolean transition function of the pathological variant
 # to cope with both boolean and multivalued logic, the Zadeh fuzzy logic
-# operators are used
+# operators are used: x AND y = min(x,y), x OR y = max(x,y), NOT x = 1-x
 function y=f_patho(x,k)
     y=[
     x(1,k);#CycD
