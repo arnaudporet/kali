@@ -1,7 +1,7 @@
 module lib
     implicit none
-    integer::max_targ,max_moda,size_D
-    character(15),dimension(:),allocatable::V
+    integer::max_targ,max_moda,size_D,n_node
+    character(32),dimension(:),allocatable::V
     real,dimension(:),allocatable::value
     type::attractor
         real,dimension(:,:),allocatable::a
@@ -181,13 +181,11 @@ module lib
     !##########################################################################!
     !####################    compute_therapeutic_bullet    ####################!
     !##########################################################################!
-    function compute_therapeutic_bullet(r_min,r_max,max_targ,max_moda,A_physio,f,V,D,value) result(therapeutic_bullet_set)
+    function compute_therapeutic_bullet(r_min,r_max,A_physio,f,D) result(therapeutic_bullet_set)
         implicit none
-        integer::r_min,r_max,i1,i2,i3,max_targ,max_moda
+        integer::r_min,r_max,i1,i2,i3
         type(attractor),dimension(:)::A_physio
-        character(15),dimension(:)::V
         real,dimension(:,:)::D
-        real,dimension(:)::value
         type(bullet),dimension(:),allocatable::therapeutic_bullet_set
         type(attractor),dimension(:),allocatable::A_patho
         integer,dimension(:,:),allocatable::C_targ
@@ -202,8 +200,8 @@ module lib
             end function f
         end interface
         allocate(therapeutic_bullet_set(0))
-        do i1=r_min,min(r_max,size(V))
-            C_targ=generate_combination(range_int(1,size(V)),i1,max_targ)
+        do i1=r_min,min(r_max,n_node)
+            C_targ=generate_combination(range_int(1,n_node),i1,max_targ)
             C_moda=generate_arrangement(value,i1,max_moda)
             do i2=1,size(C_targ,1)
                 do i3=1,size(C_moda,1)
@@ -266,7 +264,7 @@ module lib
             stop
         end if
         if (x==0) then
-            y=1._8
+            y=real(1,8)
         else
             y=real(x,8)
             do i=1,x-1
@@ -383,8 +381,12 @@ module lib
         implicit none
         integer::x
         character(:),allocatable::y
-        character(10)::n
-        write (unit=n,fmt="(i10)") x
+        character(9)::n
+        if (x<0 .or. x>999999999) then
+            write (unit=*,fmt="(a)") "int2char(x): x<0 or x>999 999 999 unsupported"!FIXME
+            stop
+        end if
+        write (unit=n,fmt="(i9)") x
         y=trim(adjustl(n))
     end function int2char
     !##########################################################################!
@@ -455,10 +457,9 @@ module lib
     !##########################################################################!
     !#######################    report_attractor_set    #######################!
     !##########################################################################!
-    subroutine report_attractor_set(A_set,V,setting)
+    subroutine report_attractor_set(A_set,setting)
         implicit none
         type(attractor),dimension(:)::A_set
-        character(15),dimension(:)::V
         integer::setting,n_point,n_cycle,i1,i2,i3,save_
         character(:),allocatable::report
         character(:),allocatable::s
@@ -528,10 +529,9 @@ module lib
     !##########################################################################!
     !##################    report_therapeutic_bullet_set    ###################!
     !##########################################################################!
-    subroutine report_therapeutic_bullet_set(therapeutic_bullet_set,V)
+    subroutine report_therapeutic_bullet_set(therapeutic_bullet_set)
         implicit none
         type(bullet),dimension(:)::therapeutic_bullet_set
-        character(15),dimension(:)::V
         integer::n_gold,n_silv,i1,i2,save_
         character(:),allocatable::report
         n_gold=0
@@ -589,11 +589,9 @@ module lib
     !##########################################################################!
     !############################    what_to_do    ############################!
     !##########################################################################!
-    subroutine what_to_do(f,V,max_targ,max_moda,size_D,value)
+    subroutine what_to_do(f)
         implicit none
-        character(15),dimension(:)::V
-        integer::to_do,r_min,r_max,setting,max_targ,max_moda,size_D,comprehensive_D
-        real,dimension(:)::value
+        integer::to_do,r_min,r_max,setting,comprehensive_D
         real::start,finish
         real,dimension(:,:),allocatable::D
         type(attractor),dimension(:),allocatable::A_set
@@ -619,17 +617,17 @@ module lib
         read (unit=*,fmt=*) to_do
         if (to_do/=2 .and. to_do/=4 .and. to_do/=5) then
             if (all(value==[0.0,1.0])) then
-                write (unit=*,fmt="(a,es10.3e3,a)") new_line("a")//"size(S)=",real(2,8)**real(size(V),8),new_line("a")//&
+                write (unit=*,fmt="(a,es10.3e3,a)") new_line("a")//"size(S)=",real(2,8)**real(n_node,8),new_line("a")//&
                 "comprehensive_D? [1/0]"//new_line("a")
                 read (unit=*,fmt=*) comprehensive_D
                 select case (comprehensive_D)
                     case (1)
-                        D=transpose(generate_state_space(size(V)))
+                        D=transpose(generate_state_space(n_node))
                     case (0)
-                        D=transpose(generate_arrangement(value,size(V),size_D))
+                        D=transpose(generate_arrangement(value,n_node,size_D))
                 end select
             else
-                D=transpose(generate_arrangement(value,size(V),size_D))
+                D=transpose(generate_arrangement(value,n_node,size_D))
             end if
         end if
         select case (to_do)
@@ -640,13 +638,13 @@ module lib
                 write (unit=*,fmt="(a)") new_line("a")//"setting:"//new_line("a")//new_line("a")//"    [1] physiological"//&
                 new_line("a")//"    [2] pathological"//new_line("a")
                 read (unit=*,fmt=*) setting
-                call report_attractor_set(A_set,V,setting)
+                call report_attractor_set(A_set,setting)
                 deallocate(A_set,c_targ,c_moda,D)
             case (2)
                 A_physio=load_attractor_set(1)
                 A_patho=load_attractor_set(2)
                 a_patho_set=compute_pathological_attractor(A_physio,A_patho)
-                call report_attractor_set(a_patho_set,V,3)
+                call report_attractor_set(a_patho_set,3)
                 deallocate(A_physio,A_patho,a_patho_set)
             case (3)
                 A_physio=load_attractor_set(1)
@@ -654,8 +652,8 @@ module lib
                 read (unit=*,fmt=*) r_min
                 write (unit=*,fmt="(a)") new_line("a")//"r_max="//new_line("a")
                 read (unit=*,fmt=*) r_max
-                therapeutic_bullet_set=compute_therapeutic_bullet(r_min,r_max,max_targ,max_moda,A_physio,f,V,D,value)
-                call report_therapeutic_bullet_set(therapeutic_bullet_set,V)
+                therapeutic_bullet_set=compute_therapeutic_bullet(r_min,r_max,A_physio,f,D)
+                call report_therapeutic_bullet_set(therapeutic_bullet_set)
                 deallocate(A_physio,therapeutic_bullet_set,D)
             case (4)
                 write (unit=*,fmt="(a)") new_line("a")//"1) do step 1 with f_physio"//new_line("a")//"2) do step 1 with f_patho"//&
@@ -689,4 +687,3 @@ module lib
         write (unit=*,fmt="(a)") "done in "//int2char(int(finish-start))//" seconds"//new_line("a")
     end subroutine what_to_do
 end module lib
-

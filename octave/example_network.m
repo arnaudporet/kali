@@ -7,7 +7,8 @@
 # GNU Octave (http://www.gnu.org/software/octave/) is a high-level interpreted
 # language, primarily intended for numerical computations. 
 
-# The example network is a boolean model of the mammalian cell cycle [1].
+# The example network is a published boolean model of the mammalian cell
+# cycle [1].
 
 # [1] Fauré, A., Naldi, A., Chaouiya, C., & Thieffry, D. (2006). Dynamical
 # analysis of a generic Boolean model for the control of the mammalian cell
@@ -74,4 +75,3 @@ endfunction
 # pass either f_physio (for computing the physiological attractor set) or
 # f_patho (for computing the phathological attractor set or to compute therapeutic bullets)
 what_to_do("f_physio",V,size_D,max_targ,max_moda,value)
-

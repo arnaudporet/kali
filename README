@@ -10,7 +10,8 @@ How to:
     1) clone the project in your home directory ~/
     2) open the template file ~/kali-targ/example_network.f95
 
-The example network is a boolean model of the mammalian cell cycle [1].
+The example network is a published boolean model of the mammalian cell
+cycle [1].
 
 [1] Fauré, A., Naldi, A., Chaouiya, C., & Thieffry, D. (2006). Dynamical
 analysis of a generic Boolean model for the control of the mammalian cell cycle.

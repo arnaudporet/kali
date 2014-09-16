@@ -8,7 +8,8 @@
 
 ! Do not forget to recompile the sources following any modification.
 
-! The example network is a boolean model of the mammalian cell cycle [1].
+! The example network is a published boolean model of the mammalian cell
+! cycle [1].
 
 ! [1] Fauré, A., Naldi, A., Chaouiya, C., & Thieffry, D. (2006). Dynamical
 ! analysis of a generic Boolean model for the control of the mammalian cell
@@ -17,19 +18,20 @@
 program example_network
     use lib
     implicit none
-    ! allocate the number of nodes
-    allocate(V(10))
+    ! the number of nodes
+    n_node=10
     ! the domain of values, for example [0.0,1.0] for boolean logic and
     ! [0.0,0.5,1.0] for three valued logic
     value=[0.0,1.0]
     ! the maximum number of target combinations to test
-    max_targ=1e4
+    max_targ=10000
     ! the maximum number of modality arrangements to test for each target
     ! combination
-    max_moda=1e4
+    max_moda=10000
     ! the size of the subset of the state space to start from
-    size_D=1e4
+    size_D=10000
     ! the node names
+    allocate(V(n_node))
     V(1)="CycD"
     V(2)="Rb"
     V(3)="E2F"
@@ -43,7 +45,7 @@ program example_network
     ! pass either f_physio (for computing the physiological attractor set) or
     ! f_patho (for computing the phathological attractor set or to compute
     ! therapeutic bullets)
-    call what_to_do(f_physio,V,max_targ,max_moda,size_D,value)
+    call what_to_do(f_physio)
     deallocate(value,V)
     contains
     !##########################################################################!
@@ -63,7 +65,8 @@ program example_network
         y(4,1)=min(x(3,k),1.0-x(2,k))!CycE
         y(5,1)=max(min(x(3,k),1.0-x(2,k),1.0-x(7,k),1.0-min(x(8,k),x(9,k))),&
         min(x(5,k),1.0-x(2,k),1.0-x(7,k),1.0-min(x(8,k),x(9,k))))!CycA
-        y(6,1)=max(min(1.0-x(1,k),1.0-x(4,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-min(x(4,k),x(5,k)),1.0-x(10,k),1.0-x(1,k)))!p27
+        y(6,1)=max(min(1.0-x(1,k),1.0-x(4,k),1.0-x(5,k),1.0-x(10,k)),&
+        min(x(6,k),1.0-min(x(4,k),x(5,k)),1.0-x(10,k),1.0-x(1,k)))!p27
         y(7,1)=x(10,k)!Cdc20
         y(8,1)=max(min(1.0-x(5,k),1.0-x(10,k)),x(7,k),min(x(6,k),1.0-x(10,k)))!Cdh1
         y(9,1)=max(1.0-x(8,k),min(x(8,k),x(9,k),max(x(7,k),x(5,k),x(10,k))))!UbcH10
@@ -86,11 +89,11 @@ program example_network
         y(4,1)=min(x(3,k),1.0-x(2,k))!CycE
         y(5,1)=max(min(x(3,k),1.0-x(2,k),1.0-x(7,k),1.0-min(x(8,k),x(9,k))),&
         min(x(5,k),1.0-x(2,k),1.0-x(7,k),1.0-min(x(8,k),x(9,k))))!CycA
-        y(6,1)=max(min(1.0-x(1,k),1.0-x(4,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-min(x(4,k),x(5,k)),1.0-x(10,k),1.0-x(1,k)))!p27
+        y(6,1)=max(min(1.0-x(1,k),1.0-x(4,k),1.0-x(5,k),1.0-x(10,k)),&
+        min(x(6,k),1.0-min(x(4,k),x(5,k)),1.0-x(10,k),1.0-x(1,k)))!p27
         y(7,1)=x(10,k)!Cdc20
         y(8,1)=max(min(1.0-x(5,k),1.0-x(10,k)),x(7,k),min(x(6,k),1.0-x(10,k)))!Cdh1
         y(9,1)=max(1.0-x(8,k),min(x(8,k),x(9,k),max(x(7,k),x(5,k),x(10,k))))!UbcH10
         y(10,1)=min(1.0-x(7,k),1.0-x(8,k))!CycB
     end function f_patho
 end program example_network
-
