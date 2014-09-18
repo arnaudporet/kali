@@ -24,12 +24,12 @@ program example_network
     ! [0.0,0.5,1.0] for three valued logic
     value=[0.0,1.0]
     ! the maximum number of target combinations to test
-    max_targ=10000
+    max_targ=int(1e4)
     ! the maximum number of modality arrangements to test for each target
     ! combination
-    max_moda=10000
+    max_moda=int(1e4)
     ! the size of the subset of the state space to start from
-    size_D=10000
+    size_D=int(1e4)
     ! the node names
     allocate(V(n_node))
     V(1)="CycD"
