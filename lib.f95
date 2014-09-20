@@ -1,7 +1,7 @@
 module lib
     implicit none
     integer::max_targ,max_moda,size_D,n_node
-    character(32),dimension(:),allocatable::V
+    character(16),dimension(:),allocatable::V
     real,dimension(:),allocatable::value
     type::attractor
         real,dimension(:,:),allocatable::a

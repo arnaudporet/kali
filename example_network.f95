@@ -1,7 +1,7 @@
 ! How to:
 !     1) read the comments
 !     2) fill the template
-!     3) compile and execute: cd ~/kali-targ/ && gfortran lib.f95 example_network.f95 -o example_network && ./example_network
+!     3) compile and execute: cd ~/kali-targ/ && gfortran lib.f95 example_network.f95 -o example_network && rm lib.mod && ./example_network
 
 ! GFortran (https://www.gnu.org/software/gcc/fortran/) is the Fortran compiler
 ! front end and run-time libraries for GCC, the GNU Compiler Collection.
@@ -84,7 +84,7 @@ program example_network
         integer::k
         real,dimension(size(x,1),1)::y
         y(1,1)=x(1,k)!CycD
-        y(2,1)=0!Rb
+        y(2,1)=0.0!Rb
         y(3,1)=max(min(1.0-x(2,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-x(2,k),1.0-x(10,k)))!E2F
         y(4,1)=min(x(3,k),1.0-x(2,k))!CycE
         y(5,1)=max(min(x(3,k),1.0-x(2,k),1.0-x(7,k),1.0-min(x(8,k),x(9,k))),&
