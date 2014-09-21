@@ -24,10 +24,10 @@ program example_network
     ! [0.0,0.5,1.0] for three valued logic
     value=[0.0,1.0]
     ! the maximum number of target combinations to test
-    max_targ=int(1e4)
+    max_targ=int(1e2)
     ! the maximum number of modality arrangements to test for each target
     ! combination
-    max_moda=int(1e4)
+    max_moda=int(1e2)
     ! the size of the subset of the state space to start from
     size_D=int(1e4)
     ! the node names
@@ -45,7 +45,7 @@ program example_network
     ! pass either f_physio (for computing the physiological attractor set) or
     ! f_patho (for computing the phathological attractor set or to compute
     ! therapeutic bullets)
-    call what_to_do(f_physio)
+    call what_to_do(f_physio,value,size_D,n_node,max_targ,max_moda,V)
     deallocate(value,V)
     contains
     !##########################################################################!

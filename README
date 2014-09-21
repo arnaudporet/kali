@@ -16,9 +16,3 @@ cycle [1].
 [1] Fauré, A., Naldi, A., Chaouiya, C., & Thieffry, D. (2006). Dynamical
 analysis of a generic Boolean model for the control of the mammalian cell cycle.
 Bioinformatics, 22(14), e124-e131.
-
-The algorithm was firstly implemented in Octave
-(https://www.gnu.org/software/octave/) for convenience and then in Fortran 95
-compiled with GFortran (https://www.gnu.org/software/gcc/fortran/) for
-performance. The GNU Octave implementation is available in the octave folder of
-the present project.
