@@ -29,7 +29,6 @@ for i in range(len(names)):
     lines.append("V("+str(i+1)+")=\""+names[i]+"\"")
 lines.append("")
 for i in range(len(equations)):
-    equations[i]=equations[i].replace(";","")
     lines.append("y("+str(i+1)+",1)="+equations[i]+"! "+names[i])
 
 open(output_file,"w").write("\n".join(lines))
