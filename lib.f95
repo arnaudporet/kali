@@ -511,8 +511,8 @@ module lib
                     set_name="set_patho"
                     report_name="report_patho"
                 case (3)
-                    set_name="set_physio_versus_patho"
-                    report_name="report_physio_versus_patho"
+                    set_name="set_versus"
+                    report_name="report_versus"
             end select
             s=int2char(size(A_set))//new_line("a")
             do i1=1,size(A_set)
