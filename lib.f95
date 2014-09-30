@@ -5,6 +5,7 @@ module lib
     character(16),dimension(:),allocatable::V
     type::attractor
         real,dimension(:,:),allocatable::a
+        real::popularity
     end type attractor
     type::bullet
         integer,dimension(:),allocatable::targ
@@ -15,13 +16,15 @@ module lib
     !##########################################################################!
     !##########################    add_attractor    ###########################!
     !##########################################################################!
-    function add_attractor(A_set,a) result(y)
+    function add_attractor(A_set,a,popularity) result(y)
         implicit none
         type(attractor),dimension(:)::A_set
         real,dimension(:,:)::a
+        real::popularity
         type(attractor),dimension(size(A_set)+1)::y
         y(:size(A_set))=A_set
         y(size(A_set)+1)%a=a
+        y(size(A_set)+1)%popularity=popularity
     end function add_attractor
     !##########################################################################!
     !############################    add_bullet    ############################!
@@ -112,7 +115,7 @@ module lib
         real,dimension(:,:),allocatable::x
         integer::i1,i2,k
         logical::a_found,in_A
-        real,dimension(:,:),allocatable::a
+        real,dimension(:,:),allocatable::a,count
         interface
             function f(x,k) result(y)
                 implicit none
@@ -122,6 +125,7 @@ module lib
             end function f
         end interface
         allocate(A_set(0))
+        allocate(count(1,0))
         do i1=1,size(D,2)
             x=reshape(D(:,i1),[size(D,1),1])
             k=1
@@ -141,11 +145,13 @@ module lib
                     do i2=1,size(A_set)
                         if (.not. compare_attractor(a,A_set(i2)%a)) then
                             in_A=.true.
+                            count(1,i2)=count(1,i2)+1.0
                             exit
                         end if
                     end do
                     if (.not. in_A) then
-                        A_set=add_attractor(A_set,a)
+                        A_set=add_attractor(A_set,a,0.0)
+                        count=concatenate(count,reshape([1.0],[1,1]),2)
                     end if
                     exit
                 end if
@@ -153,6 +159,10 @@ module lib
             end do
             deallocate(x,a)
         end do
+        do i1=1,size(A_set)
+            A_set(i1)%popularity=(count(1,i1)/real(size(D,2)))*100.0
+        end do
+        deallocate(count)
     end function compute_attractor
     !##########################################################################!
     !##################    compute_pathological_attractor    ##################!
@@ -174,7 +184,7 @@ module lib
                 end if
             end do
             if (.not. in_physio) then
-                a_patho_set=add_attractor(a_patho_set,A_patho(i1)%a)
+                a_patho_set=add_attractor(a_patho_set,A_patho(i1)%a,A_patho(i1)%popularity)
             end if
         end do
     end function compute_pathological_attractor
@@ -394,13 +404,13 @@ module lib
         implicit none
         integer::x
         character(:),allocatable::y
-        character(9)::n
+        character(9)::z
         if (x<0 .or. x>999999999) then
             write (unit=*,fmt="(a)") "int2char(x): x<0 or x>999 999 999 unsupported"!FIXME
             stop
         end if
-        write (unit=n,fmt="(i9)") x
-        y=trim(adjustl(n))
+        write (unit=z,fmt="(i9)") x
+        y=trim(adjustl(z))
     end function int2char
     !##########################################################################!
     !########################    load_attractor_set    ########################!
@@ -423,6 +433,7 @@ module lib
         do i1=1,size(A_set)
             read (unit=1,fmt=*) n
             read (unit=1,fmt=*) m
+            read (unit=1,fmt=*) A_set(i1)%popularity
             allocate(A_set(i1)%a(n,m))
         end do
         do i1=1,size(A_set)
@@ -458,14 +469,17 @@ module lib
     !############################    real2char    #############################!
     !##########################################################################!
     function real2char(x) result(y)
+        !####################    /!\ only one digit /!\    ####################!
         implicit none
         real::x
-        character(3)::y
-        if (x<0.0 .or. x>1.0) then
-            write (unit=*,fmt="(a)") "real2char(x): x<0.0 or x>1.0 unsupported"!FIXME
+        character(:),allocatable::y
+        character(5)::z
+        if (x<0.0 .or. x>999.9) then
+            write (unit=*,fmt="(a)") "real2char(x): x<0.0 or x>999.9 unsupported"!FIXME
             stop
         end if
-        write (unit=y,fmt="(f3.1)") x
+        write (unit=z,fmt="(f5.1)") x
+        y=trim(adjustl(z))
     end function real2char
     !##########################################################################!
     !#######################    report_attractor_set    #######################!
@@ -488,6 +502,7 @@ module lib
             else
                 n_cycle=n_cycle+1
             end if
+            report=report//"popularity: "//real2char(A_set(i1)%popularity)//"%"//new_line("a")//new_line("a")
             do i2=1,size(A_set(i1)%a,1)
                 report=report//V(i2)//": "
                 do i3=1,size(A_set(i1)%a,2)
@@ -516,7 +531,8 @@ module lib
             end select
             s=int2char(size(A_set))//new_line("a")
             do i1=1,size(A_set)
-                s=s//int2char(size(A_set(i1)%a,1))//new_line("a")//int2char(size(A_set(i1)%a,2))//new_line("a")
+                s=s//int2char(size(A_set(i1)%a,1))//new_line("a")//int2char(size(A_set(i1)%a,2))//new_line("a")//&
+                real2char(A_set(i1)%popularity)//new_line("a")
             end do
             do i1=1,size(A_set)
                 do i2=1,size(A_set(i1)%a,1)
