@@ -5,12 +5,14 @@ package main
 
 import "fmt"
 
-const x [3]int={1,2,3}
-
 func main() {
-    fmt.Println(x)
+    for i:=1;i<=10;i++ {
+        if i==5 {
+            exit
+        }
+        fmt.Println(i)
+    }
 }
 
-func f(x int) ([]int) {
-    return []int{x,x}
-}
+
+
