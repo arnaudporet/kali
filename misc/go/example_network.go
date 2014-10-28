@@ -54,23 +54,27 @@ func f_physio(x [][]bool,k int) [][]bool {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////    lib    ///////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
 func all(x []bool) bool {
-    for _,value:=range x {if value==false {return false}}
+    for i,_:=range x {if x[i]==false {return false}}
     return true
 }
 
 func any(x []bool) bool {
-    for _,value:=range x {if value==true {return true}}
+    for i,_:=range x {if x[i]==true {return true}}
     return false
 }
 
 func compare_attractor(a1,a2 [][]bool) bool {
-    if len(a1[0])!=len(a2[0]) {return true}
-    else {
+    var start1,start2 int
+    if len(a1[0])!=len(a2[0]) {return true} else {
         start_found:=false
         for j1,_:=range a1[0] {
             for j2,_:=range a2[0] {
-                z:=[]bool
+                z:=[]bool{}
                 for i,_:=range a1 {z=append(z,a1[i][j1]==a2[i][j2])}
                 if all(z) {
                     start_found=true
@@ -84,7 +88,7 @@ func compare_attractor(a1,a2 [][]bool) bool {
         if !start_found {return true}
         else {
             for j:=1;j<=len(a1[0])-1;j++ {
-                z:=[]bool
+                z:=[]bool{}
                 for i,_:=range a1 {z=append(z,a1[i][(start1+j)%len(a1[0])]==a2[i][(start2+j)%len(a2[0])])}
                 if !all(z) {return true}
             }
@@ -96,10 +100,10 @@ func compare_attractor(a1,a2 [][]bool) bool {
 func compare_attractor_set(A1,A2 [][][]bool) bool {
     if len(A1)!=len(A2) {return true} else {
         in_2:=[]bool{}
-        for _,a1:=range A1 {
+        for i1,_:=range A1 {
             z:=false
-            for _,a2:=range A2 {
-                if !compare_attractor(a1,a2) {
+            for i2,_:=range A2 {
+                if !compare_attractor(A1[i1],A2[i2]) {
                     z=true
                     break
                 }
@@ -110,64 +114,50 @@ func compare_attractor_set(A1,A2 [][][]bool) bool {
     }
 }
 
-function compute_attractor(f,c_targ,c_moda,D) result(A_set)<<<<<<<<<<<<<<<<<<<<<<<<<<
-    implicit none
-    integer,dimension(:)::c_targ
-    real,dimension(:)::c_moda
-    real,dimension(:,:)::D
-    type(attractor),dimension(:),allocatable::A_set
-    real,dimension(:,:),allocatable::x
-    integer::i1,i2,k
-    logical::a_found,in_A
-    real,dimension(:,:),allocatable::a,count
-    interface
-        function f(x,k) result(y)
-            implicit none
-            real,dimension(:,:)::x
-            integer::k
-            real,dimension(size(x,1),1)::y
-        end function f
-    end interface
-    allocate(A_set(0))
-    allocate(count(1,0))
-    do i1=1,size(D,2)
-        x=reshape(D(:,i1),[size(D,1),1])
-        k=1
-        do
-            x=concatenate(x,f(x,k),2)
-            x(c_targ,k+1)=c_moda
-            a_found=.false.
-            do i2=k,1,-1
-                if (all(x(:,i2)==x(:,k+1))) then
-                    a_found=.true.
-                    a=reshape(x(:,i2:k),[size(D,1),k-i2+1])
-                    exit
-                end if
-            end do
-            if (a_found) then
-                in_A=.false.
-                do i2=1,size(A_set)
-                    if (.not. compare_attractor(a,A_set(i2)%a)) then
-                        in_A=.true.
-                        count(1,i2)=count(1,i2)+1.0
-                        exit
-                    end if
-                end do
-                if (.not. in_A) then
-                    A_set=add_attractor(A_set,a,0.0)
-                    count=concatenate(count,reshape([1.0],[1,1]),2)
-                end if
-                exit
-            end if
-            k=k+1
-        end do
-        deallocate(x,a)
-    end do
-    do i1=1,size(A_set)
-        A_set(i1)%popularity=(count(1,i1)/real(size(D,2)))*100.0
-    end do
-    deallocate(count)
-end function compute_attractor
+func compute_attractor(f func(x [][]bool,k int) [][]bool,c_targ []int,c_moda []bool,D [][]bool) ([][][]bool,[]float64{}) {
+    A:=[][][]bool{}
+    count:=[]int{}
+    for i1,_:=range D[0] {
+        x:=make([][]bool,len(D))
+        for i,_:=range D {x[i]=[]bool{D[i][i1]}}
+        k:=0
+        for {
+            x=concatenate(x,f(x,k))
+            for i,_:=range c_targ {x[c_targ[i]][k+1]=c_moda[i]}
+            a_found:=false
+            for i2:=k;i2>=0;i2-- {
+                z:=[]bool{}
+                for i,_:=range x {z=append(z,x[i][i2]==x[i][k+1])}
+                if all(z) {
+                    a_found=true
+                    a:=make([][]bool,len(x))
+                    for i,_:=range x {a[i]=x[i][i2:k+1]}
+                    break
+                }
+            }
+            if a_found {
+                in_A:=false
+                for i2,_:=range A {
+                    if !compare_attractor(a,A[i2]) {
+                        in_A=true
+                        count[i2]+=1
+                        break
+                    }
+                }
+                if !in_A {
+                    A=append(A,[][]bool{})
+                    A[len(A)-1]=a
+                    count=append(count,1)
+                }
+                break
+            }
+            k+=1
+        }
+    }
+    popularity:=make([]float64,len(count))
+    for i1,_:=range count {popularity[i1]=(float64(count[i1])/float64(len(D[0])))*100.0}
+}
+
 !##########################################################################!
 !##################    compute_pathological_attractor    ##################!
 !##########################################################################!
@@ -235,38 +225,13 @@ function compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,val
         deallocate(C_targ,C_moda)
     end do
 end function compute_therapeutic_bullet
-!##########################################################################!
-!###########################    concatenate    ############################!
-!##########################################################################!
-function concatenate(x1,x2,d) result(y)
-    implicit none
-    real,dimension(:,:)::x1
-    real,dimension(:,:)::x2
-    integer::d
-    real,dimension(:,:),allocatable::y
-    select case (d)
-        case (1)
-            if (size(x1,1)==0) then
-                y=x2
-            else if (size(x2,1)==0) then
-                y=x1
-            else
-                allocate(y(size(x1,1)+size(x2,1),size(x1,2)))
-                y(1:size(x1,1),:)=x1
-                y(size(x1,1)+1:size(x1,1)+size(x2,1),:)=x2
-            end if
-        case (2)
-            if (size(x1,2)==0) then
-                y=x2
-            else if (size(x2,2)==0) then
-                y=x1
-            else
-                allocate(y(size(x1,1),size(x1,2)+size(x2,2)))
-                y(:,1:size(x1,2))=x1
-                y(:,size(x1,2)+1:size(x1,2)+size(x2,2))=x2
-            end if
-    end select
-end function concatenate
+
+func concatenate(x,y [][]bool) [][]bool {
+    for i,_:=range x {
+        x[i]=append(x[i],y[i]...)
+    }
+    return x
+}
 !##########################################################################!
 !##############################    facto    ###############################!
 !##########################################################################!
