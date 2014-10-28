@@ -24,103 +24,93 @@ func main() {
     what_to_do()
 }
 
-func f_physio(x []bool) []bool {
-    return []bool{
-        x[0],// CycD
-        (!x[0] && !x[3] && !x[4] && !x[9]) || (x[5] && !x[0] && !x[9]),// Rb
-        (!x[1] && !x[4] && !x[9]) || (x[5] && !x[1] && !x[9]),// E2F
-        x[2] && !x[1],// CycE
-        (x[2] && !x[1] && !x[6] && !(x[7] && x[8])) || (x[4] && !x[1] && !x[6] && !(x[7] && x[8])),// CycA
-        (!x[0] && !x[3] && !x[4] && !x[9]) || (x[5] && !(x[3] && x[4]) && !x[9] && !x[0]),// p27
-        x[9],// Cdc20
-        (!x[4] && !x[9]) || x[6] || (x[5] && !x[9]),// Cdh1
-        !x[7] || (x[7] && x[8] && (x[6] || x[4] || x[9])),// UbcH10
-        !x[6] && !x[7],// CycB
+func f_physio(x [][]bool,k int) [][]bool {
+    return [][]bool{
+        {x[0][k]},// CycD
+        {(!x[0][k] && !x[3][k] && !x[4][k] && !x[9][k]) || (x[5][k] && !x[0][k] && !x[9][k])},// Rb
+        {(!x[1][k] && !x[4][k] && !x[9][k]) || (x[5][k] && !x[1][k] && !x[9][k])},// E2F
+        {x[2][k] && !x[1][k]},// CycE
+        {(x[2][k] && !x[1][k] && !x[6][k] && !(x[7][k] && x[8][k])) || (x[4][k] && !x[1][k] && !x[6][k] && !(x[7][k] && x[8][k]))},// CycA
+        {(!x[0][k] && !x[3][k] && !x[4][k] && !x[9][k]) || (x[5][k] && !(x[3][k] && x[4][k]) && !x[9][k] && !x[0][k])},// p27
+        {x[9][k]},// Cdc20
+        {(!x[4][k] && !x[9][k]) || x[6][k] || (x[5][k] && !x[9][k])},// Cdh1
+        {!x[7][k] || (x[7][k] && x[8][k] && (x[6][k] || x[4][k] || x[9][k]))},// UbcH10
+        {!x[6][k] && !x[7][k]},// CycB
     }
 }
 
-func f_patho(x []bool) []bool {
-    return []bool{
-        x[0],// CycD
-        false,// Rb
-        (!x[1] && !x[4] && !x[9]) || (x[5] && !x[1] && !x[9]),// E2F
-        x[2] && !x[1],// CycE
-        (x[2] && !x[1] && !x[6] && !(x[7] && x[8])) || (x[4] && !x[1] && !x[6] && !(x[7] && x[8])),// CycA
-        (!x[0] && !x[3] && !x[4] && !x[9]) || (x[5] && !(x[3] && x[4]) && !x[9] && !x[0]),// p27
-        x[9],// Cdc20
-        (!x[4] && !x[9]) || x[6] || (x[5] && !x[9]),// Cdh1
-        !x[7] || (x[7] && x[8] && (x[6] || x[4] || x[9])),// UbcH10
-        !x[6] && !x[7],// CycB
+func f_physio(x [][]bool,k int) [][]bool {
+    return [][]bool{
+        {x[0][k]},// CycD
+        {false},// Rb
+        {(!x[1][k] && !x[4][k] && !x[9][k]) || (x[5][k] && !x[1][k] && !x[9][k])},// E2F
+        {x[2][k] && !x[1][k]},// CycE
+        {(x[2][k] && !x[1][k] && !x[6][k] && !(x[7][k] && x[8][k])) || (x[4][k] && !x[1][k] && !x[6][k] && !(x[7][k] && x[8][k]))},// CycA
+        {(!x[0][k] && !x[3][k] && !x[4][k] && !x[9][k]) || (x[5][k] && !(x[3][k] && x[4][k]) && !x[9][k] && !x[0][k])},// p27
+        {x[9][k]},// Cdc20
+        {(!x[4][k] && !x[9][k]) || x[6][k] || (x[5][k] && !x[9][k])},// Cdh1
+        {!x[7][k] || (x[7][k] && x[8][k] && (x[6][k] || x[4][k] || x[9][k]))},// UbcH10
+        {!x[6][k] && !x[7][k]},// CycB
     }
 }
 
-func all(x []bool) (bool) {
+func all(x []bool) bool {
     for _,value:=range x {if value==false {return false}}
     return true
 }
 
-func any(x []bool) (bool) {
+func any(x []bool) bool {
     for _,value:=range x {if value==true {return true}}
     return false
 }
 
-func compare_attractor(a1,a2 [][]bool) (differ bool) {
-    differ=false
-    if len(a1[0])!=len(a2[0]) {differ=true} else {
-        start_found=false
+func compare_attractor(a1,a2 [][]bool) bool {
+    if len(a1[0])!=len(a2[0]) {return true}
+    else {
+        start_found:=false
         for j1,_:=range a1[0] {
             for j2,_:=range a2[0] {
                 z:=[]bool
                 for i,_:=range a1 {z=append(z,a1[i][j1]==a2[i][j2])}
                 if all(z) {
                     start_found=true
-                    start1=i1
-                    start2=i2
+                    start1:=j1
+                    start2:=j2
                     break
                 }
             }
             if start_found {break}
         }
-        if !start_found {differ=true} else {
-            do i1=0,size(a1,2)-2<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                if (.not. all(a1(:,modulo(start1+i1,size(a1,2))+1)==a2(:,modulo(start2+i1,size(a2,2))+1))) then
-                    differ=.true.
-                    exit
-                end if
-            end do
+        if !start_found {return true}
+        else {
+            for j:=1;j<=len(a1[0])-1;j++ {
+                z:=[]bool
+                for i,_:=range a1 {z=append(z,a1[i][(start1+j)%len(a1[0])]==a2[i][(start2+j)%len(a2[0])])}
+                if !all(z) {return true}
+            }
+            return false
         }
     }
 }
-!##########################################################################!
-!######################    compare_attractor_set    #######################!
-!##########################################################################!
-function compare_attractor_set(A_set1,A_set2) result(differ)
-    implicit none
-    type(attractor),dimension(:)::A_set1
-    type(attractor),dimension(:)::A_set2
-    logical::differ,z
-    logical,dimension(size(A_set1))::in_2
-    integer::i1,i2
-    if (size(A_set1)/=size(A_set2)) then
-        differ=.true.
-    else
-        do i1=1,size(A_set1)
-            z=.false.
-            do i2=1,size(A_set2)
-                if (.not. compare_attractor(A_set1(i1)%a,A_set2(i2)%a)) then
-                    z=.true.
-                    exit
-                end if
-            end do
-            in_2(i1)=z
-        end do
-        differ=.not. all(in_2)
-    end if
-end function compare_attractor_set
-!##########################################################################!
-!########################    compute_attractor    #########################!
-!##########################################################################!
-function compute_attractor(f,c_targ,c_moda,D) result(A_set)
+
+func compare_attractor_set(A1,A2 [][][]bool) bool {
+    if len(A1)!=len(A2) {return true} else {
+        in_2:=[]bool{}
+        for _,a1:=range A1 {
+            z:=false
+            for _,a2:=range A2 {
+                if !compare_attractor(a1,a2) {
+                    z=true
+                    break
+                }
+            }
+            in_2=append(in_2,z)
+        }
+        return !all(in_2)
+    }
+}
+
+function compute_attractor(f,c_targ,c_moda,D) result(A_set)<<<<<<<<<<<<<<<<<<<<<<<<<<
     implicit none
     integer,dimension(:)::c_targ
     real,dimension(:)::c_moda
