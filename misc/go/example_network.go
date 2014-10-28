@@ -145,7 +145,7 @@ func compute_attractor(f func(x [][]bool,k int) [][]bool,c_targ []int,c_moda []b
                     }
                 }
                 if !in_A {
-                    A=append(A,[][]bool{})
+                    A=append(A,[][]bool{})<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     A[len(A)-1]=a
                     count=append(count,1)
                 }
@@ -155,33 +155,26 @@ func compute_attractor(f func(x [][]bool,k int) [][]bool,c_targ []int,c_moda []b
         }
     }
     popularity:=make([]float64,len(count))
-    for i1,_:=range count {popularity[i1]=(float64(count[i1])/float64(len(D[0])))*100.0}
+    for i,_:=range count {popularity[i]=(float64(count[i])/float64(len(D[0])))*100.0}
+    return A,popularity
 }
 
-!##########################################################################!
-!##################    compute_pathological_attractor    ##################!
-!##########################################################################!
-function compute_pathological_attractor(A_physio,A_patho) result(a_patho_set)
-    implicit none
-    type(attractor),dimension(:)::A_physio
-    type(attractor),dimension(:)::A_patho
-    type(attractor),dimension(:),allocatable::a_patho_set
-    integer::i1,i2
-    logical::in_physio
-    allocate(a_patho_set(0))
-    do i1=1,size(A_patho)
-        in_physio=.false.
-        do i2=1,size(A_physio)
-            if (.not. compare_attractor(A_patho(i1)%a,A_physio(i2)%a)) then
-                in_physio=.true.
-                exit
-            end if
-        end do
-        if (.not. in_physio) then
-            a_patho_set=add_attractor(a_patho_set,A_patho(i1)%a,A_patho(i1)%popularity)
-        end if
-    end do
-end function compute_pathological_attractor
+func compute_pathological_attractor(A_physio,A_patho [][][]bool) [][][]bool {
+    a_patho_set:=[][][]bool{}
+    for i1,_:=range A_patho {
+        in_physio:=false
+        for i2,_:=range A_physio {
+            if !compare_attractor(A_patho[i1],A_physio[i2]) {
+                in_physio=true
+                break
+            }
+        }
+        if !in_physio {
+            a_patho_set=add_attractor(a_patho_set,A_patho(i1)%a,A_patho(i1)%popularity)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        }
+    }
+}
+
 !##########################################################################!
 !####################    compute_therapeutic_bullet    ####################!
 !##########################################################################!
