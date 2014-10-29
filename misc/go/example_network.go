@@ -9,6 +9,8 @@ import (
     "time"
     "math/rand"
     "sort"
+    "strings"
+    "strconv"
 )
 
 func main() {
@@ -187,7 +189,7 @@ func factorial(x float64) float64 {
     if x==float64(0) {return float64(1)} else {return x*factorial(x-float64(1))}
 }
 
-func generate_arrangement(k int,n_arrang int) [][]bool {
+func generate_arrangement(k,n_arrang int) [][]bool {
     ////////////////////    /!\ only with repetition /!\    ////////////////////
     arrang_mat:=[][]bool{}
     for i1:=1;i1<=int(math.Min(float64(n_arrang),math.Pow(float64(2),float64(k))));i1++ {
@@ -257,76 +259,20 @@ func generate_combination(k,n,n_combi int) [][]int {
     return combi_mat
 }
 
-!##########################################################################!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-!#######################    generate_state_space    #######################!
-!##########################################################################!
-function generate_state_space(n) result(y)
-    implicit none
-    integer::n,i1,i2
-    real,dimension(:,:),allocatable::y
-    real,dimension(:,:),allocatable::z
-    if (n>30) then
-        write (unit=*,fmt="(a)") "generate_state_space(n): n>30 unsupported"
-        stop
-    end if
-    allocate(y(2,1))
-    y(1,1)=0.0
-    y(2,1)=1.0
-    do i1=1,n-1
-        allocate(z(size(y,1)*2,size(y,2)+1))
-        do i2=1,size(y,1)
-            z(2*i2-1,:size(y,2))=y(i2,:)
-            z(2*i2-1,size(y,2)+1)=0.0
-            z(2*i2,:size(y,2))=y(i2,:)
-            z(2*i2,size(y,2)+1)=1.0
-        end do
-        deallocate(y)
-        y=z
-        deallocate(z)
-    end do
-end function generate_state_space
-!##########################################################################!
-!############################    Heaviside    #############################!
-!##########################################################################!
-function Heaviside(x) result(y)
-    implicit none
-    real::x,y
-    if (x<=0.0) then
-        y=0.0
-    else
-        y=1.0
-    end if
-end function Heaviside
-!##########################################################################!
-!#########################    init_random_seed    #########################!
-!##########################################################################!
-subroutine init_random_seed()
-    implicit none
-    integer,allocatable::seed(:)
-    integer::n,un,istat
-    call random_seed(size=n)
-    allocate(seed(n))
-    open(newunit=un,file="/dev/urandom",access="stream",form="unformatted",action="read",status="old",iostat=istat)
-    read(un) seed
-    close(un)
-    call random_seed(put=seed)
-    deallocate(seed)
-end subroutine init_random_seed
-!##########################################################################!
-!#############################    int2char    #############################!TODO merge with real2char?
-!##########################################################################!
-function int2char(x) result(y)
-    implicit none
-    integer::x
-    character(:),allocatable::y
-    character(9)::z
-    if (x<0 .or. x>999999999) then
-        write (unit=*,fmt="(a)") "int2char(x): x<0 or x>999 999 999 unsupported"!FIXME
-        stop
-    end if
-    write (unit=z,fmt="(i9)") x
-    y=trim(adjustl(z))
-end function int2char
+func generate_state_space(n int) [][]bool {
+    y:=[][]bool{{false,true}}
+    for i1:=1;i1<=n-1;i1++ {
+        for i2,_:=range y {y[i2]=append(y[i2],y[i2]...)}
+        y=append(y,[]bool{})
+        for j,_:=range y[0] {
+            z:=false
+            if j>=len(y[0])/2 {z=true}
+            y[i1]=append(y[i1],z)
+        }
+    }
+    return y
+}
+
 !##########################################################################!
 !########################    load_attractor_set    ########################!
 !##########################################################################!
@@ -359,91 +305,31 @@ function load_attractor_set(setting) result(A_set)
     close (unit=1)
     deallocate(set_name)
 end function load_attractor_set
-!##########################################################################!
-!#############################    rand_int    #############################!
-!##########################################################################!
-function rand_int(a,b) result(y)
-    implicit none
-    integer::a,b,y
-    real::x
-    call random_number(x)
-    y=nint(real(a)+x*(real(b)-real(a)))
-end function rand_int
-!##########################################################################!
-!############################    range_int    #############################!
-!##########################################################################!
-function range_int(a,b) result(y)
-    implicit none
-    integer::a,b,i
-    integer,dimension(b-a+1)::y
-    do i=1,size(y)
-        y(i)=a+i-1
-    end do
-end function range_int
-!##########################################################################!
-!############################    real2char    #############################!
-!##########################################################################!
-function real2char(x) result(y)
-    !####################    /!\ only one digit /!\    ####################!
-    implicit none
-    real::x
-    character(:),allocatable::y
-    character(5)::z
-    if (x<0.0 .or. x>999.9) then
-        write (unit=*,fmt="(a)") "real2char(x): x<0.0 or x>999.9 unsupported"!FIXME
-        stop
-    end if
-    write (unit=z,fmt="(f5.1)") x
-    y=trim(adjustl(z))
-end function real2char
-!##########################################################################!
-!#######################    report_attractor_set    #######################!
-!##########################################################################!
-subroutine report_attractor_set(A_set,setting,V)
-    implicit none
-    type(attractor),dimension(:)::A_set
-    integer::setting,n_point,n_cycle,i1,i2,i3,save_
-    character(16),dimension(:)::V
-    character(:),allocatable::report
-    character(:),allocatable::s
-    character(:),allocatable::set_name
-    character(:),allocatable::report_name
-    n_point=0
-    n_cycle=0
-    report=repeat("-",80)//new_line("a")
-    do i1=1,size(A_set)
-        if (size(A_set(i1)%a,2)==1) then
-            n_point=n_point+1
-        else
-            n_cycle=n_cycle+1
-        end if
-        report=report//"popularity: "//real2char(A_set(i1)%popularity)//"%"//new_line("a")//new_line("a")
-        do i2=1,size(A_set(i1)%a,1)
-            report=report//V(i2)//": "
-            do i3=1,size(A_set(i1)%a,2)
-                report=report//real2char(A_set(i1)%a(i2,i3))//" "
-            end do
-            report=report//new_line("a")
-        end do
-        report=report//repeat("-",80)//new_line("a")
-    end do
-    report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//&
-    " cycles)"
-    write (unit=*,fmt="(a)") new_line("a")//report//new_line("a")
-    write (unit=*,fmt="(a)") "save? [1/0]"//new_line("a")
-    read (unit=*,fmt=*) save_
-    if (save_==1) then
-        select case (setting)
-            case (1)
-                set_name="set_physio"
-                report_name="report_physio"
-            case (2)
-                set_name="set_patho"
-                report_name="report_patho"
-            case (3)
-                set_name="set_versus"
-                report_name="report_versus"
-        end select
+
+func report_attractor_set(A [][][]bool,setting int,V []string) {
+    n_point:=0
+    n_cycle:=0
+    report:=strings.Repeat("-",80)+"\n"
+    for i1:=range A {
+        if len(A[i1][0])==1 {n_point+=1} else {n_cycle+=1}
+        for i2:=range A[i1] {
+            report+=V[i2]+": "
+            for i3:=range A[i1][0] {report+=strconv.FormatBool(A[i1][i2][i3])+" "}
+            report+="\n"
+        }
+        report+=strings.Repeat("-",80)+"\n"
+    }
+    report+="found attractors: "+strconv.FormatInt(int64(len(A)),10)+" ("+strconv.FormatInt(int64(n_point),10)+" points, "+strconv.FormatInt(int64(n_cycle),10)+" cycles)"
+    fmt.Println(report)
+    save:="y"
+    fmt.Printf("save [Y/n]" )
+    fmt.Scanf("%s",&save)
+    if strings.ToLower(save)=="y" || strings.ToLower(save)=="yes" {
+        switch setting {
+            case 1: set_name,report_name:="set_physio","report_physio"
+            case 2: set_name,report_name:="set_patho","report_patho"
+            case 3: set_name,report_name:="set_versus","report_versus"
+        }<<<<<<<<<<<<<<<<<<<<
         s=int2char(size(A_set))//new_line("a")
         do i1=1,size(A_set)
             s=s//int2char(size(A_set(i1)%a,1))//new_line("a")//int2char(size(A_set(i1)%a,2))//new_line("a")//&
@@ -468,9 +354,9 @@ subroutine report_attractor_set(A_set,setting,V)
         write (unit=*,fmt="(a)") new_line("a")//"set saved as: "//set_name//new_line("a")//"report saved as: "//report_name//&
         new_line("a")
         deallocate(s,set_name,report_name)
-    end if
-    deallocate(report)
-end subroutine report_attractor_set
+    }
+}
+
 !##########################################################################!
 !##################    report_therapeutic_bullet_set    ###################!
 !##########################################################################!
