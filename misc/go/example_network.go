@@ -3,9 +3,16 @@
 
 package main
 
-import "fmt"
+import (
+    "fmt"
+    "math"
+    "time"
+    "math/rand"
+    "sort"
+)
 
 func main() {
+    rand.Seed(int64(time.Now().Nanosecond()))
     max_targ:=int(1e2)
     max_moda:=int(1e2)
     size_D:=int(1e4)
@@ -70,8 +77,7 @@ func compare_attractor(a1,a2 [][]bool) bool {
             }
             if start_found {break}
         }
-        if !start_found {return true}
-        else {
+        if !start_found {return true} else {
             for j:=1;j<=len(a1[0])-1;j++ {
                 z:=[]bool{}
                 for i,_:=range a1 {z=append(z,a1[i][(start1+j)%len(a1[0])]==a2[i][(start2+j)%len(a2[0])])}
@@ -99,10 +105,8 @@ func compare_attractor_set(A1,A2 [][][]bool) bool {
     }
 }
 
-func compute_attractor(f func(x [][]bool,k int) [][]bool,c_targ []int,c_moda []bool,D [][]bool) ([][][]bool,[]float64) {
+func compute_attractor(f func(x [][]bool,k int) [][]bool,c_targ []int,c_moda []bool,D [][]bool) [][][]bool {
     A:=[][][]bool{}
-    count:=[]int{}
-    popularity:=[]float64{}
     for i1,_:=range D[0] {
         x:=[][]bool{}
         for i,_:=range D {x=append(x,[]bool{D[i][i1]})}
@@ -118,9 +122,7 @@ func compute_attractor(f func(x [][]bool,k int) [][]bool,c_targ []int,c_moda []b
                 if all(z) {
                     a_found=true
                     a:=[][]bool{}
-                    for i,_:=range x {
-                        a=append(a,x[i][i2:k+1])
-                    }
+                    for i,_:=range x {a=append(a,x[i][i2:k+1])}
                     break
                 }
             }
@@ -129,21 +131,16 @@ func compute_attractor(f func(x [][]bool,k int) [][]bool,c_targ []int,c_moda []b
                 for i2,_:=range A {
                     if !compare_attractor(a,A[i2]) {
                         in_A=true
-                        count[i2]+=1
                         break
                     }
                 }
-                if !in_A {
-                    A=append(A,a)
-                    count=append(count,1)
-                }
+                if !in_A {A=append(A,a)}
                 break
             }
             k+=1
         }
     }
-    for i,_:=range count {popularity=append(popularity,(float64(count[i])/float64(len(D[0])))*100.0)}
-    return A,popularity
+    return A
 }
 
 func compute_pathological_attractor(A_physio,A_patho [][][]bool) [][][]bool {
@@ -158,138 +155,109 @@ func compute_pathological_attractor(A_physio,A_patho [][][]bool) [][][]bool {
         }
         if !in_physio {a_patho_set=append(a_patho_set,A_patho[i1])}
     }
+    return a_patho_set
 }
 
-!##########################################################################!
-!####################    compute_therapeutic_bullet    ####################!
-!##########################################################################!
-function compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio) result(therapeutic_bullet_set)
-    implicit none
-    integer::r_min,r_max,i1,i2,i3,max_targ,max_moda,n_node
-    type(attractor),dimension(:)::A_physio
-    real,dimension(:,:)::D
-    type(bullet),dimension(:),allocatable::therapeutic_bullet_set
-    type(attractor),dimension(:),allocatable::A_patho
-    integer,dimension(:,:),allocatable::C_targ
-    real,dimension(:,:),allocatable::C_moda
-    real,dimension(:)::value
-    character(6)::metal
-    interface
-        function f(x,k) result(y)
-            implicit none
-            real,dimension(:,:)::x
-            integer::k
-            real,dimension(size(x,1),1)::y
-        end function f
-    end interface
-    allocate(therapeutic_bullet_set(0))
-    do i1=r_min,min(r_max,n_node)
-        C_targ=generate_combination(range_int(1,n_node),i1,max_targ)
-        C_moda=generate_arrangement(value,i1,max_moda)
-        do i2=1,size(C_targ,1)
-            do i3=1,size(C_moda,1)
-                A_patho=compute_attractor(f,C_targ(i2,:),C_moda(i3,:),D)
-                if (size(compute_pathological_attractor(A_physio,A_patho))==0) then
-                    if (compare_attractor_set(A_physio,A_patho)) then
-                        metal="silver"
-                    else
-                        metal="golden"
-                    end if
-                    therapeutic_bullet_set=add_bullet(therapeutic_bullet_set,C_targ(i2,:),C_moda(i3,:),metal)
-                end if
-                deallocate(A_patho)
-            end do
-        end do
-        deallocate(C_targ,C_moda)
-    end do
-end function compute_therapeutic_bullet
-
-func concatenate(x,y [][]bool) [][]bool {
-    for i,_:=range x {
-        x[i]=append(x[i],y[i]...)
+func compute_therapeutic_bullet(f func(x [][]bool,k int) [][]bool,D [][]bool,r_min int,r_max int,max_targ int,max_moda int,n_node int,A_physio [][][]bool) ([][]int,[][]bool,[]string) {
+    targ_set:=[][]int
+    moda_set:=[][]bool
+    metal_set:=[]string
+    for i1:=r_min;i1<=int(math.Min(float64(r_max),float64(n_node)));i1++ {
+        C_targ:=generate_combination(i1,n_node,max_targ)
+        C_moda:=generate_arrangement(i1,max_moda)
+        for i2:=range C_targ {
+            for i3:=range C_moda {
+                A_patho:=compute_attractor(f,C_targ[i2],C_moda[i3],D)
+                if len(compute_pathological_attractor(A_physio,A_patho))==0 {
+                    if compare_attractor_set(A_physio,A_patho) {
+                        metal:="silver"
+                    } else {
+                        metal:="golden"
+                    }
+                    targ_set=append(targ_set,C_targ[i2])
+                    moda_set=append(moda_set,C_moda[i3])
+                    metal_set=append(metal_set,metal)
+                }
+            }
+        }
     }
-    return x
 }
-!##########################################################################!
-!##############################    facto    ###############################!
-!##########################################################################!
-function facto(x) result(y)
-    implicit none
-    integer::x,i
-    real(kind=8)::y
-    if (x>170) then
-        write (unit=*,fmt="(a)") "facto(x): x>170 unsupported"
-        stop
-    end if
-    if (x==0) then
-        y=real(1,8)
-    else
-        y=real(x,8)
-        do i=1,x-1
-            y=y*(real(x,8)-real(i,8))
-        end do
-    end if
-end function facto
-!##########################################################################!
-!#######################    generate_arrangement    #######################!
-!##########################################################################!
-function generate_arrangement(deck,k,n_arrang) result(arrang_mat)
-    !#################    /!\ only with repetition /!\    #################!
-    implicit none
-    real,dimension(:)::deck
-    integer::k,i1,i2,n_arrang
-    real(kind=8)::max_arrang
-    real,dimension(:,:),allocatable::arrang_mat
-    real,dimension(k)::arrang
-    max_arrang=min(real(size(deck),8)**real(k,8),real(huge(1),8))
-    allocate(arrang_mat(min(n_arrang,int(max_arrang)),k))
-    do i1=1,size(arrang_mat,1)
-        1 continue
-        do i2=1,k
-            arrang(i2)=deck(rand_int(1,size(deck)))
-        end do
-        do i2=1,i1-1
-            if (all(arrang_mat(i2,:)==arrang)) then
-                go to 1
-            end if
-        end do
-        arrang_mat(i1,:)=arrang
-    end do
-end function generate_arrangement
-!##########################################################################!
-!#######################    generate_combination    #######################!
-!##########################################################################!
-function generate_combination(deck,k,n_combi) result(combi_mat)
-    !###############    /!\ only without repetition /!\    ################!
-    implicit none
-    integer,dimension(:)::deck
-    integer::k,i1,i2,z,n_combi
-    real(kind=8)::max_combi
-    integer,dimension(:,:),allocatable::combi_mat
-    integer,dimension(k)::combi
-    max_combi=min(facto(size(deck))/(facto(k)*facto(size(deck)-k)),real(huge(1),8))
-    allocate(combi_mat(min(n_combi,int(max_combi)),k))
-    do i1=1,size(combi_mat,1)
-        1 continue
-        do i2=1,k
-            2 continue
-            z=deck(rand_int(1,size(deck)))
-            if (any(z==combi(1:i2-1))) then
-                go to 2
-            else
-                combi(i2)=z
-            end if
-        end do
-        combi=sort(combi)
-        do i2=1,i1-1
-            if (all(combi_mat(i2,:)==combi)) then
-                go to 1
-            end if
-        end do
-        combi_mat(i1,:)=combi
-    end do
-end function generate_combination
-!##########################################################################!
+
+func factorial(x float64) float64 {
+    if x==float64(0) {return float64(1)} else {return x*factorial(x-float64(1))}
+}
+
+func generate_arrangement(k int,n_arrang int) [][]bool {
+    ////////////////////    /!\ only with repetition /!\    ////////////////////
+    arrang_mat:=[][]bool{}
+    for i1:=1;i1<=int(math.Min(float64(n_arrang),math.Pow(float64(2),float64(k))));i1++ {
+        for {
+            arrang:=[]bool{}
+            for i2:=1;i2<=k;i2++ {
+                z:=false
+                if rand.Intn(2)==1 {z=true}
+                arrang=append(arrang,z)
+            }
+            in_arrang_mat:=false
+            for i2,_:=range arrang_mat {
+                z:=[]bool{}
+                for i,_:=range arrang {z=append(z,arrang[i]==arrang_mat[i2][i])}
+                if all(z) {
+                    in_arrang_mat=true
+                    break
+                }
+            }
+            if !in_arrang_mat {
+                arrang_mat=append(arrang_mat,arrang)
+                break
+            }
+        }
+    }
+    return arrang_mat
+}
+
+func generate_combination(k,n,n_combi int) [][]int {
+    //////////////////    /!\ only without repetition /!\    ///////////////////
+    combi_mat:=[][]int{}
+    for i1:=1;i1<=int(math.Min(float64(n_combi),factorial(float64(n))/(factorial(float64(k))*factorial(float64(n-k)))));i1++ {
+        for {
+            combi:=[]int{}
+            for i2:=1;i2<=k;i2++ {
+                for {
+                    z:=rand.Intn(n)
+                    in_combi:=false
+                    for i3,_:=range combi {
+                        if combi[i3]==z {
+                            in_combi=true
+                            break
+                        }
+                    }
+                    if !in_combi {
+                        combi=append(combi,z)
+                        break
+                    }
+                }
+            }
+            sort.Ints(combi)
+            in_combi_mat:=false
+            for i2,_:=range combi_mat {
+                z:=[]bool{}
+                for i,_:=range combi {z=append(z,combi[i]==combi_mat[i2][i])}
+                if all(z) {
+                    in_combi_mat=true
+                    break
+                }
+            }
+            if !in_combi_mat {
+                combi_mat=append(combi_mat,combi)
+                break
+            }
+        }
+    }
+    return combi_mat
+}
+
+!##########################################################################!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 !#######################    generate_state_space    #######################!
 !##########################################################################!
 function generate_state_space(n) result(y)
@@ -540,30 +508,6 @@ subroutine report_therapeutic_bullet_set(therapeutic_bullet_set,V)
     end if
     deallocate(report)
 end subroutine report_therapeutic_bullet_set
-!##########################################################################!
-!###############################    sort    ###############################!
-!##########################################################################!
-function sort(x) result(y)
-    implicit none
-    integer,dimension(:)::x
-    integer,dimension(size(x))::y
-    integer,dimension(:),allocatable::z
-    integer,dimension(:),allocatable::w
-    integer,dimension(1)::p
-    integer::i
-    z=x
-    do i=1,size(x)
-        p=minloc(z)
-        y(i)=z(p(1))
-        w=z
-        deallocate(z)
-        allocate(z(size(x)-i))
-        z(:p(1)-1)=w(:p(1)-1)
-        z(p(1):)=w(p(1)+1:)
-        deallocate(w)
-    end do
-    deallocate(z)
-end function sort
 !##########################################################################!
 !############################    what_to_do    ############################!
 !##########################################################################!

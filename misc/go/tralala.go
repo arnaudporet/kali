@@ -3,9 +3,9 @@
 
 package main
 
-import "fmt"
+import (
+    "fmt"
+)
 
 func main() {
-    fmt.Printf("%v,%T",1e3,1e3)
 }
-
