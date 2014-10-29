@@ -39,21 +39,6 @@ func f_physio(x [][]bool,k int) [][]bool {
     }
 }
 
-func f_physio(x [][]bool,k int) [][]bool {
-    return [][]bool{
-        {x[0][k]},// CycD
-        {false},// Rb
-        {(!x[1][k] && !x[4][k] && !x[9][k]) || (x[5][k] && !x[1][k] && !x[9][k])},// E2F
-        {x[2][k] && !x[1][k]},// CycE
-        {(x[2][k] && !x[1][k] && !x[6][k] && !(x[7][k] && x[8][k])) || (x[4][k] && !x[1][k] && !x[6][k] && !(x[7][k] && x[8][k]))},// CycA
-        {(!x[0][k] && !x[3][k] && !x[4][k] && !x[9][k]) || (x[5][k] && !(x[3][k] && x[4][k]) && !x[9][k] && !x[0][k])},// p27
-        {x[9][k]},// Cdc20
-        {(!x[4][k] && !x[9][k]) || x[6][k] || (x[5][k] && !x[9][k])},// Cdh1
-        {!x[7][k] || (x[7][k] && x[8][k] && (x[6][k] || x[4][k] || x[9][k]))},// UbcH10
-        {!x[6][k] && !x[7][k]},// CycB
-    }
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////    lib    ///////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -69,7 +54,7 @@ func any(x []bool) bool {
 }
 
 func compare_attractor(a1,a2 [][]bool) bool {
-    var start1,start2 int
+    // var start1,start2 int
     if len(a1[0])!=len(a2[0]) {return true} else {
         start_found:=false
         for j1,_:=range a1[0] {
@@ -114,15 +99,17 @@ func compare_attractor_set(A1,A2 [][][]bool) bool {
     }
 }
 
-func compute_attractor(f func(x [][]bool,k int) [][]bool,c_targ []int,c_moda []bool,D [][]bool) ([][][]bool,[]float64{}) {
+func compute_attractor(f func(x [][]bool,k int) [][]bool,c_targ []int,c_moda []bool,D [][]bool) ([][][]bool,[]float64) {
     A:=[][][]bool{}
     count:=[]int{}
+    popularity:=[]float64{}
     for i1,_:=range D[0] {
-        x:=make([][]bool,len(D))
-        for i,_:=range D {x[i]=[]bool{D[i][i1]}}
+        x:=[][]bool{}
+        for i,_:=range D {x=append(x,[]bool{D[i][i1]})}
         k:=0
         for {
-            x=concatenate(x,f(x,k))
+            z:=f(x,k)
+            for i,_:=range x {x[i]=append(x[i],z[i])}
             for i,_:=range c_targ {x[c_targ[i]][k+1]=c_moda[i]}
             a_found:=false
             for i2:=k;i2>=0;i2-- {
@@ -130,8 +117,10 @@ func compute_attractor(f func(x [][]bool,k int) [][]bool,c_targ []int,c_moda []b
                 for i,_:=range x {z=append(z,x[i][i2]==x[i][k+1])}
                 if all(z) {
                     a_found=true
-                    a:=make([][]bool,len(x))
-                    for i,_:=range x {a[i]=x[i][i2:k+1]}
+                    a:=[][]bool{}
+                    for i,_:=range x {
+                        a=append(a,x[i][i2:k+1])
+                    }
                     break
                 }
             }
@@ -145,8 +134,7 @@ func compute_attractor(f func(x [][]bool,k int) [][]bool,c_targ []int,c_moda []b
                     }
                 }
                 if !in_A {
-                    A=append(A,[][]bool{})<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    A[len(A)-1]=a
+                    A=append(A,a)
                     count=append(count,1)
                 }
                 break
@@ -154,8 +142,7 @@ func compute_attractor(f func(x [][]bool,k int) [][]bool,c_targ []int,c_moda []b
             k+=1
         }
     }
-    popularity:=make([]float64,len(count))
-    for i,_:=range count {popularity[i]=(float64(count[i])/float64(len(D[0])))*100.0}
+    for i,_:=range count {popularity=append(popularity,(float64(count[i])/float64(len(D[0])))*100.0)}
     return A,popularity
 }
 
@@ -169,9 +156,7 @@ func compute_pathological_attractor(A_physio,A_patho [][][]bool) [][][]bool {
                 break
             }
         }
-        if !in_physio {
-            a_patho_set=add_attractor(a_patho_set,A_patho(i1)%a,A_patho(i1)%popularity)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        }
+        if !in_physio {a_patho_set=append(a_patho_set,A_patho[i1])}
     }
 }
 
