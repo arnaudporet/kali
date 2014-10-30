@@ -16,7 +16,6 @@ import (
 )
 
 func main() {
-    rand.Seed(int64(time.Now().Nanosecond()))
     max_targ:=int(1e2)
     max_moda:=int(1e2)
     size_D:=int(1e4)
@@ -345,86 +344,52 @@ func report_attractor_set(A [][][]bool,setting int,V []string) {
     }
 }
 
-subroutine report_therapeutic_bullet_set(therapeutic_bullet_set,V)<<<<<<<<<<<<<<
-    implicit none
-    type(bullet),dimension(:)::therapeutic_bullet_set
-    character(16),dimension(:)::V
-    integer::n_gold,n_silv,i1,i2,save_
-    character(:),allocatable::report
-    n_gold=0
-    n_silv=0
-    report=repeat("-",80)//new_line("a")
-    do i1=1,size(therapeutic_bullet_set)
-        if (therapeutic_bullet_set(i1)%metal=="golden") then
-            n_gold=n_gold+1
-        else
-            n_silv=n_silv+1
-        end if
-        do i2=1,size(therapeutic_bullet_set(i1)%targ)
-            report=report//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//"["//real2char(therapeutic_bullet_set(i1)%moda(i2))//&
-            "] "
-        end do
-        report=report//"("//therapeutic_bullet_set(i1)%metal//" bullet)"//new_line("a")//repeat("-",80)//new_line("a")
-    end do
-    report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))//" ("//int2char(n_gold)//&
-    " golden bullets, "//int2char(n_silv)//" silver bullets)"
-    write (unit=*,fmt="(a)") new_line("a")//report//new_line("a")
-    write (unit=*,fmt="(a)") "save? [1/0]"//new_line("a")
-    read (unit=*,fmt=*) save_
-    if (save_==1) then
-        open (unit=1,file="report_therapeutic_bullet",status="replace")
-        write (unit=1,fmt="(a)") report
-        close (unit=1)
-        write (unit=*,fmt="(a)") new_line("a")//"report saved as: report_therapeutic_bullet"//new_line("a")
-    end if
-    deallocate(report)
-end subroutine report_therapeutic_bullet_set
-!##########################################################################!
-!############################    what_to_do    ############################!
-!##########################################################################!
-subroutine what_to_do(f,value,size_D,n_node,max_targ,max_moda,V)
-    implicit none
-    integer::to_do,r_min,r_max,setting,comprehensive_D,size_D,n_node,max_targ,max_moda
-    real,dimension(:)::value
-    character(16),dimension(:)::V
-    real::start,finish
-    real,dimension(:,:),allocatable::D
-    type(attractor),dimension(:),allocatable::A_set
-    integer,dimension(0)::dummy1
-    real,dimension(0)::dummy2
-    type(attractor),dimension(:),allocatable::A_physio
-    type(attractor),dimension(:),allocatable::A_patho
-    type(attractor),dimension(:),allocatable::a_patho_set
-    type(bullet),dimension(:),allocatable::therapeutic_bullet_set
-    interface
-        function f(x,k) result(y)
-            implicit none
-            real,dimension(:,:)::x
-            integer::k
-            real,dimension(size(x,1),1)::y
-        end function f
-    end interface
-    call init_random_seed()
-    call cpu_time(start)
-    write (unit=*,fmt="(a)") new_line("a")//"what to do: "//new_line("a")//new_line("a")//"    [1] compute attractors"//&
-    new_line("a")//"    [2] compute pathological attractors"//new_line("a")//"    [3] compute therapeutic bullets"//&
-    new_line("a")//"    [4] help"//new_line("a")//"    [5] license"//new_line("a")
-    read (unit=*,fmt=*) to_do
-    if (to_do/=2 .and. to_do/=4 .and. to_do/=5) then
-        if (all(value==[0.0,1.0])) then
-            write (unit=*,fmt="(a,es10.3e3,a)") new_line("a")//"size(S)=",real(2,8)**real(n_node,8),new_line("a")//&
-            "comprehensive_D? [1/0]"//new_line("a")
-            read (unit=*,fmt=*) comprehensive_D
-            select case (comprehensive_D)
-                case (1)
-                    D=transpose(generate_state_space(n_node))
-                case (0)
-                    D=transpose(generate_arrangement(value,n_node,size_D))
-            end select
-        else
-            D=transpose(generate_arrangement(value,n_node,size_D))
-        end if
-    end if
+func report_therapeutic_bullet_set(targ_set [][]int,moda_set [][]bool,metal_set []string,V []string) {
+    n_gold:=0
+    n_silv:=0
+    report:=strings.Repeat("-",80)+"\n"
+    for i1,_:=range targ_set {
+        if metal_set[i1]=="golden" {n_gold+=1} else {n_silv+=1}
+        for i2,_:=range targ_set[i1]) {
+            moda:="-"
+            if moda_set[i1][i2] {moda="+"}
+            report+=moda+V[targ_set[i1][i2]]+" "
+        }
+        report+="("+metal[i1]+" bullet)\n"+strings.Repeat("-",80)+"\n"
+    }
+    report+="found therapeutic bullets: "+strconv.FormatInt(int64(len(targ_set)),10)+" ("+strconv.FormatInt(int64(n_gold),10)+" golden bullets, "+strconv.FormatInt(int64(n_silv),10)+" silver bullets)"
+    fmt.Println(report)
+    save:="y"
+    fmt.Printf("save [Y/n]" )
+    fmt.Scanf("%s",&save)
+    if strings.ToLower(save)=="y" || strings.ToLower(save)=="yes" {
+        file,_:=os.Create("report_therapeutic_bullet.txt")
+        file.WriteString(report)
+        file.Close()
+        fmt.Println("report saved as: report_therapeutic_bullet.txt")
+    }
+}
+
+func transpose(x [][]int) [][]int {
+    y:=[][]int{}
+    for i,_:=range x {
+        y=append(y,[]int{})
+        for j,_:=range x[i] {y[len(y)-1]=append(y[len(y)-1],x[j][i])}
+    }
+    return y
+}
+
+func what_to_do(f func(x [][]bool,k int) [][]bool,size_D int,n_node int,max_targ int,max_moda int,V []string) {
+    rand.Seed(int64(time.Now().Nanosecond()))
+    to_do:=5
+    fmt.Printf("[1] compute attractors\n[2] compute pathological attractors\n[3] compute therapeutic bullets\n[4] help\n[5] license\nwhat to do: ")
+    fmt.Scanf("%d",&to_do)
+    if to_do==1 || to_do==3 {
+        comprehensive_D:="n"
+        fmt.Printf("size(S) = %e\ncomprehensive D [y/N] ",math.Pow(float64(2),float64(n_node)))
+        fmt.Scanf("%s",&comprehensive_D)
+        if strings.ToLower(comprehensive_D)=="y" || strings.ToLower(comprehensive_D)=="yes" {D:=generate_state_space(n_node)} else {D:=transpose(generate_arrangement(n_node,size_D))}
+    }<<<<<<<<<<<<<<<<<<<<<<<<<<
     select case (to_do)
         case (1)
             A_set=compute_attractor(f,dummy1,dummy2,D)
@@ -478,5 +443,4 @@ subroutine what_to_do(f,value,size_D,n_node,max_targ,max_moda,V)
     end select
     call cpu_time(finish)
     write (unit=*,fmt="(a)") "done in "//int2char(int(finish-start))//" seconds"//new_line("a")
-end subroutine what_to_do
-end module lib
+}
