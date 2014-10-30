@@ -386,61 +386,40 @@ func what_to_do(f func(x [][]bool,k int) [][]bool,size_D int,n_node int,max_targ
     fmt.Scanf("%d",&to_do)
     if to_do==1 || to_do==3 {
         comprehensive_D:="n"
-        fmt.Printf("size(S) = %e\ncomprehensive D [y/N] ",math.Pow(float64(2),float64(n_node)))
+        fmt.Printf("size(S)=%e\ncomprehensive D [y/N] ",math.Pow(float64(2),float64(n_node)))
         fmt.Scanf("%s",&comprehensive_D)
         if strings.ToLower(comprehensive_D)=="y" || strings.ToLower(comprehensive_D)=="yes" {D:=generate_state_space(n_node)} else {D:=transpose(generate_arrangement(n_node,size_D))}
-    }<<<<<<<<<<<<<<<<<<<<<<<<<<
-    select case (to_do)
-        case (1)
-            A_set=compute_attractor(f,dummy1,dummy2,D)
-            write (unit=*,fmt="(a)") new_line("a")//"setting:"//new_line("a")//new_line("a")//"    [1] physiological"//&
-            new_line("a")//"    [2] pathological"//new_line("a")
-            read (unit=*,fmt=*) setting
-            call report_attractor_set(A_set,setting,V)
-            deallocate(A_set,D)
-        case (2)
-            A_physio=load_attractor_set(1)
-            A_patho=load_attractor_set(2)
-            a_patho_set=compute_pathological_attractor(A_physio,A_patho)
-            call report_attractor_set(a_patho_set,3,V)
-            deallocate(A_physio,A_patho,a_patho_set)
-        case (3)
-            A_physio=load_attractor_set(1)
-            write (unit=*,fmt="(a)") new_line("a")//"r_min="//new_line("a")
-            read (unit=*,fmt=*) r_min
-            write (unit=*,fmt="(a)") new_line("a")//"r_max="//new_line("a")
-            read (unit=*,fmt=*) r_max
-            therapeutic_bullet_set=compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio)
-            call report_therapeutic_bullet_set(therapeutic_bullet_set,V)
-            deallocate(A_physio,therapeutic_bullet_set,D)
-        case (4)
-            write (unit=*,fmt="(a)") new_line("a")//"1) do step 1 with f_physio"//new_line("a")//"2) do step 1 with f_patho"//&
-            new_line("a")//"3) eventually do step 2"//new_line("a")//"4) do step 3 with f_patho"//new_line("a")//&
-            new_line("a")//"do not forget to recompile the sources following any "//"modification"//new_line("a")
-        case (5)
-            write (unit=*,fmt="(a)") new_line("a")//'Copyright (c) 2013-2014, Arnaud Poret'//new_line("a")//&
-            'All rights reserved.'//new_line("a")//new_line("a")//&
-            'Redistribution and use in source and binary forms, with or without modification,'//new_line("a")//&
-            'are permitted provided that the following conditions are met:'//new_line("a")//new_line("a")//&
-            '1. Redistributions of source code must retain the above copyright notice, this'//new_line("a")//&
-            'list of conditions and the following disclaimer.'//new_line("a")//new_line("a")//&
-            '2. Redistributions in binary form must reproduce the above copyright notice,'//new_line("a")//&
-            'this list of conditions and the following disclaimer in the documentation and/or'//new_line("a")//&
-            'other materials provided with the distribution.'//new_line("a")//new_line("a")//&
-            '3. Neither the name of the copyright holder nor the names of its contributors'//new_line("a")//&
-            'may be used to endorse or promote products derived from this software without'//new_line("a")//&
-            'specific prior written permission.'//new_line("a")//new_line("a")//&
-            'THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND'//new_line("a")//&
-            'ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED'//new_line("a")//&
-            'WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE'//new_line("a")//&
-            'DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR'//new_line("a")//&
-            'ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES'//new_line("a")//&
-            '(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;'//new_line("a")//&
-            'LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON'//new_line("a")//&
-            'ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT'//new_line("a")//&
-            '(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS'//new_line("a")//&
-            'SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.'//new_line("a")
-    end select
-    call cpu_time(finish)
-    write (unit=*,fmt="(a)") "done in "//int2char(int(finish-start))//" seconds"//new_line("a")
+    }
+    switch to_do {
+        case: 1 {
+            A:=compute_attractor(f,[]int{},[]bool{},D)
+            setting:=1
+            fmt.Printf("[1] physiological\n[2] pathological\nsetting: ")
+            fmt.Scanf("%d",&setting)
+            report_attractor_set(A,setting,V)
+        }
+        case: 2 {
+            A_physio:=load_attractor_set(1)
+            A_patho:=load_attractor_set(2)
+            a_patho_set:=compute_pathological_attractor(A_physio,A_patho)
+            report_attractor_set(a_patho_set,3,V)
+        }
+        case: 3 {
+            A_physio:=load_attractor_set(1)
+            r_min:=1
+            fmt.Printf("r_min=")
+            fmt.Scanf("%d",&r_min)
+            r_max:=1
+            fmt.Printf("r_max=")
+            fmt.Scanf("%d",&r_max)
+            targ_set,moda_set,metal_set:=compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,A_physio)
+            report_therapeutic_bullet_set(targ_set,moda_set,metal_set,V)
+        }
+        case: 4 {
+            fmt.Println("1) do step 1 with f_physio\n2) do step 1 with f_patho\n3) eventually do step 2\n4) do step 3 with f_patho\ndo not forget to recompile the sources following any modification")
+        }
+        case: 5 {
+            fmt.Println("Copyright (c) 2013-2014, Arnaud Poret\nAll rights reserved.\n\nRedistribution and use in source and binary forms, with or without modification,\nare permitted provided that the following conditions are met:\n\n1. Redistributions of source code must retain the above copyright notice, this\nlist of conditions and the following disclaimer.\n\n2. Redistributions in binary form must reproduce the above copyright notice,\nthis list of conditions and the following disclaimer in the documentation and/or\nother materials provided with the distribution.\n\n3. Neither the name of the copyright holder nor the names of its contributors\nmay be used to endorse or promote products derived from this software without\nspecific prior written permission.\n\nTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND\nANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED\nWARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\nDISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR\nANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\nLOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON\nANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\nSOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.")
+        }
+    }
 }
