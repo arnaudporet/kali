@@ -11,6 +11,8 @@ import (
     "sort"
     "strings"
     "strconv"
+    "os"
+    "encoding/csv"
 )
 
 func main() {
@@ -273,38 +275,32 @@ func generate_state_space(n int) [][]bool {
     return y
 }
 
-!##########################################################################!
-!########################    load_attractor_set    ########################!
-!##########################################################################!
-function load_attractor_set(setting) result(A_set)
-    implicit none
-    integer::setting
-    type(attractor),dimension(:),allocatable::A_set
-    character(:),allocatable::set_name
-    integer::i1,i2,z,n,m
-    select case (setting)
-        case (1)
-            set_name="set_physio"
-        case (2)
-            set_name="set_patho"
-    end select
-    open (unit=1,file=set_name,status="old")
-    read (unit=1,fmt=*) z
-    allocate(A_set(z))
-    do i1=1,size(A_set)
-        read (unit=1,fmt=*) n
-        read (unit=1,fmt=*) m
-        read (unit=1,fmt=*) A_set(i1)%popularity
-        allocate(A_set(i1)%a(n,m))
-    end do
-    do i1=1,size(A_set)
-        do i2=1,size(A_set(i1)%a,1)
-            read (unit=1,fmt="("//int2char(size(A_set(i1)%a,2))//"f3.1)") A_set(i1)%a(i2,:)
-        end do
-    end do
-    close (unit=1)
-    deallocate(set_name)
-end function load_attractor_set
+func load_attractor_set(setting int) [][][]bool {
+    A:=[][][]bool{}
+    switch setting {
+        case 1: set_name:="set_physio.csv"
+        case 2: set_name:="set_patho.csv"
+    }
+    csv_file,_:=os.Open(set_name)
+    csv_reader:=csv.NewReader(csv_file)
+    csv_reader.FieldsPerRecord=-1
+    s,_:=csv_reader.ReadAll()
+    csv_file.Close()
+    s_bis:=[][]bool{}
+    for i,_:=range s {
+        if i>=1 {
+            s_bis=append(s_bis,[]bool{})
+            for j,_:=range s[i] {
+                z,_:=strconv.ParseBool(s[i][j])
+                s_bis[len(s_bis)-1]=append(s_bis[len(s_bis)-1],z)
+            }
+        }
+    }
+    n_attractor,_:=strconv.ParseInt(s[0][0],10,0)
+    n_line:=(len(s)-1)/int(n_attractor)
+    for i:=1;i<=int(n_attractor);i++ {A=append(A,s_bis[(i-1)*n_line:i*n_line])}
+    return A
+}
 
 func report_attractor_set(A [][][]bool,setting int,V []string) {
     n_point:=0
@@ -314,8 +310,9 @@ func report_attractor_set(A [][][]bool,setting int,V []string) {
         if len(A[i1][0])==1 {n_point+=1} else {n_cycle+=1}
         for i2:=range A[i1] {
             report+=V[i2]+": "
-            for i3:=range A[i1][0] {report+=strconv.FormatBool(A[i1][i2][i3])+" "}
-            report+="\n"
+            z:=[]string{}
+            for i3:=range A[i1][i2] {z=append(z,strconv.FormatBool(A[i1][i2][i3]))}
+            report+=strings.Join(z," ")+"\n"
         }
         report+=strings.Repeat("-",80)+"\n"
     }
@@ -326,41 +323,29 @@ func report_attractor_set(A [][][]bool,setting int,V []string) {
     fmt.Scanf("%s",&save)
     if strings.ToLower(save)=="y" || strings.ToLower(save)=="yes" {
         switch setting {
-            case 1: set_name,report_name:="set_physio","report_physio"
-            case 2: set_name,report_name:="set_patho","report_patho"
-            case 3: set_name,report_name:="set_versus","report_versus"
-        }<<<<<<<<<<<<<<<<<<<<
-        s=int2char(size(A_set))//new_line("a")
-        do i1=1,size(A_set)
-            s=s//int2char(size(A_set(i1)%a,1))//new_line("a")//int2char(size(A_set(i1)%a,2))//new_line("a")//&
-            real2char(A_set(i1)%popularity)//new_line("a")
-        end do
-        do i1=1,size(A_set)
-            do i2=1,size(A_set(i1)%a,1)
-                do i3=1,size(A_set(i1)%a,2)
-                    s=s//real2char(A_set(i1)%a(i2,i3))
-                end do
-                if (i1/=size(A_set) .or. i2/=size(A_set(i1)%a,1)) then
-                    s=s//new_line("a")
-                end if
-            end do
-        end do
-        open (unit=1,file=set_name,status="replace")
-        write (unit=1,fmt="(a)") s
-        close (unit=1)
-        open (unit=1,file=report_name,status="replace")
-        write (unit=1,fmt="(a)") report
-        close (unit=1)
-        write (unit=*,fmt="(a)") new_line("a")//"set saved as: "//set_name//new_line("a")//"report saved as: "//report_name//&
-        new_line("a")
-        deallocate(s,set_name,report_name)
+            case 1: set_name,report_name:="set_physio.csv","report_physio.txt"
+            case 2: set_name,report_name:="set_patho.csv","report_patho.txt"
+            case 3: set_name,report_name:="set_versus.csv","report_versus.txt"
+        }
+        file,_:=os.Create(report_name)
+        file.WriteString(report)
+        file.Close()
+        s:=[][]string{{strconv.FormatInt(int64(len(A)),10)}}
+        for i1,_:=range A {
+            for i2,_:=range A[i1] {
+                s=append(s,[]string{})
+                for i3,_:=range A[i1][i2] {s[len(s)-1]=append(s[len(s)-1],strconv.FormatBool(A[i1][i2][i3]))}
+            }
+        }
+        csv_file,_:=os.Create(set_name)
+        csv_writer:=csv.NewWriter(csv_file)
+        csv_writer.WriteAll(s)
+        csv_file.Close()
+        fmt.Printf("set saved as: %s\nreport saved as: %s\n",set_name,report_name)
     }
 }
 
-!##########################################################################!
-!##################    report_therapeutic_bullet_set    ###################!
-!##########################################################################!
-subroutine report_therapeutic_bullet_set(therapeutic_bullet_set,V)
+subroutine report_therapeutic_bullet_set(therapeutic_bullet_set,V)<<<<<<<<<<<<<<
     implicit none
     type(bullet),dimension(:)::therapeutic_bullet_set
     character(16),dimension(:)::V
