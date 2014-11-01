@@ -45,7 +45,7 @@ program example_network
     ! pass either f_physio (for computing the physiological attractor set) or
     ! f_patho (for computing the phathological attractor set or to compute
     ! therapeutic bullets)
-    call what_to_do(f_patho,value,size_D,n_node,max_targ,max_moda,V)
+    call what_to_do(f_physio,value,size_D,n_node,max_targ,max_moda,V)
     deallocate(value,V)
     contains
     !##########################################################################!
