@@ -4,13 +4,13 @@ module lib
     real,dimension(:),allocatable::value
     character(16),dimension(:),allocatable::V
     type::attractor
-        real,dimension(:,:),allocatable::a
         real::popularity
+        real,dimension(:,:),allocatable::a
     end type attractor
     type::bullet
         integer,dimension(:),allocatable::targ
         real,dimension(:),allocatable::moda
-        character(6)::metal
+        character(16)::metal
     end type bullet
     contains
     !##########################################################################!
@@ -18,10 +18,10 @@ module lib
     !##########################################################################!
     function add_attractor(A_set,a,popularity) result(y)
         implicit none
-        type(attractor),dimension(:)::A_set
-        real,dimension(:,:)::a
         real::popularity
+        real,dimension(:,:)::a
         type(attractor),dimension(size(A_set)+1)::y
+        type(attractor),dimension(:)::A_set
         y(:size(A_set))=A_set
         y(size(A_set)+1)%a=a
         y(size(A_set)+1)%popularity=popularity
@@ -31,11 +31,11 @@ module lib
     !##########################################################################!
     function add_bullet(bullet_set,targ,moda,metal) result(y)
         implicit none
-        type(bullet),dimension(:)::bullet_set
         integer,dimension(:)::targ
         real,dimension(:)::moda
-        character(6)::metal
+        character(16)::metal
         type(bullet),dimension(size(bullet_set)+1)::y
+        type(bullet),dimension(:)::bullet_set
         y(:size(bullet_set))=bullet_set
         y(size(bullet_set)+1)%targ=targ
         y(size(bullet_set)+1)%moda=moda
@@ -46,10 +46,9 @@ module lib
     !##########################################################################!
     function compare_attractor(a1,a2) result(differ)
         implicit none
-        real,dimension(:,:)::a1
-        real,dimension(:,:)::a2
         logical::differ,start_found
         integer::i1,i2,start1,start2
+        real,dimension(:,:)::a1,a2
         differ=.false.
         if (size(a1,2)/=size(a2,2)) then
             differ=.true.
@@ -82,11 +81,10 @@ module lib
     !##########################################################################!
     function compare_attractor_set(A_set1,A_set2) result(differ)
         implicit none
-        type(attractor),dimension(:)::A_set1
-        type(attractor),dimension(:)::A_set2
         logical::differ,z
         logical,dimension(size(A_set1))::in_2
         integer::i1,i2
+        type(attractor),dimension(:)::A_set1,A_set2
         if (size(A_set1)/=size(A_set2)) then
             differ=.true.
         else
@@ -108,20 +106,19 @@ module lib
     !##########################################################################!
     function compute_attractor(f,c_targ,c_moda,D) result(A_set)
         implicit none
+        logical::a_found,in_A
+        integer::i1,i2,k
         integer,dimension(:)::c_targ
         real,dimension(:)::c_moda
         real,dimension(:,:)::D
+        real,dimension(:,:),allocatable::a,count,x
         type(attractor),dimension(:),allocatable::A_set
-        real,dimension(:,:),allocatable::x
-        integer::i1,i2,k
-        logical::a_found,in_A
-        real,dimension(:,:),allocatable::a,count
         interface
             function f(x,k) result(y)
                 implicit none
-                real,dimension(:,:)::x
                 integer::k
                 real,dimension(size(x,1),1)::y
+                real,dimension(:,:)::x
             end function f
         end interface
         allocate(A_set(0))
@@ -169,11 +166,10 @@ module lib
     !##########################################################################!
     function compute_pathological_attractor(A_physio,A_patho) result(a_patho_set)
         implicit none
-        type(attractor),dimension(:)::A_physio
-        type(attractor),dimension(:)::A_patho
-        type(attractor),dimension(:),allocatable::a_patho_set
-        integer::i1,i2
         logical::in_physio
+        integer::i1,i2
+        type(attractor),dimension(:)::A_physio,A_patho
+        type(attractor),dimension(:),allocatable::a_patho_set
         allocate(a_patho_set(0))
         do i1=1,size(A_patho)
             in_physio=.false.
@@ -194,20 +190,20 @@ module lib
     function compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio) result(therapeutic_bullet_set)
         implicit none
         integer::r_min,r_max,i1,i2,i3,max_targ,max_moda,n_node
-        type(attractor),dimension(:)::A_physio
-        real,dimension(:,:)::D
-        type(bullet),dimension(:),allocatable::therapeutic_bullet_set
-        type(attractor),dimension(:),allocatable::A_patho
         integer,dimension(:,:),allocatable::C_targ
-        real,dimension(:,:),allocatable::C_moda
         real,dimension(:)::value
-        character(6)::metal
+        real,dimension(:,:)::D
+        real,dimension(:,:),allocatable::C_moda
+        character(16)::metal
+        type(attractor),dimension(:)::A_physio
+        type(attractor),dimension(:),allocatable::A_patho
+        type(bullet),dimension(:),allocatable::therapeutic_bullet_set
         interface
             function f(x,k) result(y)
                 implicit none
-                real,dimension(:,:)::x
                 integer::k
                 real,dimension(size(x,1),1)::y
+                real,dimension(:,:)::x
             end function f
         end interface
         allocate(therapeutic_bullet_set(0))
@@ -236,9 +232,8 @@ module lib
     !##########################################################################!
     function concatenate(x1,x2,d) result(y)
         implicit none
-        real,dimension(:,:)::x1
-        real,dimension(:,:)::x2
         integer::d
+        real,dimension(:,:)::x1,x2
         real,dimension(:,:),allocatable::y
         select case (d)
             case (1)
@@ -269,7 +264,7 @@ module lib
     function facto(x) result(y)
         implicit none
         integer::x,i
-        real(kind=8)::y
+        real(8)::y
         if (x>170) then
             write (unit=*,fmt="(a)") "facto(x): x>170 unsupported"
             stop
@@ -279,7 +274,7 @@ module lib
         else
             y=real(x,8)
             do i=1,x-1
-                y=y*(real(x,8)-real(i,8))
+                y=y*real(x-i,8)
             end do
         end if
     end function facto
@@ -289,13 +284,10 @@ module lib
     function generate_arrangement(deck,k,n_arrang) result(arrang_mat)
         !#################    /!\ only with repetition /!\    #################!
         implicit none
-        real,dimension(:)::deck
         integer::k,i1,i2,n_arrang
-        real(kind=8)::max_arrang
-        real,dimension(:,:),allocatable::arrang_mat
         real,dimension(k)::arrang
-        max_arrang=min(real(size(deck),8)**real(k,8),real(huge(1),8))
-        allocate(arrang_mat(min(n_arrang,int(max_arrang)),k))
+        real,dimension(:)::deck
+        real,dimension(min(n_arrang,int(min(real(size(deck),8)**real(k,8),real(huge(1),8)))),k)::arrang_mat
         do i1=1,size(arrang_mat,1)
             1 continue
             do i2=1,k
@@ -315,13 +307,10 @@ module lib
     function generate_combination(deck,k,n_combi) result(combi_mat)
         !###############    /!\ only without repetition /!\    ################!
         implicit none
-        integer,dimension(:)::deck
         integer::k,i1,i2,z,n_combi
-        real(kind=8)::max_combi
-        integer,dimension(:,:),allocatable::combi_mat
         integer,dimension(k)::combi
-        max_combi=min(facto(size(deck))/(facto(k)*facto(size(deck)-k)),real(huge(1),8))
-        allocate(combi_mat(min(n_combi,int(max_combi)),k))
+        integer,dimension(:)::deck
+        integer,dimension(min(n_combi,int(min(facto(size(deck))/(facto(k)*facto(size(deck)-k)),real(huge(1),8)))),k)::combi_mat
         do i1=1,size(combi_mat,1)
             1 continue
             do i2=1,k
@@ -348,32 +337,25 @@ module lib
     function generate_state_space(n) result(y)
         implicit none
         integer::n,i1,i2
-        real,dimension(:,:),allocatable::y
-        real,dimension(:,:),allocatable::z
+        integer,dimension(n,2**n)::y
         if (n>30) then
             write (unit=*,fmt="(a)") "generate_state_space(n): n>30 unsupported"
             stop
         end if
-        allocate(y(2,1))
-        y(1,1)=0.0
-        y(2,1)=1.0
-        do i1=1,n-1
-            allocate(z(size(y,1)*2,size(y,2)+1))
-            do i2=1,size(y,1)
-                z(2*i2-1,:size(y,2))=y(i2,:)
-                z(2*i2-1,size(y,2)+1)=0.0
-                z(2*i2,:size(y,2))=y(i2,:)
-                z(2*i2,size(y,2)+1)=1.0
+        do i1=1,n
+            y(:i1-1,(2**i1)/2+1:2**i1)=y(:i1-1,:2**(i1-1))
+            do i2=1,2**(i1-1)
+                y(i1,i2)=0
             end do
-            deallocate(y)
-            y=z
-            deallocate(z)
+            do i2=(2**i1)/2+1,2**i1
+                y(i1,i2)=1
+            end do
         end do
     end function generate_state_space
     !##########################################################################!
     !############################    Heaviside    #############################!
     !##########################################################################!
-    function Heaviside(x) result(y)
+    function Heaviside(x) result(y)!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         implicit none
         real::x,y
         if (x<=0.0) then
@@ -637,9 +619,9 @@ module lib
         interface
             function f(x,k) result(y)
                 implicit none
-                real,dimension(:,:)::x
                 integer::k
                 real,dimension(size(x,1),1)::y
+                real,dimension(:,:)::x
             end function f
         end interface
         call init_random_seed()

@@ -56,9 +56,9 @@ program example_network
     ! operators are used: x AND y = min(x,y), x OR y = max(x,y), NOT x = 1-x
     function f_physio(x,k) result(y)
         implicit none
-        real,dimension(:,:)::x
         integer::k
         real,dimension(size(x,1),1)::y
+        real,dimension(:,:)::x
         y(1,1)=x(1,k)!CycD
         y(2,1)=max(min(1.0-x(1,k),1.0-x(4,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-x(1,k),1.0-x(10,k)))!Rb
         y(3,1)=max(min(1.0-x(2,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-x(2,k),1.0-x(10,k)))!E2F
@@ -80,9 +80,9 @@ program example_network
     ! operators are used: x AND y = min(x,y), x OR y = max(x,y), NOT x = 1-x
     function f_patho(x,k) result(y)
         implicit none
-        real,dimension(:,:)::x
         integer::k
         real,dimension(size(x,1),1)::y
+        real,dimension(:,:)::x
         y(1,1)=x(1,k)!CycD
         y(2,1)=0.0!Rb
         y(3,1)=max(min(1.0-x(2,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-x(2,k),1.0-x(10,k)))!E2F

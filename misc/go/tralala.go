@@ -1,6 +1,5 @@
 
 // clear && golang-go run tralala.go
-// gccgo tralala.go -o tralala && ./tralala
 
 package main
 
@@ -17,12 +16,13 @@ func main() {
 
 func generate_arrangement(k,n_arrang int) (arrang_mat [][]int) {
     ////////////////////    /!\ only with repetition /!\    ////////////////////
-    var i1,i2,j1 int
+    var i1,j1,i2 int
     var arrang []int
     var in_arrang_mat bool
     var z []bool
-    arrang_mat=[][]int{}
-    for i1=1;i1<=int(math.Min(float64(n_arrang),math.Pow(float64(2),float64(k))));i1++ {
+    var max_arrang int
+    max_arrang=int(math.Min(float64(n_arrang),math.Pow(float64(2),float64(k))))
+    for i1=1;i1<=max_arrang;i1++ {
         for {
             arrang=[]int{}
             for j1=1;j1<=k;j1++ {arrang=append(arrang,rand.Intn(2))}
