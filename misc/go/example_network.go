@@ -35,7 +35,7 @@ func main() {
         "UbcH10",
         "CycB",
     }
-    what_to_do(f_physio,size_D,max_targ,max_moda,V)
+    what_to_do(f_patho,size_D,max_targ,max_moda,V)
 }
 
 func f_physio(x [][]bool,k int) [][]bool {
