@@ -385,19 +385,18 @@ module lib
     !##########################################################################!
     !########################    load_attractor_set    ########################!
     !##########################################################################!
-    function load_attractor_set(setting) result(A_set)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    function load_attractor_set(setting) result(A_set)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         implicit none
-        integer::setting
+        integer::setting,i1,i2,z,n,m
+        character(16)::set_name
         type(attractor),dimension(:),allocatable::A_set
-        character(:),allocatable::set_name
-        integer::i1,i2,z,n,m
         select case (setting)
             case (1)
                 set_name="set_physio"
             case (2)
                 set_name="set_patho"
         end select
-        open (unit=1,file=set_name,status="old")
+        open (unit=1,file=trim(set_name),status="old")
         read (unit=1,fmt=*) z
         allocate(A_set(z))
         do i1=1,size(A_set)
