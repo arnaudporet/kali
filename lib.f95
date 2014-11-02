@@ -353,51 +353,39 @@ module lib
         end do
     end function generate_state_space
     !##########################################################################!
-    !############################    Heaviside    #############################!
-    !##########################################################################!
-    function Heaviside(x) result(y)!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        implicit none
-        real::x,y
-        if (x<=0.0) then
-            y=0.0
-        else
-            y=1.0
-        end if
-    end function Heaviside
-    !##########################################################################!
     !#########################    init_random_seed    #########################!
     !##########################################################################!
     subroutine init_random_seed()
         implicit none
-        integer,allocatable::seed(:)
-        integer::n,un,istat
-        call random_seed(size=n)
-        allocate(seed(n))
-        open(newunit=un,file="/dev/urandom",access="stream",form="unformatted",action="read",status="old",iostat=istat)
-        read(un) seed
-        close(un)
+        integer::seed_size,error
+        integer,dimension(:),allocatable::seed
+        call random_seed(size=seed_size)
+        allocate(seed(seed_size))
+        open(unit=1,file="/dev/urandom",status="old",access="stream",form="unformatted",action="read",iostat=error)
+        if (error==0) then
+            read (unit=1) seed
+            close (unit=1)
+        else
+            write (*,*) "Too bad, your operating system does not provide a random number generator."
+            stop
+        end if
         call random_seed(put=seed)
-        deallocate(seed)
     end subroutine init_random_seed
     !##########################################################################!
-    !#############################    int2char    #############################!TODO merge with real2char?
+    !#############################    int2char    #############################!
     !##########################################################################!
     function int2char(x) result(y)
         implicit none
         integer::x
+        character(11)::z
         character(:),allocatable::y
-        character(9)::z
-        if (x<0 .or. x>999999999) then
-            write (unit=*,fmt="(a)") "int2char(x): x<0 or x>999 999 999 unsupported"!FIXME
-            stop
-        end if
-        write (unit=z,fmt="(i9)") x
+        write (unit=z,fmt="(i11)") x
         y=trim(adjustl(z))
     end function int2char
     !##########################################################################!
     !########################    load_attractor_set    ########################!
     !##########################################################################!
-    function load_attractor_set(setting) result(A_set)
+    function load_attractor_set(setting) result(A_set)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         implicit none
         integer::setting
         type(attractor),dimension(:),allocatable::A_set
