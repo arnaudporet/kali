@@ -366,7 +366,7 @@ module lib
             read (unit=1) seed
             close (unit=1)
         else
-            write (*,*) "Too bad, your operating system does not provide a random number generator."
+            write (unit=*,fmt="(a)") "Too bad, your operating system does not provide a random number generator."
             stop
         end if
         call random_seed(put=seed)
@@ -385,16 +385,16 @@ module lib
     !##########################################################################!
     !########################    load_attractor_set    ########################!
     !##########################################################################!
-    function load_attractor_set(setting) result(A_set)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    function load_attractor_set(setting) result(A_set)
         implicit none
         integer::setting,i1,i2,z,n,m
-        character(16)::set_name
+        character(32)::set_name
         type(attractor),dimension(:),allocatable::A_set
         select case (setting)
             case (1)
-                set_name="set_physio"
+                set_name="set_physio.csv"
             case (2)
-                set_name="set_patho"
+                set_name="set_patho.csv"
         end select
         open (unit=1,file=trim(set_name),status="old")
         read (unit=1,fmt=*) z
@@ -407,7 +407,7 @@ module lib
         end do
         do i1=1,size(A_set)
             do i2=1,size(A_set(i1)%a,1)
-                read (unit=1,fmt="("//int2char(size(A_set(i1)%a,2))//"f3.1)") A_set(i1)%a(i2,:)
+                read (unit=1,fmt=*) A_set(i1)%a(i2,:)
             end do
         end do
         close (unit=1)
@@ -421,7 +421,7 @@ module lib
         integer::a,b,y
         real::x
         call random_number(x)
-        y=nint(real(a)+x*(real(b)-real(a)))
+        y=nint(real(a)+x*(real(b-a)))
     end function rand_int
     !##########################################################################!
     !############################    range_int    #############################!
@@ -438,16 +438,11 @@ module lib
     !############################    real2char    #############################!
     !##########################################################################!
     function real2char(x) result(y)
-        !####################    /!\ only one digit /!\    ####################!
         implicit none
         real::x
+        character(46)::z
         character(:),allocatable::y
-        character(5)::z
-        if (x<0.0 .or. x>999.9) then
-            write (unit=*,fmt="(a)") "real2char(x): x<0.0 or x>999.9 unsupported"!FIXME
-            stop
-        end if
-        write (unit=z,fmt="(f5.1)") x
+        write (unit=z,fmt="(f46.5)") x
         y=trim(adjustl(z))
     end function real2char
     !##########################################################################!
@@ -455,13 +450,11 @@ module lib
     !##########################################################################!
     subroutine report_attractor_set(A_set,setting,V)
         implicit none
-        type(attractor),dimension(:)::A_set
         integer::setting,n_point,n_cycle,i1,i2,i3,save_
+        character(32)::set_name,report_name
         character(16),dimension(:)::V
-        character(:),allocatable::report
-        character(:),allocatable::s
-        character(:),allocatable::set_name
-        character(:),allocatable::report_name
+        character(:),allocatable::report,s
+        type(attractor),dimension(:)::A_set
         n_point=0
         n_cycle=0
         report=repeat("-",80)//new_line("a")
@@ -471,32 +464,31 @@ module lib
             else
                 n_cycle=n_cycle+1
             end if
-            report=report//"popularity: "//real2char(A_set(i1)%popularity)//"%"//new_line("a")//new_line("a")
+            report=report//"popularity: "//real2char(A_set(i1)%popularity)//"%"//new_line("a")
             do i2=1,size(A_set(i1)%a,1)
                 report=report//V(i2)//": "
-                do i3=1,size(A_set(i1)%a,2)
+                do i3=1,size(A_set(i1)%a,2)-1
                     report=report//real2char(A_set(i1)%a(i2,i3))//" "
                 end do
-                report=report//new_line("a")
+                report=report//real2char(A_set(i1)%a(i2,size(A_set(i1)%a,2)))//new_line("a")
             end do
             report=report//repeat("-",80)//new_line("a")
         end do
         report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//&
         " cycles)"
-        write (unit=*,fmt="(a)") new_line("a")//report//new_line("a")
-        write (unit=*,fmt="(a)") "save? [1/0]"//new_line("a")
+        write (unit=*,fmt="(a)") report//new_line("a")//"save? [1/0]"
         read (unit=*,fmt=*) save_
         if (save_==1) then
             select case (setting)
                 case (1)
-                    set_name="set_physio"
-                    report_name="report_physio"
+                    set_name="set_physio.csv"
+                    report_name="report_physio.txt"
                 case (2)
-                    set_name="set_patho"
-                    report_name="report_patho"
+                    set_name="set_patho.csv"
+                    report_name="report_patho.txt"
                 case (3)
-                    set_name="set_versus"
-                    report_name="report_versus"
+                    set_name="set_versus.csv"
+                    report_name="report_versus.txt"
             end select
             s=int2char(size(A_set))//new_line("a")
             do i1=1,size(A_set)
@@ -505,26 +497,26 @@ module lib
             end do
             do i1=1,size(A_set)
                 do i2=1,size(A_set(i1)%a,1)
-                    do i3=1,size(A_set(i1)%a,2)
-                        s=s//real2char(A_set(i1)%a(i2,i3))
+                    do i3=1,size(A_set(i1)%a,2)-1
+                        s=s//real2char(A_set(i1)%a(i2,i3))//","
                     end do
+                    s=s//real2char(A_set(i1)%a(i2,size(A_set(i1)%a,2)))
                     if (i1/=size(A_set) .or. i2/=size(A_set(i1)%a,1)) then
                         s=s//new_line("a")
                     end if
                 end do
             end do
-            open (unit=1,file=set_name,status="replace")
+            open (unit=1,file=trim(set_name),status="replace")
             write (unit=1,fmt="(a)") s
             close (unit=1)
-            open (unit=1,file=report_name,status="replace")
+            open (unit=1,file=trim(report_name),status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
-            write (unit=*,fmt="(a)") new_line("a")//"set saved as: "//set_name//new_line("a")//"report saved as: "//report_name//&
-            new_line("a")
-            deallocate(s,set_name,report_name)
+            write (unit=*,fmt="(a)") new_line("a")//"set saved as: "//trim(set_name)//new_line("a")//"report saved as: "//trim(report_name)
+            deallocate(s)
         end if
         deallocate(report)
-    end subroutine report_attractor_set
+    end subroutine report_attractor_set<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     !##########################################################################!
     !##################    report_therapeutic_bullet_set    ###################!
     !##########################################################################!
