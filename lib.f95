@@ -310,7 +310,8 @@ module lib
         integer::k,i1,i2,z,n_combi
         integer,dimension(k)::combi
         integer,dimension(:)::deck
-        integer,dimension(min(n_combi,int(min(facto(size(deck))/(facto(k)*facto(size(deck)-k)),real(huge(1),8)))),k)::combi_mat
+        integer,dimension(:,:),allocatable::combi_mat
+        allocate(combi_mat(min(n_combi,int(min(facto(size(deck))/(facto(k)*facto(size(deck)-k)),real(huge(1),8)))),k))
         do i1=1,size(combi_mat,1)
             1 continue
             do i2=1,k
@@ -475,7 +476,7 @@ module lib
         end do
         report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//&
         " cycles)"
-        write (unit=*,fmt="(a)") report//new_line("a")//"save? [1/0]"
+        write (unit=*,fmt="(a)") report//new_line("a")//"save [1/0]"
         read (unit=*,fmt=*) save_
         if (save_==1) then
             select case (setting)
@@ -511,8 +512,7 @@ module lib
             open (unit=1,file=trim(report_name),status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
-            write (unit=*,fmt="(a)") new_line("a")//"set saved as: "//trim(set_name)//new_line("a")//"report saved as: "//&
-            trim(report_name)
+            write (unit=*,fmt="(a)") "set saved as: "//trim(set_name)//new_line("a")//"report saved as: "//trim(report_name)
             deallocate(s)
         end if
         deallocate(report)
@@ -530,7 +530,7 @@ module lib
         n_silv=0
         report=repeat("-",80)//new_line("a")
         do i1=1,size(therapeutic_bullet_set)
-            if (therapeutic_bullet_set(i1)%metal=="gold") then
+            if (trim(therapeutic_bullet_set(i1)%metal)=="gold") then
                 n_gold=n_gold+1
             else
                 n_silv=n_silv+1
@@ -539,11 +539,11 @@ module lib
                 report=report//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//"["//real2char(therapeutic_bullet_set(i1)%moda(i2))//&
                 "] "
             end do
-            report=report//"("//therapeutic_bullet_set(i1)%metal//" bullet)"//new_line("a")//repeat("-",80)//new_line("a")
+            report=report//"("//trim(therapeutic_bullet_set(i1)%metal)//" bullet)"//new_line("a")//repeat("-",80)//new_line("a")
         end do
         report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))//" ("//int2char(n_gold)//&
         " gold bullets, "//int2char(n_silv)//" silver bullets)"
-        write (unit=*,fmt="(a)") report//new_line("a")//"save? [1/0]"
+        write (unit=*,fmt="(a)") report//new_line("a")//"save [1/0]"
         read (unit=*,fmt=*) save_
         if (save_==1) then
             open (unit=1,file="report_therapeutic_bullet.txt",status="replace")
@@ -599,13 +599,13 @@ module lib
         end interface
         call init_random_seed()
         call cpu_time(start)
-        write (unit=*,fmt="(a)") "what to do:"//new_line("a")//"    [1] compute attractors"//new_line("a")//&
-        "    [2] compute pathological attractors"//new_line("a")//"    [3] compute therapeutic bullets"//new_line("a")//&
-        "    [4] help"//new_line("a")//"    [5] license"
+        write (unit=*,fmt="(a)") "[1] compute attractors"//new_line("a")//"[2] compute pathological attractors"//new_line("a")//&
+        "[3] compute therapeutic bullets"//new_line("a")//"[4] help"//new_line("a")//"[5] license"//new_line("a")//&
+        "what to do [1/2/3/4/5]"
         read (unit=*,fmt=*) to_do
         if (to_do==1 .or. to_do==3) then
             if (all(value==[0.0,1.0])) then
-                write (unit=*,fmt="(a,es10.3e3,a)") "size(S)=",real(2,8)**real(n_node,8),", comprehensive_D? [1/0]"
+                write (unit=*,fmt="(a,es10.3e3,a)") "size(S)=",real(2,8)**real(n_node,8),", comprehensive_D [1/0]"
                 read (unit=*,fmt=*) comprehensive_D
                 select case (comprehensive_D)
                     case (1)
@@ -620,7 +620,7 @@ module lib
         select case (to_do)
             case (1)
                 A_set=compute_attractor(f,dummy1,dummy2,D)
-                write (unit=*,fmt="(a)") "setting:"//new_line("a")//"    [1] physiological"//"    [2] pathological"
+                write (unit=*,fmt="(a)") "[1] physiological"//new_line("a")//"[2] pathological"//new_line("a")//"setting [1/2]"
                 read (unit=*,fmt=*) setting
                 call report_attractor_set(A_set,setting,V)
                 deallocate(A_set,D)
