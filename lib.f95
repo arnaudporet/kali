@@ -217,7 +217,7 @@ module lib
                         if (compare_attractor_set(A_physio,A_patho)) then
                             metal="silver"
                         else
-                            metal="golden"
+                            metal="gold"
                         end if
                         therapeutic_bullet_set=add_bullet(therapeutic_bullet_set,C_targ(i2,:),C_moda(i3,:),metal)
                     end if
@@ -474,8 +474,7 @@ module lib
             end do
             report=report//repeat("-",80)//new_line("a")
         end do
-        report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//&
-        " cycles)"
+        report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//" cycles)"
         write (unit=*,fmt="(a)") report//new_line("a")//"save? [1/0]"
         read (unit=*,fmt=*) save_
         if (save_==1) then
@@ -492,8 +491,7 @@ module lib
             end select
             s=int2char(size(A_set))//new_line("a")
             do i1=1,size(A_set)
-                s=s//int2char(size(A_set(i1)%a,1))//new_line("a")//int2char(size(A_set(i1)%a,2))//new_line("a")//&
-                real2char(A_set(i1)%popularity)//new_line("a")
+                s=s//int2char(size(A_set(i1)%a,1))//new_line("a")//int2char(size(A_set(i1)%a,2))//new_line("a")//real2char(A_set(i1)%popularity)//new_line("a")
             end do
             do i1=1,size(A_set)
                 do i2=1,size(A_set(i1)%a,1)
@@ -516,41 +514,38 @@ module lib
             deallocate(s)
         end if
         deallocate(report)
-    end subroutine report_attractor_set<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    end subroutine report_attractor_set
     !##########################################################################!
     !##################    report_therapeutic_bullet_set    ###################!
     !##########################################################################!
     subroutine report_therapeutic_bullet_set(therapeutic_bullet_set,V)
         implicit none
-        type(bullet),dimension(:)::therapeutic_bullet_set
-        character(16),dimension(:)::V
         integer::n_gold,n_silv,i1,i2,save_
+        character(16),dimension(:)::V
         character(:),allocatable::report
+        type(bullet),dimension(:)::therapeutic_bullet_set
         n_gold=0
         n_silv=0
         report=repeat("-",80)//new_line("a")
         do i1=1,size(therapeutic_bullet_set)
-            if (therapeutic_bullet_set(i1)%metal=="golden") then
+            if (therapeutic_bullet_set(i1)%metal=="gold") then
                 n_gold=n_gold+1
             else
                 n_silv=n_silv+1
             end if
             do i2=1,size(therapeutic_bullet_set(i1)%targ)
-                report=report//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//"["//real2char(therapeutic_bullet_set(i1)%moda(i2))//&
-                "] "
+                report=report//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//"["//real2char(therapeutic_bullet_set(i1)%moda(i2))//"] "
             end do
             report=report//"("//therapeutic_bullet_set(i1)%metal//" bullet)"//new_line("a")//repeat("-",80)//new_line("a")
         end do
-        report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))//" ("//int2char(n_gold)//&
-        " golden bullets, "//int2char(n_silv)//" silver bullets)"
-        write (unit=*,fmt="(a)") new_line("a")//report//new_line("a")
-        write (unit=*,fmt="(a)") "save? [1/0]"//new_line("a")
+        report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))//" ("//int2char(n_gold)//" gold bullets, "//int2char(n_silv)//" silver bullets)"
+        write (unit=*,fmt="(a)") report//new_line("a")//"save? [1/0]"
         read (unit=*,fmt=*) save_
         if (save_==1) then
-            open (unit=1,file="report_therapeutic_bullet",status="replace")
+            open (unit=1,file="report_therapeutic_bullet.txt",status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
-            write (unit=*,fmt="(a)") new_line("a")//"report saved as: report_therapeutic_bullet"//new_line("a")
+            write (unit=*,fmt="(a)") "report saved as: report_therapeutic_bullet.txt"
         end if
         deallocate(report)
     end subroutine report_therapeutic_bullet_set
@@ -559,24 +554,22 @@ module lib
     !##########################################################################!
     function sort(x) result(y)
         implicit none
-        integer,dimension(:)::x
+        integer::i,i_min
         integer,dimension(size(x))::y
-        integer,dimension(:),allocatable::z
-        integer,dimension(:),allocatable::w
-        integer,dimension(1)::p
-        integer::i
-        z=x
+        integer,dimension(:)::x
+        integer,dimension(:),allocatable::z1,z2
+        z1=x
         do i=1,size(x)
-            p=minloc(z)
-            y(i)=z(p(1))
-            w=z
-            deallocate(z)
-            allocate(z(size(x)-i))
-            z(:p(1)-1)=w(:p(1)-1)
-            z(p(1):)=w(p(1)+1:)
-            deallocate(w)
+            i_min=minloc(z1,1)
+            y(i)=z1(i_min)
+            z2=z1
+            deallocate(z1)
+            allocate(z1(size(x)-i))
+            z1(:i_min-1)=z2(:i_min-1)
+            z1(i_min:)=z2(i_min+1:)
+            deallocate(z2)
         end do
-        deallocate(z)
+        deallocate(z1)
     end function sort
     !##########################################################################!
     !############################    what_to_do    ############################!
@@ -584,16 +577,13 @@ module lib
     subroutine what_to_do(f,value,size_D,n_node,max_targ,max_moda,V)
         implicit none
         integer::to_do,r_min,r_max,setting,comprehensive_D,size_D,n_node,max_targ,max_moda
-        real,dimension(:)::value
-        character(16),dimension(:)::V
-        real::start,finish
-        real,dimension(:,:),allocatable::D
-        type(attractor),dimension(:),allocatable::A_set
         integer,dimension(0)::dummy1
+        real::start,finish
         real,dimension(0)::dummy2
-        type(attractor),dimension(:),allocatable::A_physio
-        type(attractor),dimension(:),allocatable::A_patho
-        type(attractor),dimension(:),allocatable::a_patho_set
+        real,dimension(:)::value
+        real,dimension(:,:),allocatable::D
+        character(16),dimension(:)::V
+        type(attractor),dimension(:),allocatable::A_set,A_physio,A_patho,a_patho_set
         type(bullet),dimension(:),allocatable::therapeutic_bullet_set
         interface
             function f(x,k) result(y)
@@ -605,18 +595,15 @@ module lib
         end interface
         call init_random_seed()
         call cpu_time(start)
-        write (unit=*,fmt="(a)") new_line("a")//"what to do: "//new_line("a")//new_line("a")//"    [1] compute attractors"//&
-        new_line("a")//"    [2] compute pathological attractors"//new_line("a")//"    [3] compute therapeutic bullets"//&
-        new_line("a")//"    [4] help"//new_line("a")//"    [5] license"//new_line("a")
+        write (unit=*,fmt="(a)") "what to do:"//new_line("a")//"    [1] compute attractors"//new_line("a")//"    [2] compute pathological attractors"//new_line("a")//"    [3] compute therapeutic bullets"//new_line("a")//"    [4] help"//new_line("a")//"    [5] license"
         read (unit=*,fmt=*) to_do
-        if (to_do/=2 .and. to_do/=4 .and. to_do/=5) then
+        if (to_do==1 .or. to_do==3) then
             if (all(value==[0.0,1.0])) then
-                write (unit=*,fmt="(a,es10.3e3,a)") new_line("a")//"size(S)=",real(2,8)**real(n_node,8),new_line("a")//&
-                "comprehensive_D? [1/0]"//new_line("a")
+                write (unit=*,fmt="(a,es10.3e3,a)") "size(S)=",real(2,8)**real(n_node,8),", comprehensive_D? [1/0]"
                 read (unit=*,fmt=*) comprehensive_D
                 select case (comprehensive_D)
                     case (1)
-                        D=transpose(generate_state_space(n_node))
+                        D=generate_state_space(n_node)
                     case (0)
                         D=transpose(generate_arrangement(value,n_node,size_D))
                 end select
@@ -627,8 +614,7 @@ module lib
         select case (to_do)
             case (1)
                 A_set=compute_attractor(f,dummy1,dummy2,D)
-                write (unit=*,fmt="(a)") new_line("a")//"setting:"//new_line("a")//new_line("a")//"    [1] physiological"//&
-                new_line("a")//"    [2] pathological"//new_line("a")
+                write (unit=*,fmt="(a)") "setting:"//new_line("a")//"    [1] physiological"//"    [2] pathological"
                 read (unit=*,fmt=*) setting
                 call report_attractor_set(A_set,setting,V)
                 deallocate(A_set,D)
@@ -640,19 +626,17 @@ module lib
                 deallocate(A_physio,A_patho,a_patho_set)
             case (3)
                 A_physio=load_attractor_set(1)
-                write (unit=*,fmt="(a)") new_line("a")//"r_min="//new_line("a")
+                write (unit=*,fmt="(a)") "r_min="
                 read (unit=*,fmt=*) r_min
-                write (unit=*,fmt="(a)") new_line("a")//"r_max="//new_line("a")
+                write (unit=*,fmt="(a)") "r_max="
                 read (unit=*,fmt=*) r_max
                 therapeutic_bullet_set=compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio)
                 call report_therapeutic_bullet_set(therapeutic_bullet_set,V)
                 deallocate(A_physio,therapeutic_bullet_set,D)
             case (4)
-                write (unit=*,fmt="(a)") new_line("a")//"1) do step 1 with f_physio"//new_line("a")//"2) do step 1 with f_patho"//&
-                new_line("a")//"3) eventually do step 2"//new_line("a")//"4) do step 3 with f_patho"//new_line("a")//&
-                new_line("a")//"do not forget to recompile the sources following any "//"modification"//new_line("a")
+                write (unit=*,fmt="(a)") "1) do step 1 with f_physio"//new_line("a")//"2) do step 1 with f_patho"//new_line("a")//"3) eventually do step 2"//new_line("a")//"4) do step 3 with f_patho"//new_line("a")//"do not forget to recompile the sources following any modification"
             case (5)
-                write (unit=*,fmt="(a)") new_line("a")//'Copyright (c) 2013-2014, Arnaud Poret'//new_line("a")//&
+                write (unit=*,fmt="(a)") 'Copyright (c) 2013-2014, Arnaud Poret'//new_line("a")//&
                 'All rights reserved.'//new_line("a")//new_line("a")//&
                 'Redistribution and use in source and binary forms, with or without modification,'//new_line("a")//&
                 'are permitted provided that the following conditions are met:'//new_line("a")//new_line("a")//&
@@ -673,9 +657,9 @@ module lib
                 'LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON'//new_line("a")//&
                 'ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT'//new_line("a")//&
                 '(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS'//new_line("a")//&
-                'SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.'//new_line("a")
+                'SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.'
         end select
         call cpu_time(finish)
-        write (unit=*,fmt="(a)") "done in "//int2char(int(finish-start))//" seconds"//new_line("a")
+        write (unit=*,fmt="(a)") "done in "//int2char(int(finish-start))//" seconds"
     end subroutine what_to_do
 end module lib
