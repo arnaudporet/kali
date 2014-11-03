@@ -20,8 +20,8 @@ module lib
         implicit none
         real::popularity
         real,dimension(:,:)::a
-        type(attractor),dimension(size(A_set)+1)::y
         type(attractor),dimension(:)::A_set
+        type(attractor),dimension(size(A_set)+1)::y
         y(:size(A_set))=A_set
         y(size(A_set)+1)%a=a
         y(size(A_set)+1)%popularity=popularity
@@ -34,8 +34,8 @@ module lib
         integer,dimension(:)::targ
         real,dimension(:)::moda
         character(16)::metal
-        type(bullet),dimension(size(bullet_set)+1)::y
         type(bullet),dimension(:)::bullet_set
+        type(bullet),dimension(size(bullet_set)+1)::y
         y(:size(bullet_set))=bullet_set
         y(size(bullet_set)+1)%targ=targ
         y(size(bullet_set)+1)%moda=moda
@@ -82,9 +82,9 @@ module lib
     function compare_attractor_set(A_set1,A_set2) result(differ)
         implicit none
         logical::differ,z
+        type(attractor),dimension(:)::A_set1,A_set2
         logical,dimension(size(A_set1))::in_2
         integer::i1,i2
-        type(attractor),dimension(:)::A_set1,A_set2
         if (size(A_set1)/=size(A_set2)) then
             differ=.true.
         else
@@ -117,8 +117,8 @@ module lib
             function f(x,k) result(y)
                 implicit none
                 integer::k
-                real,dimension(size(x,1),1)::y
                 real,dimension(:,:)::x
+                real,dimension(size(x,1),1)::y
             end function f
         end interface
         allocate(A_set(0))
@@ -202,8 +202,8 @@ module lib
             function f(x,k) result(y)
                 implicit none
                 integer::k
-                real,dimension(size(x,1),1)::y
                 real,dimension(:,:)::x
+                real,dimension(size(x,1),1)::y
             end function f
         end interface
         allocate(therapeutic_bullet_set(0))
@@ -411,7 +411,6 @@ module lib
             end do
         end do
         close (unit=1)
-        deallocate(set_name)
     end function load_attractor_set
     !##########################################################################!
     !#############################    rand_int    #############################!
@@ -474,7 +473,8 @@ module lib
             end do
             report=report//repeat("-",80)//new_line("a")
         end do
-        report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//" cycles)"
+        report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//&
+        " cycles)"
         write (unit=*,fmt="(a)") report//new_line("a")//"save? [1/0]"
         read (unit=*,fmt=*) save_
         if (save_==1) then
@@ -491,7 +491,8 @@ module lib
             end select
             s=int2char(size(A_set))//new_line("a")
             do i1=1,size(A_set)
-                s=s//int2char(size(A_set(i1)%a,1))//new_line("a")//int2char(size(A_set(i1)%a,2))//new_line("a")//real2char(A_set(i1)%popularity)//new_line("a")
+                s=s//int2char(size(A_set(i1)%a,1))//new_line("a")//int2char(size(A_set(i1)%a,2))//new_line("a")//&
+                real2char(A_set(i1)%popularity)//new_line("a")
             end do
             do i1=1,size(A_set)
                 do i2=1,size(A_set(i1)%a,1)
@@ -510,7 +511,8 @@ module lib
             open (unit=1,file=trim(report_name),status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
-            write (unit=*,fmt="(a)") new_line("a")//"set saved as: "//trim(set_name)//new_line("a")//"report saved as: "//trim(report_name)
+            write (unit=*,fmt="(a)") new_line("a")//"set saved as: "//trim(set_name)//new_line("a")//"report saved as: "//&
+            trim(report_name)
             deallocate(s)
         end if
         deallocate(report)
@@ -534,11 +536,13 @@ module lib
                 n_silv=n_silv+1
             end if
             do i2=1,size(therapeutic_bullet_set(i1)%targ)
-                report=report//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//"["//real2char(therapeutic_bullet_set(i1)%moda(i2))//"] "
+                report=report//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//"["//real2char(therapeutic_bullet_set(i1)%moda(i2))//&
+                "] "
             end do
             report=report//"("//therapeutic_bullet_set(i1)%metal//" bullet)"//new_line("a")//repeat("-",80)//new_line("a")
         end do
-        report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))//" ("//int2char(n_gold)//" gold bullets, "//int2char(n_silv)//" silver bullets)"
+        report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))//" ("//int2char(n_gold)//&
+        " gold bullets, "//int2char(n_silv)//" silver bullets)"
         write (unit=*,fmt="(a)") report//new_line("a")//"save? [1/0]"
         read (unit=*,fmt=*) save_
         if (save_==1) then
@@ -555,8 +559,8 @@ module lib
     function sort(x) result(y)
         implicit none
         integer::i,i_min
-        integer,dimension(size(x))::y
         integer,dimension(:)::x
+        integer,dimension(size(x))::y
         integer,dimension(:),allocatable::z1,z2
         z1=x
         do i=1,size(x)
@@ -589,13 +593,15 @@ module lib
             function f(x,k) result(y)
                 implicit none
                 integer::k
-                real,dimension(size(x,1),1)::y
                 real,dimension(:,:)::x
+                real,dimension(size(x,1),1)::y
             end function f
         end interface
         call init_random_seed()
         call cpu_time(start)
-        write (unit=*,fmt="(a)") "what to do:"//new_line("a")//"    [1] compute attractors"//new_line("a")//"    [2] compute pathological attractors"//new_line("a")//"    [3] compute therapeutic bullets"//new_line("a")//"    [4] help"//new_line("a")//"    [5] license"
+        write (unit=*,fmt="(a)") "what to do:"//new_line("a")//"    [1] compute attractors"//new_line("a")//&
+        "    [2] compute pathological attractors"//new_line("a")//"    [3] compute therapeutic bullets"//new_line("a")//&
+        "    [4] help"//new_line("a")//"    [5] license"
         read (unit=*,fmt=*) to_do
         if (to_do==1 .or. to_do==3) then
             if (all(value==[0.0,1.0])) then
@@ -634,7 +640,9 @@ module lib
                 call report_therapeutic_bullet_set(therapeutic_bullet_set,V)
                 deallocate(A_physio,therapeutic_bullet_set,D)
             case (4)
-                write (unit=*,fmt="(a)") "1) do step 1 with f_physio"//new_line("a")//"2) do step 1 with f_patho"//new_line("a")//"3) eventually do step 2"//new_line("a")//"4) do step 3 with f_patho"//new_line("a")//"do not forget to recompile the sources following any modification"
+                write (unit=*,fmt="(a)") "1) do step 1 with f_physio"//new_line("a")//"2) do step 1 with f_patho"//new_line("a")//&
+                "3) eventually do step 2"//new_line("a")//"4) do step 3 with f_patho"//new_line("a")//&
+                "do not forget to recompile the sources following any modification"
             case (5)
                 write (unit=*,fmt="(a)") 'Copyright (c) 2013-2014, Arnaud Poret'//new_line("a")//&
                 'All rights reserved.'//new_line("a")//new_line("a")//&
