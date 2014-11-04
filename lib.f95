@@ -476,7 +476,7 @@ module lib
         end do
         report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//&
         " cycles)"
-        write (unit=*,fmt="(a)") report//new_line("a")//"save [1/0]"
+        write (unit=*,fmt="(a)",advance="no") new_line("a")//report//new_line("a")//new_line("a")//"save [1/0] "
         read (unit=*,fmt=*) save_
         if (save_==1) then
             select case (setting)
@@ -512,7 +512,8 @@ module lib
             open (unit=1,file=trim(report_name),status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
-            write (unit=*,fmt="(a)") "set saved as: "//trim(set_name)//new_line("a")//"report saved as: "//trim(report_name)
+            write (unit=*,fmt="(a)") new_line("a")//"set saved as: "//trim(set_name)//new_line("a")//"report saved as: "//&
+            trim(report_name)
             deallocate(s)
         end if
         deallocate(report)
@@ -543,13 +544,13 @@ module lib
         end do
         report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))//" ("//int2char(n_gold)//&
         " gold bullets, "//int2char(n_silv)//" silver bullets)"
-        write (unit=*,fmt="(a)") report//new_line("a")//"save [1/0]"
+        write (unit=*,fmt="(a)",advance="no") new_line("a")//report//new_line("a")//new_line("a")//"save [1/0] "
         read (unit=*,fmt=*) save_
         if (save_==1) then
             open (unit=1,file="report_therapeutic_bullet.txt",status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
-            write (unit=*,fmt="(a)") "report saved as: report_therapeutic_bullet.txt"
+            write (unit=*,fmt="(a)") new_line("a")//"report saved as: report_therapeutic_bullet.txt"
         end if
         deallocate(report)
     end subroutine report_therapeutic_bullet_set
@@ -599,13 +600,14 @@ module lib
         end interface
         call init_random_seed()
         call cpu_time(start)
-        write (unit=*,fmt="(a)") "[1] compute attractors"//new_line("a")//"[2] compute pathological attractors"//new_line("a")//&
-        "[3] compute therapeutic bullets"//new_line("a")//"[4] help"//new_line("a")//"[5] license"//new_line("a")//&
-        "what to do [1/2/3/4/5]"
+        write (unit=*,fmt="(a)",advance="no") new_line("a")//"[1] compute attractors"//new_line("a")//&
+        "[2] compute pathological attractors"//new_line("a")//"[3] compute therapeutic bullets"//new_line("a")//"[4] help"//&
+        new_line("a")//"[5] license"//new_line("a")//new_line("a")//"what to do [1/2/3/4/5] "
         read (unit=*,fmt=*) to_do
         if (to_do==1 .or. to_do==3) then
             if (all(value==[0.0,1.0])) then
-                write (unit=*,fmt="(a,es10.3e3,a)") "size(S)=",real(2,8)**real(n_node,8),", comprehensive_D [1/0]"
+                write (unit=*,fmt="(a,es10.3e3,a)",advance="no") new_line("a")//"size(S)=",real(2,8)**real(n_node,8),&
+                ", comprehensive_D [1/0] "
                 read (unit=*,fmt=*) comprehensive_D
                 select case (comprehensive_D)
                     case (1)
@@ -620,7 +622,8 @@ module lib
         select case (to_do)
             case (1)
                 A_set=compute_attractor(f,dummy1,dummy2,D)
-                write (unit=*,fmt="(a)") "[1] physiological"//new_line("a")//"[2] pathological"//new_line("a")//"setting [1/2]"
+                write (unit=*,fmt="(a)",advance="no") new_line("a")//"[1] physiological"//new_line("a")//"[2] pathological"//&
+                new_line("a")//new_line("a")//"setting [1/2] "
                 read (unit=*,fmt=*) setting
                 call report_attractor_set(A_set,setting,V)
                 deallocate(A_set,D)
@@ -632,19 +635,19 @@ module lib
                 deallocate(A_physio,A_patho,a_patho_set)
             case (3)
                 A_physio=load_attractor_set(1)
-                write (unit=*,fmt="(a)") "r_min="
+                write (unit=*,fmt="(a)",advance="no") new_line("a")//"r_min="
                 read (unit=*,fmt=*) r_min
-                write (unit=*,fmt="(a)") "r_max="
+                write (unit=*,fmt="(a)",advance="no") "r_max="
                 read (unit=*,fmt=*) r_max
                 therapeutic_bullet_set=compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio)
                 call report_therapeutic_bullet_set(therapeutic_bullet_set,V)
                 deallocate(A_physio,therapeutic_bullet_set,D)
             case (4)
-                write (unit=*,fmt="(a)") "1) do step 1 with f_physio"//new_line("a")//"2) do step 1 with f_patho"//new_line("a")//&
-                "3) eventually do step 2"//new_line("a")//"4) do step 3 with f_patho"//new_line("a")//&
-                "do not forget to recompile the sources following any modification"
+                write (unit=*,fmt="(a)") new_line("a")//"1) do step 1 with f_physio"//new_line("a")//"2) do step 1 with f_patho"//&
+                new_line("a")//"3) eventually do step 2"//new_line("a")//"4) do step 3 with f_patho"//new_line("a")//&
+                new_line("a")//"do not forget to recompile the sources following any modification"
             case (5)
-                write (unit=*,fmt="(a)") 'Copyright (c) 2013-2014, Arnaud Poret'//new_line("a")//&
+                write (unit=*,fmt="(a)") new_line("a")//'Copyright (c) 2013-2014, Arnaud Poret'//new_line("a")//&
                 'All rights reserved.'//new_line("a")//new_line("a")//&
                 'Redistribution and use in source and binary forms, with or without modification,'//new_line("a")//&
                 'are permitted provided that the following conditions are met:'//new_line("a")//new_line("a")//&
@@ -668,6 +671,6 @@ module lib
                 'SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.'
         end select
         call cpu_time(finish)
-        write (unit=*,fmt="(a)") "done in "//int2char(int(finish-start))//" seconds"
+        write (unit=*,fmt="(a)") new_line("a")//"done in "//int2char(int(finish-start))//" seconds"//new_line("a")
     end subroutine what_to_do
 end module lib
