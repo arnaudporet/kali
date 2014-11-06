@@ -109,9 +109,10 @@ module lib
         logical::a_found,in_A
         integer::i1,i2,k
         integer,dimension(:)::c_targ
+        integer,dimension(:),allocatable::count
         real,dimension(:)::c_moda
         real,dimension(:,:)::D
-        real,dimension(:,:),allocatable::a,count,x
+        real,dimension(:,:),allocatable::a,x
         type(attractor),dimension(:),allocatable::A_set
         interface
             function f(x,k) result(y)
@@ -122,7 +123,7 @@ module lib
             end function f
         end interface
         allocate(A_set(0))
-        allocate(count(1,0))
+        allocate(count(0))
         do i1=1,size(D,2)
             x=reshape(D(:,i1),[size(D,1),1])
             k=1
@@ -142,13 +143,13 @@ module lib
                     do i2=1,size(A_set)
                         if (.not. compare_attractor(a,A_set(i2)%a)) then
                             in_A=.true.
-                            count(1,i2)=count(1,i2)+1.0
+                            count(i2)=count(i2)+1
                             exit
                         end if
                     end do
                     if (.not. in_A) then
                         A_set=add_attractor(A_set,a,0.0)
-                        count=concatenate(count,reshape([1.0],[1,1]),2)
+                        count=reshape(concatenate(reshape(real(count),[1,size(count)]),reshape([1.0],[1,1]),2),[size(count)+1])
                     end if
                     exit
                 end if
@@ -157,7 +158,7 @@ module lib
             deallocate(x,a)
         end do
         do i1=1,size(A_set)
-            A_set(i1)%popularity=(count(1,i1)/real(size(D,2)))*100.0
+            A_set(i1)%popularity=(real(count(i1))/real(size(D,2)))*100.0
         end do
         deallocate(count)
     end function compute_attractor
