@@ -441,16 +441,17 @@ module lib
     function real2char(x) result(y)
         implicit none
         real::x
-        character(46)::z
+        character(43)::z
         character(:),allocatable::y
-        write (unit=z,fmt="(f46.5)") x
+        write (unit=z,fmt="(f43.2)") x
         y=trim(adjustl(z))
     end function real2char
     !##########################################################################!
     !#######################    report_attractor_set    #######################!
     !##########################################################################!
-    subroutine report_attractor_set(A_set,setting,V)
+    subroutine report_attractor_set(A_set,setting,V,boolean)
         implicit none
+        logical::boolean
         integer::setting,n_point,n_cycle,i1,i2,i3,save_
         character(32)::set_name,report_name
         character(16),dimension(:)::V
@@ -469,9 +470,17 @@ module lib
             do i2=1,size(A_set(i1)%a,1)
                 report=report//V(i2)//": "
                 do i3=1,size(A_set(i1)%a,2)-1
-                    report=report//real2char(A_set(i1)%a(i2,i3))//" "
+                    if (boolean) then
+                        report=report//int2char(int(A_set(i1)%a(i2,i3)))//" "
+                    else
+                        report=report//real2char(A_set(i1)%a(i2,i3))//" "
+                    end if
                 end do
-                report=report//real2char(A_set(i1)%a(i2,size(A_set(i1)%a,2)))//new_line("a")
+                if (boolean) then
+                    report=report//int2char(int(A_set(i1)%a(i2,size(A_set(i1)%a,2))))//new_line("a")
+                else
+                    report=report//real2char(A_set(i1)%a(i2,size(A_set(i1)%a,2)))//new_line("a")
+                end if
             end do
             report=report//repeat("-",80)//new_line("a")
         end do
@@ -522,9 +531,11 @@ module lib
     !##########################################################################!
     !##################    report_therapeutic_bullet_set    ###################!
     !##########################################################################!
-    subroutine report_therapeutic_bullet_set(therapeutic_bullet_set,V)
+    subroutine report_therapeutic_bullet_set(therapeutic_bullet_set,V,boolean)
         implicit none
+        logical::boolean
         integer::n_gold,n_silv,i1,i2,save_
+        character(1)::moda
         character(16),dimension(:)::V
         character(:),allocatable::report
         type(bullet),dimension(:)::therapeutic_bullet_set
@@ -538,10 +549,19 @@ module lib
                 n_silv=n_silv+1
             end if
             do i2=1,size(therapeutic_bullet_set(i1)%targ)
-                report=report//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//"["//real2char(therapeutic_bullet_set(i1)%moda(i2))//&
-                "] "
+                if (boolean) then
+                    if (therapeutic_bullet_set(i1)%moda(i2)==1.0) then
+                        moda="+"
+                    else
+                        moda="-"
+                    end if
+                    report=report//moda//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//" "
+                else
+                    report=report//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//"["//&
+                    real2char(therapeutic_bullet_set(i1)%moda(i2))//"] "
+                end if
             end do
-            report=report//"("//trim(therapeutic_bullet_set(i1)%metal)//" bullet)"//new_line("a")//repeat("-",80)//new_line("a")
+            report=report//"("//trim(therapeutic_bullet_set(i1)%metal)//")"//new_line("a")//repeat("-",80)//new_line("a")
         end do
         report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))//" ("//int2char(n_gold)//&
         " gold bullets, "//int2char(n_silv)//" silver bullets)"
@@ -582,6 +602,7 @@ module lib
     !##########################################################################!
     subroutine what_to_do(f,value,size_D,n_node,max_targ,max_moda,V)
         implicit none
+        logical::boolean
         integer::to_do,r_min,r_max,setting,comprehensive_D,size_D,n_node,max_targ,max_moda
         integer,dimension(0)::dummy1
         real::start,finish
@@ -606,7 +627,8 @@ module lib
         new_line("a")//"[5] license"//new_line("a")//new_line("a")//"what to do [1/2/3/4/5] "
         read (unit=*,fmt=*) to_do
         if (to_do==1 .or. to_do==3) then
-            if (all(value==[0.0,1.0])) then
+            boolean=all(value==[0.0,1.0])
+            if (boolean) then
                 write (unit=*,fmt="(a,es10.3e3,a)",advance="no") new_line("a")//"size(S)=",real(2,8)**real(n_node,8),&
                 ", comprehensive_D [1/0] "
                 read (unit=*,fmt=*) comprehensive_D
@@ -626,13 +648,13 @@ module lib
                 write (unit=*,fmt="(a)",advance="no") new_line("a")//"[1] physiological"//new_line("a")//"[2] pathological"//&
                 new_line("a")//new_line("a")//"setting [1/2] "
                 read (unit=*,fmt=*) setting
-                call report_attractor_set(A_set,setting,V)
+                call report_attractor_set(A_set,setting,V,boolean)
                 deallocate(A_set,D)
             case (2)
                 A_physio=load_attractor_set(1)
                 A_patho=load_attractor_set(2)
                 a_patho_set=compute_pathological_attractor(A_physio,A_patho)
-                call report_attractor_set(a_patho_set,3,V)
+                call report_attractor_set(a_patho_set,3,V,boolean)
                 deallocate(A_physio,A_patho,a_patho_set)
             case (3)
                 A_physio=load_attractor_set(1)
@@ -641,7 +663,7 @@ module lib
                 write (unit=*,fmt="(a)",advance="no") "r_max="
                 read (unit=*,fmt=*) r_max
                 therapeutic_bullet_set=compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio)
-                call report_therapeutic_bullet_set(therapeutic_bullet_set,V)
+                call report_therapeutic_bullet_set(therapeutic_bullet_set,V,boolean)
                 deallocate(A_physio,therapeutic_bullet_set,D)
             case (4)
                 write (unit=*,fmt="(a)") new_line("a")//"1) do step 1 with f_physio"//new_line("a")//"2) do step 1 with f_patho"//&
