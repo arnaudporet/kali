@@ -9,8 +9,8 @@ module lib
     end type attractor
     type::bullet
         integer,dimension(:),allocatable::targ
+        real,dimension(2)::gain
         real,dimension(:),allocatable::moda
-        character(16)::metal
     end type bullet
     contains
     !##########################################################################!
@@ -29,17 +29,17 @@ module lib
     !##########################################################################!
     !############################    add_bullet    ############################!
     !##########################################################################!
-    function add_bullet(bullet_set,targ,moda,metal) result(y)
+    function add_bullet(bullet_set,targ,moda,gain) result(y)
         implicit none
         integer,dimension(:)::targ
+        real,dimension(2)::gain
         real,dimension(:)::moda
-        character(16)::metal
         type(bullet),dimension(:)::bullet_set
         type(bullet),dimension(size(bullet_set)+1)::y
         y(:size(bullet_set))=bullet_set
         y(size(bullet_set)+1)%targ=targ
         y(size(bullet_set)+1)%moda=moda
-        y(size(bullet_set)+1)%metal=metal
+        y(size(bullet_set)+1)%gain=gain
     end function add_bullet
     !##########################################################################!
     !########################    compare_attractor    #########################!
@@ -188,16 +188,17 @@ module lib
     !##########################################################################!
     !####################    compute_therapeutic_bullet    ####################!
     !##########################################################################!
-    function compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio) result(therapeutic_bullet_set)
+    function compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio,A_patho) &
+    result(therapeutic_bullet_set)
         implicit none
-        integer::r_min,r_max,i1,i2,i3,max_targ,max_moda,n_node
+        integer::r_min,r_max,i1,i2,i3,i4,i5,max_targ,max_moda,n_node
         integer,dimension(:,:),allocatable::C_targ
+        real::patho_covering,test_covering
         real,dimension(:)::value
         real,dimension(:,:)::D
         real,dimension(:,:),allocatable::C_moda
-        character(16)::metal
-        type(attractor),dimension(:)::A_physio
-        type(attractor),dimension(:),allocatable::A_patho
+        type(attractor),dimension(:)::A_physio,A_patho
+        type(attractor),dimension(:),allocatable::A_test
         type(bullet),dimension(:),allocatable::therapeutic_bullet_set
         interface
             function f(x,k) result(y)
@@ -213,16 +214,26 @@ module lib
             C_moda=generate_arrangement(value,i1,max_moda)
             do i2=1,size(C_targ,1)
                 do i3=1,size(C_moda,1)
-                    A_patho=compute_attractor(f,C_targ(i2,:),C_moda(i3,:),D)
-                    if (size(compute_pathological_attractor(A_physio,A_patho))==0) then
-                        if (compare_attractor_set(A_physio,A_patho)) then
-                            metal="silver"
-                        else
-                            metal="gold"
-                        end if
-                        therapeutic_bullet_set=add_bullet(therapeutic_bullet_set,C_targ(i2,:),C_moda(i3,:),metal)
+                    A_test=compute_attractor(f,C_targ(i2,:),C_moda(i3,:),D)
+                    patho_covering=0.0
+                    test_covering=0.0
+                    do i4=1,size(A_physio)
+                        do i5=1,size(A_patho)
+                            if (.not. compare_attractor(A_physio(i4)%a,A_patho(i5)%a)) then
+                                patho_covering=patho_covering+A_patho(i5)%popularity
+                            end if
+                        end do
+                        do i5=1,size(A_test)
+                            if (.not. compare_attractor(A_physio(i4)%a,A_test(i5)%a)) then
+                                test_covering=test_covering+A_test(i5)%popularity
+                            end if
+                        end do
+                    end do
+                    if (test_covering>patho_covering) then
+                        therapeutic_bullet_set=add_bullet(therapeutic_bullet_set,C_targ(i2,:),C_moda(i3,:),[patho_covering,&
+                        test_covering])
                     end if
-                    deallocate(A_patho)
+                    deallocate(A_test)
                 end do
             end do
             deallocate(C_targ,C_moda)
@@ -534,20 +545,13 @@ module lib
     subroutine report_therapeutic_bullet_set(therapeutic_bullet_set,V,boolean)
         implicit none
         logical::boolean
-        integer::n_gold,n_silv,i1,i2,save_
+        integer::i1,i2,save_
         character(1)::moda
         character(16),dimension(:)::V
         character(:),allocatable::report
         type(bullet),dimension(:)::therapeutic_bullet_set
-        n_gold=0
-        n_silv=0
         report=repeat("-",80)//new_line("a")
         do i1=1,size(therapeutic_bullet_set)
-            if (trim(therapeutic_bullet_set(i1)%metal)=="gold") then
-                n_gold=n_gold+1
-            else
-                n_silv=n_silv+1
-            end if
             do i2=1,size(therapeutic_bullet_set(i1)%targ)
                 if (boolean) then
                     if (therapeutic_bullet_set(i1)%moda(i2)==1.0) then
@@ -561,10 +565,10 @@ module lib
                     real2char(therapeutic_bullet_set(i1)%moda(i2))//"] "
                 end if
             end do
-            report=report//"("//trim(therapeutic_bullet_set(i1)%metal)//")"//new_line("a")//repeat("-",80)//new_line("a")
+            report=report//"("//real2char(therapeutic_bullet_set(i1)%gain(1))//"% --> "//&
+            real2char(therapeutic_bullet_set(i1)%gain(2))//"%)"//new_line("a")//repeat("-",80)//new_line("a")
         end do
-        report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))//" ("//int2char(n_gold)//&
-        " gold bullets, "//int2char(n_silv)//" silver bullets)"
+        report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))
         write (unit=*,fmt="(a)",advance="no") new_line("a")//report//new_line("a")//new_line("a")//"save [1/0] "
         read (unit=*,fmt=*) save_
         if (save_==1) then
@@ -658,11 +662,12 @@ module lib
                 deallocate(A_physio,A_patho,a_patho_set)
             case (3)
                 A_physio=load_attractor_set(1)
+                A_patho=load_attractor_set(2)
                 write (unit=*,fmt="(a)",advance="no") new_line("a")//"r_min="
                 read (unit=*,fmt=*) r_min
                 write (unit=*,fmt="(a)",advance="no") "r_max="
                 read (unit=*,fmt=*) r_max
-                therapeutic_bullet_set=compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio)
+                therapeutic_bullet_set=compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio,A_patho)
                 call report_therapeutic_bullet_set(therapeutic_bullet_set,V,boolean)
                 deallocate(A_physio,therapeutic_bullet_set,D)
             case (4)
