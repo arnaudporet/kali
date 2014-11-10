@@ -209,6 +209,13 @@ module lib
             end function f
         end interface
         allocate(therapeutic_bullet_set(0))
+        do i1=1,size(A_patho)
+            do i2=1,size(A_physio)
+                if (.not. compare_attractor(A_patho(i1)%a,A_physio(i2)%a)) then
+                    patho_covering=patho_covering+A_patho(i1)%popularity
+                end if
+            end do
+        end do
         do i1=r_min,min(r_max,n_node)
             C_targ=generate_combination(range_int(1,n_node),i1,max_targ)
             C_moda=generate_arrangement(value,i1,max_moda)
@@ -217,15 +224,10 @@ module lib
                     A_test=compute_attractor(f,C_targ(i2,:),C_moda(i3,:),D)
                     patho_covering=0.0
                     test_covering=0.0
-                    do i4=1,size(A_physio)
-                        do i5=1,size(A_patho)
-                            if (.not. compare_attractor(A_physio(i4)%a,A_patho(i5)%a)) then
-                                patho_covering=patho_covering+A_patho(i5)%popularity
-                            end if
-                        end do
-                        do i5=1,size(A_test)
-                            if (.not. compare_attractor(A_physio(i4)%a,A_test(i5)%a)) then
-                                test_covering=test_covering+A_test(i5)%popularity
+                    do i4=1,size(A_test)
+                        do i5=1,size(A_physio)
+                            if (.not. compare_attractor(A_test(i4)%a,A_physio(i5)%a)) then
+                                test_covering=test_covering+A_test(i4)%popularity
                             end if
                         end do
                     end do
