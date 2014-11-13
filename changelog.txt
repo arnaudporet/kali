@@ -1,3 +1,4 @@
+
 * implementation of multivalued logic (which includes Boolean logic itself)
 
 * (testing) computation of therapeutic bullets according to their ability at

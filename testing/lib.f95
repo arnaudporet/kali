@@ -1,3 +1,4 @@
+
 module lib
     implicit none
     integer::max_targ,max_moda,size_D,n_node
