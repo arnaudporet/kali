@@ -302,7 +302,8 @@ module lib
         integer::k,i1,i2,n_arrang
         real,dimension(k)::arrang
         real,dimension(:)::deck
-        real,dimension(min(n_arrang,int(min(real(size(deck),8)**real(k,8),real(huge(1),8)))),k)::arrang_mat
+        real,dimension(:,:),allocatable::arrang_mat
+        allocate(arrang_mat(min(n_arrang,int(min(real(size(deck),8)**real(k,8),real(huge(1),8)))),k))
         do i1=1,size(arrang_mat,1)
             1 continue
             do i2=1,k
@@ -629,12 +630,12 @@ module lib
         end interface
         call init_random_seed()
         call cpu_time(start)
+        boolean=all(value==[0.0,1.0])
         write (unit=*,fmt="(a)",advance="no") new_line("a")//"[1] compute attractors"//new_line("a")//&
         "[2] compute pathological attractors"//new_line("a")//"[3] compute therapeutic bullets"//new_line("a")//"[4] help"//&
         new_line("a")//"[5] license"//new_line("a")//new_line("a")//"what to do [1/2/3/4/5] "
         read (unit=*,fmt=*) to_do
         if (to_do==1 .or. to_do==3) then
-            boolean=all(value==[0.0,1.0])
             if (boolean) then
                 write (unit=*,fmt="(a,es10.3e3,a)",advance="no") new_line("a")//"size(S)=",real(2,8)**real(n_node,8),&
                 ", comprehensive_D [1/0] "
