@@ -2,8 +2,8 @@
 * implementation of multivalued logic (which includes Boolean logic itself)
 
 * (testing) computation of therapeutic bullets according to their ability at
-increasing the physiological part of the pathological state space, namely at
-increasing the size (estimated in percent of the state space) of the union of
-the physiological basins in the pathological state space (displayed as
-"x% --> y%" where the union of the physiological basins in the pathological
-state space represents x% without the computed therapeutic bullet and y% with)
+  increasing the physiological part of the pathological state space, namely at
+  increasing the size (estimated in percent of the state space) of the union of
+  the physiological basins in the pathological state space (displayed as
+  "x% --> y%" where the union of the physiological basins in the pathological
+  state space represents x% without the computed therapeutic bullet and y% with)

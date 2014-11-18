@@ -2,26 +2,27 @@
 ! How to:
 !     1) read the comments
 !     2) fill the template
-!     3) compile and execute: cd ~/kali-targ/ && gfortran lib.f95 example_network.f95 -o example_network && ./example_network
+!     3) compile: gfortran lib.f95 example_network.f95 -o example_network
+!     4) execute: ./example_network
 
-! GFortran (https://www.gnu.org/software/gcc/fortran/) is the Fortran compiler
-! front end and run-time libraries for GCC, the GNU Compiler Collection.
+! GFortran (https://gcc.gnu.org/fortran/) is the Fortran compiler front end and
+! run-time libraries for GCC, the GNU Compiler Collection.
 
 ! Do not forget to recompile the sources following any modification.
 
-! The example network is a published boolean model of the mammalian cell
+! The example network is a published Boolean model of the mammalian cell
 ! cycle [1].
 
-! [1] Fauré, A., Naldi, A., Chaouiya, C., & Thieffry, D. (2006). Dynamical
-! analysis of a generic Boolean model for the control of the mammalian cell
-! cycle. Bioinformatics, 22(14), e124-e131.
+! [1] Faure A., Naldi A., Chaouiya C., Thieffry D. (2006) Dynamical analysis of
+!     a generic Boolean model for the control of the mammalian cell cycle.
+!     Bioinformatics 22(14) e124-e131.
 
 program example_network
     use lib
     implicit none
     ! the number of nodes
     n_node=10
-    ! the domain of value, for example [0.0,1.0] for boolean logic and
+    ! the domain of value, for example [0.0,1.0] for Boolean logic and
     ! [0.0,0.5,1.0] for three-valued logic
     value=[0.0,1.0]
     ! the maximum number of target combinations to test
@@ -53,7 +54,7 @@ program example_network
     !#############################    f_physio    #############################!
     !##########################################################################!
     ! the transition function of the physiological variant
-    ! to cope with both boolean and multivalued logic, the Zadeh fuzzy logic
+    ! to cope with both Boolean and multivalued logic, the Zadeh fuzzy logic
     ! operators are used: x AND y = min(x,y), x OR y = max(x,y), NOT x = 1-x
     function f_physio(x,k) result(y)
         implicit none
@@ -76,7 +77,7 @@ program example_network
     !#############################    f_patho    ##############################!
     !##########################################################################!
     ! the transition function of the pathological variant
-    ! to cope with both boolean and multivalued logic, the Zadeh fuzzy logic
+    ! to cope with both Boolean and multivalued logic, the Zadeh fuzzy logic
     ! operators are used: x AND y = min(x,y), x OR y = max(x,y), NOT x = 1-x
     function f_patho(x,k) result(y)
         implicit none
