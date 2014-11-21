@@ -1,4 +1,3 @@
-
 ! clear && gfortran lib.f95 example_network.f95 -o example_network && rm lib.mod && ./example_network && rm example_network
 
 program example_network
