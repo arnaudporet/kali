@@ -1,5 +1,4 @@
 module lib
-    implicit none
     integer::max_targ,max_moda,size_D,n_node
     real,dimension(:),allocatable::value
     character(16),dimension(:),allocatable::V
@@ -17,7 +16,6 @@ module lib
     !##########################    add_attractor    ###########################!
     !##########################################################################!
     function add_attractor(A_set,a,popularity) result(y)
-        implicit none
         real::popularity
         real,dimension(:,:)::a
         type(attractor),dimension(:)::A_set
@@ -30,7 +28,6 @@ module lib
     !############################    add_bullet    ############################!
     !##########################################################################!
     function add_bullet(bullet_set,targ,moda,gain) result(y)
-        implicit none
         integer,dimension(:)::targ
         real,dimension(2)::gain
         real,dimension(:)::moda
@@ -45,7 +42,6 @@ module lib
     !########################    compare_attractor    #########################!
     !##########################################################################!
     function compare_attractor(a1,a2) result(differ)
-        implicit none
         logical::differ,start_found
         integer::i1,i2,start1,start2
         real,dimension(:,:)::a1,a2
@@ -80,7 +76,6 @@ module lib
     !######################    compare_attractor_set    #######################!
     !##########################################################################!
     function compare_attractor_set(A_set1,A_set2) result(differ)
-        implicit none
         logical::differ,z
         type(attractor),dimension(:)::A_set1,A_set2
         logical,dimension(size(A_set1))::in_2
@@ -105,7 +100,6 @@ module lib
     !########################    compute_attractor    #########################!
     !##########################################################################!
     function compute_attractor(f,c_targ,c_moda,D) result(A_set)
-        implicit none
         logical::a_found,in_A
         integer::i1,i2,k
         integer,dimension(:)::c_targ
@@ -116,7 +110,6 @@ module lib
         type(attractor),dimension(:),allocatable::A_set
         interface
             function f(x,k) result(y)
-                implicit none
                 integer::k
                 real,dimension(:,:)::x
                 real,dimension(size(x,1),1)::y
@@ -166,7 +159,6 @@ module lib
     !##################    compute_pathological_attractor    ##################!
     !##########################################################################!
     function compute_pathological_attractor(A_physio,A_patho) result(a_patho_set)
-        implicit none
         logical::in_physio
         integer::i1,i2
         type(attractor),dimension(:)::A_physio,A_patho
@@ -188,9 +180,7 @@ module lib
     !##########################################################################!
     !####################    compute_therapeutic_bullet    ####################!
     !##########################################################################!
-    function compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio,A_patho) &
-    result(therapeutic_bullet_set)
-        implicit none
+    function compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio,A_patho) result(therapeutic_bullet_set)
         integer::r_min,r_max,i1,i2,i3,i4,i5,max_targ,max_moda,n_node
         integer,dimension(:,:),allocatable::C_targ
         real::patho_covering,test_covering
@@ -202,7 +192,6 @@ module lib
         type(bullet),dimension(:),allocatable::therapeutic_bullet_set
         interface
             function f(x,k) result(y)
-                implicit none
                 integer::k
                 real,dimension(:,:)::x
                 real,dimension(size(x,1),1)::y
@@ -232,8 +221,7 @@ module lib
                         end do
                     end do
                     if (test_covering>patho_covering) then
-                        therapeutic_bullet_set=add_bullet(therapeutic_bullet_set,C_targ(i2,:),C_moda(i3,:),[patho_covering,&
-                        test_covering])
+                        therapeutic_bullet_set=add_bullet(therapeutic_bullet_set,C_targ(i2,:),C_moda(i3,:),[patho_covering,test_covering])
                     end if
                     deallocate(A_test)
                 end do
@@ -245,7 +233,6 @@ module lib
     !###########################    concatenate    ############################!
     !##########################################################################!
     function concatenate(x1,x2,d) result(y)
-        implicit none
         integer::d
         real,dimension(:,:)::x1,x2
         real,dimension(:,:),allocatable::y
@@ -276,7 +263,6 @@ module lib
     !##############################    facto    ###############################!
     !##########################################################################!
     function facto(x) result(y)
-        implicit none
         integer::x,i
         real(8)::y
         if (x>170) then
@@ -297,7 +283,6 @@ module lib
     !##########################################################################!
     function generate_arrangement(deck,k,n_arrang) result(arrang_mat)
         !#################    /!\ only with repetition /!\    #################!
-        implicit none
         integer::k,i1,i2,n_arrang
         real,dimension(k)::arrang
         real,dimension(:)::deck
@@ -321,7 +306,6 @@ module lib
     !##########################################################################!
     function generate_combination(deck,k,n_combi) result(combi_mat)
         !###############    /!\ only without repetition /!\    ################!
-        implicit none
         integer::k,i1,i2,z,n_combi
         integer,dimension(k)::combi
         integer,dimension(:)::deck
@@ -351,9 +335,8 @@ module lib
     !#######################    generate_state_space    #######################!
     !##########################################################################!
     function generate_state_space(n) result(y)
-        implicit none
         integer::n,i1,i2
-        integer,dimension(n,2**n)::y
+        real,dimension(n,2**n)::y
         if (n>30) then
             write (unit=*,fmt="(a)") "generate_state_space(n): n>30 unsupported"
             stop
@@ -361,10 +344,10 @@ module lib
         do i1=1,n
             y(:i1-1,(2**i1)/2+1:2**i1)=y(:i1-1,:2**(i1-1))
             do i2=1,2**(i1-1)
-                y(i1,i2)=0
+                y(i1,i2)=0.0
             end do
             do i2=(2**i1)/2+1,2**i1
-                y(i1,i2)=1
+                y(i1,i2)=1.0
             end do
         end do
     end function generate_state_space
@@ -372,7 +355,6 @@ module lib
     !#########################    init_random_seed    #########################!
     !##########################################################################!
     subroutine init_random_seed()
-        implicit none
         integer::seed_size,error
         integer,dimension(:),allocatable::seed
         call random_seed(size=seed_size)
@@ -391,7 +373,6 @@ module lib
     !#############################    int2char    #############################!
     !##########################################################################!
     function int2char(x) result(y)
-        implicit none
         integer::x
         character(11)::z
         character(:),allocatable::y
@@ -402,7 +383,6 @@ module lib
     !########################    load_attractor_set    ########################!
     !##########################################################################!
     function load_attractor_set(setting) result(A_set)
-        implicit none
         integer::setting,i1,i2,z,n,m
         character(32)::set_name
         type(attractor),dimension(:),allocatable::A_set
@@ -432,7 +412,6 @@ module lib
     !#############################    rand_int    #############################!
     !##########################################################################!
     function rand_int(a,b) result(y)
-        implicit none
         integer::a,b,y
         real::x
         call random_number(x)
@@ -442,7 +421,6 @@ module lib
     !############################    range_int    #############################!
     !##########################################################################!
     function range_int(a,b) result(y)
-        implicit none
         integer::a,b,i
         integer,dimension(b-a+1)::y
         do i=1,size(y)
@@ -453,7 +431,6 @@ module lib
     !############################    real2char    #############################!
     !##########################################################################!
     function real2char(x) result(y)
-        implicit none
         real::x
         character(43)::z
         character(:),allocatable::y
@@ -464,7 +441,6 @@ module lib
     !#######################    report_attractor_set    #######################!
     !##########################################################################!
     subroutine report_attractor_set(A_set,setting,V,boolean)
-        implicit none
         logical::boolean
         integer::setting,n_point,n_cycle,i1,i2,i3,save_
         character(32)::set_name,report_name
@@ -498,8 +474,7 @@ module lib
             end do
             report=report//repeat("-",80)//new_line("a")
         end do
-        report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//&
-        " cycles)"
+        report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//" cycles)"
         write (unit=*,fmt="(a)",advance="no") new_line("a")//report//new_line("a")//new_line("a")//"save [1/0] "
         read (unit=*,fmt=*) save_
         if (save_==1) then
@@ -516,8 +491,7 @@ module lib
             end select
             s=int2char(size(A_set))//new_line("a")
             do i1=1,size(A_set)
-                s=s//int2char(size(A_set(i1)%a,1))//new_line("a")//int2char(size(A_set(i1)%a,2))//new_line("a")//&
-                real2char(A_set(i1)%popularity)//new_line("a")
+                s=s//int2char(size(A_set(i1)%a,1))//new_line("a")//int2char(size(A_set(i1)%a,2))//new_line("a")//real2char(A_set(i1)%popularity)//new_line("a")
             end do
             do i1=1,size(A_set)
                 do i2=1,size(A_set(i1)%a,1)
@@ -536,8 +510,7 @@ module lib
             open (unit=1,file=trim(report_name),status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
-            write (unit=*,fmt="(a)") new_line("a")//"set saved as: "//trim(set_name)//new_line("a")//"report saved as: "//&
-            trim(report_name)
+            write (unit=*,fmt="(a)") new_line("a")//"set saved as: "//trim(set_name)//new_line("a")//"report saved as: "//trim(report_name)
             deallocate(s)
         end if
         deallocate(report)
@@ -546,7 +519,6 @@ module lib
     !##################    report_therapeutic_bullet_set    ###################!
     !##########################################################################!
     subroutine report_therapeutic_bullet_set(therapeutic_bullet_set,V,boolean)
-        implicit none
         logical::boolean
         integer::i1,i2,save_
         character(1)::moda
@@ -564,12 +536,10 @@ module lib
                     end if
                     report=report//moda//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//" "
                 else
-                    report=report//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//"["//&
-                    real2char(therapeutic_bullet_set(i1)%moda(i2))//"] "
+                    report=report//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//"["//real2char(therapeutic_bullet_set(i1)%moda(i2))//"] "
                 end if
             end do
-            report=report//"("//real2char(therapeutic_bullet_set(i1)%gain(1))//"% --> "//&
-            real2char(therapeutic_bullet_set(i1)%gain(2))//"%)"//new_line("a")//repeat("-",80)//new_line("a")
+            report=report//"("//real2char(therapeutic_bullet_set(i1)%gain(1))//"% --> "//real2char(therapeutic_bullet_set(i1)%gain(2))//"%)"//new_line("a")//repeat("-",80)//new_line("a")
         end do
         report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))
         write (unit=*,fmt="(a)",advance="no") new_line("a")//report//new_line("a")//new_line("a")//"save [1/0] "
@@ -586,7 +556,6 @@ module lib
     !###############################    sort    ###############################!
     !##########################################################################!
     function sort(x) result(y)
-        implicit none
         integer::i,i_min
         integer,dimension(:)::x
         integer,dimension(size(x))::y
@@ -608,7 +577,6 @@ module lib
     !############################    what_to_do    ############################!
     !##########################################################################!
     subroutine what_to_do(f,value,size_D,n_node,max_targ,max_moda,V)
-        implicit none
         logical::boolean
         integer::to_do,r_min,r_max,setting,comprehensive_D,size_D,n_node,max_targ,max_moda
         integer,dimension(0)::dummy1
@@ -621,7 +589,6 @@ module lib
         type(bullet),dimension(:),allocatable::therapeutic_bullet_set
         interface
             function f(x,k) result(y)
-                implicit none
                 integer::k
                 real,dimension(:,:)::x
                 real,dimension(size(x,1),1)::y
@@ -630,14 +597,11 @@ module lib
         call init_random_seed()
         call cpu_time(start)
         boolean=all(value==[0.0,1.0])
-        write (unit=*,fmt="(a)",advance="no") new_line("a")//"[1] compute attractors"//new_line("a")//&
-        "[2] compute pathological attractors"//new_line("a")//"[3] compute therapeutic bullets"//new_line("a")//"[4] help"//&
-        new_line("a")//"[5] license"//new_line("a")//new_line("a")//"what to do [1/2/3/4/5] "
+        write (unit=*,fmt="(a)",advance="no") new_line("a")//"[1] compute attractors"//new_line("a")//"[2] compute pathological attractors"//new_line("a")//"[3] compute therapeutic bullets"//new_line("a")//"[4] help"//new_line("a")//"[5] license"//new_line("a")//new_line("a")//"what to do [1/2/3/4/5] "
         read (unit=*,fmt=*) to_do
         if (to_do==1 .or. to_do==3) then
             if (boolean) then
-                write (unit=*,fmt="(a,es10.3e3,a)",advance="no") new_line("a")//"size(S)=",real(2,8)**real(n_node,8),&
-                ", comprehensive_D [1/0] "
+                write (unit=*,fmt="(a,es10.3e3,a)",advance="no") new_line("a")//"size(S)=",real(2,8)**real(n_node,8),", comprehensive_D [1/0] "
                 read (unit=*,fmt=*) comprehensive_D
                 select case (comprehensive_D)
                     case (1)
@@ -652,8 +616,7 @@ module lib
         select case (to_do)
             case (1)
                 A_set=compute_attractor(f,dummy1,dummy2,D)
-                write (unit=*,fmt="(a)",advance="no") new_line("a")//"[1] physiological"//new_line("a")//"[2] pathological"//&
-                new_line("a")//new_line("a")//"setting [1/2] "
+                write (unit=*,fmt="(a)",advance="no") new_line("a")//"[1] physiological"//new_line("a")//"[2] pathological"//new_line("a")//new_line("a")//"setting [1/2] "
                 read (unit=*,fmt=*) setting
                 call report_attractor_set(A_set,setting,V,boolean)
                 deallocate(A_set,D)
@@ -674,33 +637,9 @@ module lib
                 call report_therapeutic_bullet_set(therapeutic_bullet_set,V,boolean)
                 deallocate(A_physio,therapeutic_bullet_set,D)
             case (4)
-                write (unit=*,fmt="(a)") new_line("a")//"1) do step 1 with f_physio"//new_line("a")//"2) do step 1 with f_patho"//&
-                new_line("a")//"3) eventually do step 2"//new_line("a")//"4) do step 3 with f_patho"//new_line("a")//&
-                new_line("a")//"do not forget to recompile the sources following any modification"
+                write (unit=*,fmt="(a)") new_line("a")//"1) do step 1 with f_physio"//new_line("a")//"2) do step 1 with f_patho"//new_line("a")//"3) eventually do step 2"//new_line("a")//"4) do step 3 with f_patho"//new_line("a")//new_line("a")//"do not forget to recompile the sources following any modification"
             case (5)
-                write (unit=*,fmt="(a)") new_line("a")//&
-                'Copyright (c) 2013-2014, Arnaud Poret arnaud.poret@gmail.com'//new_line("a")//&
-                'All rights reserved.'//new_line("a")//new_line("a")//&
-                'Redistribution and use in source and binary forms, with or without modification,'//new_line("a")//&
-                'are permitted provided that the following conditions are met:'//new_line("a")//new_line("a")//&
-                '1. Redistributions of source code must retain the above copyright notice, this'//new_line("a")//&
-                'list of conditions and the following disclaimer.'//new_line("a")//new_line("a")//&
-                '2. Redistributions in binary form must reproduce the above copyright notice,'//new_line("a")//&
-                'this list of conditions and the following disclaimer in the documentation and/or'//new_line("a")//&
-                'other materials provided with the distribution.'//new_line("a")//new_line("a")//&
-                '3. Neither the name of the copyright holder nor the names of its contributors'//new_line("a")//&
-                'may be used to endorse or promote products derived from this software without'//new_line("a")//&
-                'specific prior written permission.'//new_line("a")//new_line("a")//&
-                'THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND'//new_line("a")//&
-                'ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED'//new_line("a")//&
-                'WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE'//new_line("a")//&
-                'DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR'//new_line("a")//&
-                'ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES'//new_line("a")//&
-                '(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;'//new_line("a")//&
-                'LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON'//new_line("a")//&
-                'ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT'//new_line("a")//&
-                '(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS'//new_line("a")//&
-                'SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.'
+                write (unit=*,fmt="(a)") new_line("a")//'Copyright (c) 2013-2014, Arnaud Poret arnaud.poret@gmail.com'//new_line("a")//'All rights reserved.'//new_line("a")//new_line("a")//'Redistribution and use in source and binary forms, with or without modification,'//new_line("a")//'are permitted provided that the following conditions are met:'//new_line("a")//new_line("a")//'1. Redistributions of source code must retain the above copyright notice, this'//new_line("a")//'list of conditions and the following disclaimer.'//new_line("a")//new_line("a")//'2. Redistributions in binary form must reproduce the above copyright notice,'//new_line("a")//'this list of conditions and the following disclaimer in the documentation and/or'//new_line("a")//'other materials provided with the distribution.'//new_line("a")//new_line("a")//'3. Neither the name of the copyright holder nor the names of its contributors'//new_line("a")//'may be used to endorse or promote products derived from this software without'//new_line("a")//'specific prior written permission.'//new_line("a")//new_line("a")//'THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND'//new_line("a")//'ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED'//new_line("a")//'WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE'//new_line("a")//'DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR'//new_line("a")//'ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES'//new_line("a")//'(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;'//new_line("a")//'LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON'//new_line("a")//'ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT'//new_line("a")//'(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS'//new_line("a")//'SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.'
         end select
         call cpu_time(finish)
         write (unit=*,fmt="(a)") new_line("a")//"done in "//int2char(int(finish-start))//" seconds"//new_line("a")

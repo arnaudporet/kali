@@ -340,7 +340,7 @@ module lib
     function generate_state_space(n) result(y)
         implicit none
         integer::n,i1,i2
-        integer,dimension(n,2**n)::y
+        real,dimension(n,2**n)::y
         if (n>30) then
             write (unit=*,fmt="(a)") "generate_state_space(n): n>30 unsupported"
             stop
@@ -348,10 +348,10 @@ module lib
         do i1=1,n
             y(:i1-1,(2**i1)/2+1:2**i1)=y(:i1-1,:2**(i1-1))
             do i2=1,2**(i1-1)
-                y(i1,i2)=0
+                y(i1,i2)=0.0
             end do
             do i2=(2**i1)/2+1,2**i1
-                y(i1,i2)=1
+                y(i1,i2)=1.0
             end do
         end do
     end function generate_state_space

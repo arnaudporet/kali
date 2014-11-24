@@ -1,0 +1,290 @@
+lib.f95:599.20:
+
+        boolean=all(value==[0.0,1.0])
+                    1
+Warning: Equality comparison for REAL(4) at (1)
+lib.f95:532.24:
+
+                    if (therapeutic_bullet_set(i1)%moda(i2)==1.0) then
+                        1
+Warning: Equality comparison for REAL(4) at (1)
+lib.f95:297.24:
+
+                if (all(arrang_mat(i2,:)==arrang)) then
+                        1
+Warning: Equality comparison for REAL(4) at (1)
+lib.f95:128.28:
+
+                    if (all(x(:,i2)==x(:,k+1))) then
+                            1
+Warning: Equality comparison for REAL(4) at (1)
+lib.f95:145.30:
+
+                        count=reshape(concatenate(reshape(real(count),[1,size(c
+                              1
+Warning: Possible change of value in conversion from REAL(4) to INTEGER(4) at (1)
+lib.f95:55.28:
+
+                    if (all(a1(:,i1)==a2(:,i2))) then
+                            1
+Warning: Equality comparison for REAL(4) at (1)
+lib.f95:67.34:
+
+                    if (.not. all(a1(:,modulo(start1+i1,size(a1,2))+1)==a2(:,mo
+                                  1
+Warning: Equality comparison for REAL(4) at (1)
+lib.f95:608.24:
+
+                        D=generate_state_space(n_node)
+                        1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:610.24:
+
+                        D=transpose(generate_arrangement(value,n_node,size_D))
+                        1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:613.16:
+
+                D=transpose(generate_arrangement(value,n_node,size_D))
+                1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:618.16:
+
+                A_set=compute_attractor(f,dummy1,dummy2,D)
+                1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:624.16:
+
+                A_physio=load_attractor_set(1)
+                1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:625.16:
+
+                A_patho=load_attractor_set(2)
+                1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:626.16:
+
+                a_patho_set=compute_pathological_attractor(A_physio,A_patho)
+                1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:630.16:
+
+                A_physio=load_attractor_set(1)
+                1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:631.16:
+
+                A_patho=load_attractor_set(2)
+                1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:636.16:
+
+                therapeutic_bullet_set=compute_therapeutic_bullet(f,D,r_min,r_m
+                1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:563.8:
+
+        z1=x
+        1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:567.12:
+
+            z2=z1
+            1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:528.15:
+
+        report=repeat("-",80)//new_line("a")
+               1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:537.27:
+
+                    report=report//moda//trim(V(therapeutic_bullet_set(i1)%targ
+                           1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:539.27:
+
+                    report=report//trim(V(therapeutic_bullet_set(i1)%targ(i2)))
+                           1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:542.19:
+
+            report=report//"("//real2char(therapeutic_bullet_set(i1)%gain(1))//
+                   1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:544.15:
+
+        report=report//"found therapeutic bullets: "//int2char(size(therapeutic
+               1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:452.15:
+
+        report=repeat("-",80)//new_line("a")
+               1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:459.19:
+
+            report=report//"popularity: "//real2char(A_set(i1)%popularity)//"%"
+                   1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:461.23:
+
+                report=report//V(i2)//": "
+                       1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:464.31:
+
+                        report=report//int2char(int(A_set(i1)%a(i2,i3)))//" "
+                               1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:466.31:
+
+                        report=report//real2char(A_set(i1)%a(i2,i3))//" "
+                               1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:470.27:
+
+                    report=report//int2char(int(A_set(i1)%a(i2,size(A_set(i1)%a
+                           1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:472.27:
+
+                    report=report//real2char(A_set(i1)%a(i2,size(A_set(i1)%a,2)
+                           1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:475.19:
+
+            report=report//repeat("-",80)//new_line("a")
+                   1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:477.15:
+
+        report=report//"found attractors: "//int2char(size(A_set))//" ("//int2c
+               1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:492.14:
+
+            s=int2char(size(A_set))//new_line("a")
+              1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:494.18:
+
+                s=s//int2char(size(A_set(i1)%a,1))//new_line("a")//int2char(siz
+                  1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:499.26:
+
+                        s=s//real2char(A_set(i1)%a(i2,i3))//","
+                          1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:501.22:
+
+                    s=s//real2char(A_set(i1)%a(i2,size(A_set(i1)%a,2)))
+                      1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:503.26:
+
+                        s=s//new_line("a")
+                          1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:438.10:
+
+        y=trim(adjustl(z))
+          1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:380.10:
+
+        y=trim(adjustl(z))
+          1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:242.20:
+
+                    y=x2
+                    1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:244.20:
+
+                    y=x1
+                    1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:252.20:
+
+                    y=x2
+                    1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:254.20:
+
+                    y=x1
+                    1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:209.12:
+
+            C_targ=generate_combination(range_int(1,n_node),i1,max_targ)
+            1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:210.12:
+
+            C_moda=generate_arrangement(value,i1,max_moda)
+            1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:213.20:
+
+                    A_test=compute_attractor(f,C_targ(i2,:),C_moda(i3,:),D)
+                    1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:224.24:
+
+                        therapeutic_bullet_set=add_bullet(therapeutic_bullet_se
+                        1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:176.16:
+
+                a_patho_set=add_attractor(a_patho_set,A_patho(i1)%a,A_patho(i1)
+                1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:121.12:
+
+            x=reshape(D(:,i1),[size(D,1),1])
+            1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:124.16:
+
+                x=concatenate(x,f(x,k),2)
+                1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:130.24:
+
+                        a=reshape(x(:,i2:k),[size(D,1),k-i2+1])
+                        1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:144.24:
+
+                        A_set=add_attractor(A_set,a,0.0)
+                        1
+Warning: Code for reallocating the allocatable variable at (1) will be added
+lib.f95:145.24:
+
+                        count=reshape(concatenate(reshape(real(count),[1,size(c
+                        1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:37.8:
+
+        y(size(bullet_set)+1)%targ=targ
+        1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:38.8:
+
+        y(size(bullet_set)+1)%moda=moda
+        1
+Warning: Code for reallocating the allocatable array at (1) will be added
+lib.f95:24.8:
+
+        y(size(A_set)+1)%a=a
+        1
+Warning: Code for reallocating the allocatable array at (1) will be added
+example_network.f95:6.4:
+
+    value=[0.0,1.0]
+    1
+Warning: Code for reallocating the allocatable array at (1) will be added
