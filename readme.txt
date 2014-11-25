@@ -26,7 +26,7 @@ How to:
     2) clone the project: git clone https://github.com/arnaudporet/kali-targ.git
        (or download it if you do not have git, but I strongly encourage you to
        use git)
-    3) with a text editor, open the template file: example_network.f95
+    3) with a text editor, open the template file: example_network.f08
 
 The example network is a published Boolean model of the mammalian cell
 cycle [1].

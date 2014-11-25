@@ -149,7 +149,7 @@ module lib
                     end do
                     if (.not. in_A) then
                         A_set=add_attractor(A_set,a,0.0)
-                        count=reshape(concatenate(reshape(real(count),[1,size(count)]),reshape([1.0],[1,1]),2),[size(count)+1])
+                        count=int(reshape(concatenate(reshape(real(count),[1,size(count)]),reshape([1.0],[1,1]),2),[size(count)+1]))
                     end if
                     exit
                 end if
