@@ -442,9 +442,9 @@ module lib
     function real2char(x) result(y)
         implicit none
         real::x
-        character(43)::z
+        character(44)::z
         character(:),allocatable::y
-        write (unit=z,fmt="(f43.2)") x
+        write (unit=z,fmt="(f44.3)") x
         y=trim(adjustl(z))
     end function real2char
     !##########################################################################!
@@ -630,8 +630,8 @@ module lib
         read (unit=*,fmt=*) to_do
         if (to_do==1 .or. to_do==3) then
             if (boolean) then
-                write (unit=*,fmt="(a,es10.3e3,a)",advance="no") new_line("a")//"size(S)=",real(2,8)**real(n_node,8),&
-                ", comprehensive_D [1/0] "
+                write (unit=*,fmt="(a,es10.3e3,a)",advance="no") new_line("a")//"state space cardinality: ",&
+                real(2,8)**real(n_node,8),", comprehensive computation [1/0] "
                 read (unit=*,fmt=*) comprehensive_D
                 select case (comprehensive_D)
                     case (1)
@@ -659,9 +659,9 @@ module lib
                 deallocate(A_physio,A_patho,a_patho_set)
             case (3)
                 A_physio=load_attractor_set(1)
-                write (unit=*,fmt="(a)",advance="no") new_line("a")//"r_min="
+                write (unit=*,fmt="(a)",advance="no") new_line("a")//"number of targets per bullet (lower bound): "
                 read (unit=*,fmt=*) r_min
-                write (unit=*,fmt="(a)",advance="no") "r_max="
+                write (unit=*,fmt="(a)",advance="no") "number of targets per bullet (upper bound): "
                 read (unit=*,fmt=*) r_max
                 therapeutic_bullet_set=compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio)
                 call report_therapeutic_bullet_set(therapeutic_bullet_set,V,boolean)

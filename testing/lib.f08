@@ -75,27 +75,27 @@ module lib
     !##########################################################################!
     !######################    compare_attractor_set    #######################!
     !##########################################################################!
-    function compare_attractor_set(A_set1,A_set2) result(differ)
-        logical::differ,z
-        type(attractor),dimension(:)::A_set1,A_set2
-        logical,dimension(size(A_set1))::in_2
-        integer::i1,i2
-        if (size(A_set1)/=size(A_set2)) then
-            differ=.true.
-        else
-            do i1=1,size(A_set1)
-                z=.false.
-                do i2=1,size(A_set2)
-                    if (.not. compare_attractor(A_set1(i1)%a,A_set2(i2)%a)) then
-                        z=.true.
-                        exit
-                    end if
-                end do
-                in_2(i1)=z
-            end do
-            differ=.not. all(in_2)
-        end if
-    end function compare_attractor_set
+!    function compare_attractor_set(A_set1,A_set2) result(differ)
+!        logical::differ,z
+!        type(attractor),dimension(:)::A_set1,A_set2
+!        logical,dimension(size(A_set1))::in_2
+!        integer::i1,i2
+!        if (size(A_set1)/=size(A_set2)) then
+!            differ=.true.
+!        else
+!            do i1=1,size(A_set1)
+!                z=.false.
+!                do i2=1,size(A_set2)
+!                    if (.not. compare_attractor(A_set1(i1)%a,A_set2(i2)%a)) then
+!                        z=.true.
+!                        exit
+!                    end if
+!                end do
+!                in_2(i1)=z
+!            end do
+!            differ=.not. all(in_2)
+!        end if
+!    end function compare_attractor_set
     !##########################################################################!
     !########################    compute_attractor    #########################!
     !##########################################################################!
@@ -432,9 +432,9 @@ module lib
     !##########################################################################!
     function real2char(x) result(y)
         real::x
-        character(43)::z
+        character(44)::z
         character(:),allocatable::y
-        write (unit=z,fmt="(f43.2)") x
+        write (unit=z,fmt="(f44.3)") x
         y=trim(adjustl(z))
     end function real2char
     !##########################################################################!
@@ -601,7 +601,7 @@ module lib
         read (unit=*,fmt=*) to_do
         if (to_do==1 .or. to_do==3) then
             if (boolean) then
-                write (unit=*,fmt="(a,es10.3e3,a)",advance="no") new_line("a")//"size(S)=",real(2,8)**real(n_node,8),", comprehensive_D [1/0] "
+                write (unit=*,fmt="(a,es10.3e3,a)",advance="no") new_line("a")//"state space cardinality: ",real(2,8)**real(n_node,8),", comprehensive computation [1/0] "
                 read (unit=*,fmt=*) comprehensive_D
                 select case (comprehensive_D)
                     case (1)
@@ -629,9 +629,9 @@ module lib
             case (3)
                 A_physio=load_attractor_set(1)
                 A_patho=load_attractor_set(2)
-                write (unit=*,fmt="(a)",advance="no") new_line("a")//"r_min="
+                write (unit=*,fmt="(a)",advance="no") new_line("a")//"number of targets per bullet (lower bound): "
                 read (unit=*,fmt=*) r_min
-                write (unit=*,fmt="(a)",advance="no") "r_max="
+                write (unit=*,fmt="(a)",advance="no") "number of targets per bullet (upper bound): "
                 read (unit=*,fmt=*) r_max
                 therapeutic_bullet_set=compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio,A_patho)
                 call report_therapeutic_bullet_set(therapeutic_bullet_set,V,boolean)

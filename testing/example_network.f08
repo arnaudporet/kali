@@ -1,6 +1,7 @@
-! clear && gfortran -std=f2008 -ffree-line-length-none -fimplicit-none -fmax-errors=1 lib.f08 example_network.f08 -o example_network && rm lib.mod && ./example_network && rm example_network
 
-! clear && gfortran -std=f2008 -ffree-line-length-none -fimplicit-none -fmax-errors=1 -Waliasing -Wampersand -Wcharacter-truncation -Wline-truncation -Wconversion -Wconversion-extra -Wimplicit-interface -Wimplicit-procedure -Wintrinsics-std -Wreal-q-constant -Wsurprising -Wno-tabs -Wunderflow -Wintrinsic-shadow -Wunused-dummy-argument -Wunused-parameter -Walign-commons -Wfunction-elimination -Wrealloc-lhs-all -Wcompare-reals -Wtarget-lifetime lib.f08 example_network.f08 && rm lib.mod a.out
+! clear && gf08 lib.f08 example_network.f08 -o example_network && ./example_network && rm lib.mod example_network
+
+! clear && gf08dbg lib.f08 example_network.f08 && rm lib.mod a.out
 
 program example_network
     use lib
