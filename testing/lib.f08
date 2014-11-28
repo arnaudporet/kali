@@ -1,3 +1,4 @@
+
 module lib
     integer::max_targ,max_moda,size_D,n_node
     real,dimension(:),allocatable::value

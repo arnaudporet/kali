@@ -1,3 +1,4 @@
+
 module lib
     integer::max_targ,max_moda,size_D,n_node
     real,dimension(:),allocatable::value
@@ -132,6 +133,7 @@ module lib
         do i1=1,size(A_set)
             A_set(i1)%popularity=(real(count(i1))/real(size(D,2)))*100.0
         end do
+        <<<<<<<<<<<<<<<<<<<<<<<<<<
         deallocate(count)
     end function compute_attractor
     !##########################################################################!
@@ -381,7 +383,7 @@ module lib
     !#############################    minlocs    ##############################!
     !##########################################################################!
     function minlocs(x) result(y)
-        integer::i_min,i
+        integer::i,i_min
         integer,dimension(:),allocatable::y
         real,dimension(:)::x
         i_min=minloc(x,1)
@@ -548,21 +550,16 @@ module lib
     !##########################################################################!
     function sort(x) result(y)
         integer::i,i_min
+        real::z
         real,dimension(:)::x
         real,dimension(size(x))::y
-        real,dimension(:),allocatable::z1,z2
-        z1=x
-        do i=1,size(x)
-            i_min=minloc(z1,1)
-            y(i)=z1(i_min)
-            z2=z1
-            deallocate(z1)
-            allocate(z1(size(x)-i))
-            z1(:i_min-1)=z2(:i_min-1)
-            z1(i_min:)=z2(i_min+1:)
-            deallocate(z2)
+        y=x
+        do i=1,size(y)-1
+            i_min=minloc(y(i:),1)+i-1
+            z=y(i)
+            y(i)=y(i_min)
+            y(i_min)=z
         end do
-        deallocate(z1)
     end function sort
     !##########################################################################!
     !##########################    sort_attractor    ##########################!
