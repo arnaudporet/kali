@@ -23,7 +23,7 @@ program example_network
     n_node=10
     ! the domain of value, for example [0.0,1.0] for Boolean logic and
     ! [0.0,0.5,1.0] for three-valued logic
-    value=[0.0,0.5,1.0]
+    value=[0.0,1.0]
     ! the maximum number of target combinations to test
     max_targ=int(1e2)
     ! the maximum number of modality arrangements to test for each target
@@ -46,7 +46,7 @@ program example_network
     ! pass either f_physio (for computing the physiological attractor set) or
     ! f_patho (for computing the phathological attractor set or to compute
     ! therapeutic bullets)
-    call what_to_do(f_patho,value,size_D,n_node,max_targ,max_moda,V)
+    call what_to_do(f_physio,value,size_D,n_node,max_targ,max_moda,V)
     deallocate(value,V)
     contains
     !##########################################################################!
