@@ -44,34 +44,58 @@ module lib
     !########################    compare_attractor    #########################!
     !##########################################################################!
     function compare_attractor(a1,a2) result(differ)
-        !##########    /!\ attractors must be in sorted form /!\    ###########!
-        logical::differ
+        logical::differ,start_found
+        integer::i1,i2,start1,start2
         real,dimension(:,:)::a1,a2
+        differ=.false.
         if (size(a1,2)/=size(a2,2)) then
             differ=.true.
         else
-            differ=.not. all(a1==a2)
+            start_found=.false.
+            do1:do i1=1,size(a1,2)
+                do2:do i2=1,size(a2,2)
+                    if (all(a1(:,i1)==a2(:,i2))) then
+                        start_found=.true.
+                        start1=i1
+                        start2=i2
+                        exit do1
+                    end if
+                end do do2
+            end do do1
+            if (.not. start_found) then
+                differ=.true.
+            else
+                do i1=0,size(a1,2)-2
+                    if (.not. all(a1(:,modulo(start1+i1,size(a1,2))+1)==a2(:,modulo(start2+i1,size(a2,2))+1))) then
+                        differ=.true.
+                        exit
+                    end if
+                end do
+            end if
         end if
     end function compare_attractor
     !##########################################################################!
     !######################    compare_attractor_set    #######################!
     !##########################################################################!
     function compare_attractor_set(A_set1,A_set2) result(differ)
-        !########    /!\ attractor sets must be in sorted form /!\    #########!
-        !##########    /!\ attractors must be in sorted form /!\    ###########!
-        logical::differ
+        logical::differ,z
+        integer::i1,i2
         type(attractor),dimension(:)::A_set1,A_set2
-        integer::i
+        logical,dimension(size(A_set1))::in_2
         if (size(A_set1)/=size(A_set2)) then
             differ=.true.
         else
-            differ=.false.
-            do i=1,size(A_set1)
-                if (compare_attractor(A_set1(i)%a,A_set2(i)%a)) then
-                    differ=.true.
-                    exit
-                end if
+            do i1=1,size(A_set1)
+                z=.false.
+                do i2=1,size(A_set2)
+                    if (.not. compare_attractor(A_set1(i1)%a,A_set2(i2)%a)) then
+                        z=.true.
+                        exit
+                    end if
+                end do
+                in_2(i1)=z
             end do
+            differ=.not. all(in_2)
         end if
     end function compare_attractor_set
     !##########################################################################!
@@ -105,7 +129,7 @@ module lib
                 do i2=k,1,-1
                     if (all(x(:,i2)==x(:,k+1))) then
                         a_found=.true.
-                        a=sort_attractor(reshape(x(:,i2:k),[size(D,1),k-i2+1]))
+                        a=reshape(x(:,i2:k),[size(D,1),k-i2+1])
                         exit
                     end if
                 end do
@@ -131,7 +155,6 @@ module lib
         do i1=1,size(A_set)
             A_set(i1)%popularity=(real(count(i1))/real(size(D,2)))*100.0
         end do
-        A_set=sort_attractor_set(A_set)
         deallocate(count)
     end function compute_attractor
     !##########################################################################!
@@ -378,21 +401,6 @@ module lib
         close (unit=1)
     end function load_attractor_set
     !##########################################################################!
-    !#############################    minlocs    ##############################!
-    !##########################################################################!
-    function minlocs(x) result(y)
-        integer::i,i_min
-        integer,dimension(:),allocatable::y
-        real,dimension(:)::x
-        i_min=minloc(x,1)
-        y=[i_min]
-        do i=i_min+1,size(x)
-            if (x(i)==x(i_min)) then
-                y=int(reshape(concatenate(real(reshape(y,[1,size(y)])),real(reshape([i],[1,1])),2),[size(y)+1]))
-            end if
-        end do
-    end function minlocs
-    !##########################################################################!
     !#############################    rand_int    #############################!
     !##########################################################################!
     function rand_int(a,b) result(y)
@@ -559,79 +567,6 @@ module lib
             y(i_min)=z
         end do
     end function sort
-    !##########################################################################!
-    !##########################    sort_attractor    ##########################!
-    !##########################################################################!
-    function sort_attractor(a) result(y)
-        integer::i,j_min
-        integer,dimension(:),allocatable::z
-        real,dimension(:,:)::a
-        real,dimension(size(a,1),size(a,2))::y
-        z=range_int(1,size(a,2))
-        do i=1,size(a,1)
-            z=z(minlocs(a(i,z)))
-            if (size(z)==1) then
-                j_min=z(1)
-                exit
-            end if
-        end do
-        y=cshift(a,j_min-1,2)
-        deallocate(z)
-    end function sort_attractor
-    !##########################################################################!
-    !########################    sort_attractor_set    ########################!
-    !##########################################################################!
-    function sort_attractor_set(A_set) result(y)
-        !##########    /!\ attractors must be in sorted form /!\    ###########!
-        logical::repass
-        integer::i1,i2
-        real::z2
-        real,dimension(:,:),allocatable::z1
-        type(attractor),dimension(:)::A_set
-        type(attractor),dimension(size(A_set))::y
-        y=A_set
-        allocate(z1(0,0))
-        do
-            repass=.false.
-            do i1=1,size(y)-1
-                if (size(y(i1)%a,2)>size(y(i1+1)%a,2)) then
-                    repass=.true.
-                    z1=y(i1)%a
-                    z2=y(i1)%popularity
-                    y(i1)%a=y(i1+1)%a
-                    y(i1)%popularity=y(i1+1)%popularity
-                    y(i1+1)%a=z1
-                    y(i1+1)%popularity=z2
-                end if
-            end do
-            if (.not. repass) then
-                exit
-            end if
-        end do
-        do
-            repass=.false.
-            do i1=1,size(y)-1
-                if (size(y(i1)%a,2)==size(y(i1+1)%a,2)) then
-                    do i2=1,size(y(i1)%a,1)
-                        if (y(i1)%a(i2,1)>y(i1+1)%a(i2,1)) then
-                            repass=.true.
-                            z1=y(i1)%a
-                            z2=y(i1)%popularity
-                            y(i1)%a=y(i1+1)%a
-                            y(i1)%popularity=y(i1+1)%popularity
-                            y(i1+1)%a=z1
-                            y(i1+1)%popularity=z2
-                            exit
-                        end if
-                    end do
-                end if
-            end do
-            if (.not. repass) then
-                exit
-            end if
-        end do
-        deallocate(z1)
-    end function sort_attractor_set
     !##########################################################################!
     !############################    what_to_do    ############################!
     !##########################################################################!
