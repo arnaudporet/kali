@@ -1,5 +1,6 @@
 
 module lib
+    !##############    /!\ networks must be deterministic /!\    ##############!
     integer::max_targ,max_moda,size_D,n_node
     real,dimension(:),allocatable::value
     character(16),dimension(:),allocatable::V
@@ -56,24 +57,21 @@ module lib
     !######################    compare_attractor_set    #######################!
     !##########################################################################!
     function compare_attractor_set(A_set1,A_set2) result(differ)
-        logical::differ,z
+        !########    /!\ attractor sets must be in sorted form /!\    #########!
+        !##########    /!\ attractors must be in sorted form /!\    ###########!
+        logical::differ
         type(attractor),dimension(:)::A_set1,A_set2
-        logical,dimension(size(A_set1))::in_2
-        integer::i1,i2
+        integer::i
         if (size(A_set1)/=size(A_set2)) then
             differ=.true.
         else
-            do i1=1,size(A_set1)
-                z=.false.
-                do i2=1,size(A_set2)
-                    if (.not. compare_attractor(A_set1(i1)%a,A_set2(i2)%a)) then
-                        z=.true.
-                        exit
-                    end if
-                end do
-                in_2(i1)=z
+            differ=.false.
+            do i=1,size(A_set1)
+                if (compare_attractor(A_set1(i)%a,A_set2(i)%a)) then
+                    differ=.true.
+                    exit
+                end if
             end do
-            differ=.not. all(in_2)
         end if
     end function compare_attractor_set
     !##########################################################################!
@@ -133,6 +131,7 @@ module lib
         do i1=1,size(A_set)
             A_set(i1)%popularity=(real(count(i1))/real(size(D,2)))*100.0
         end do
+        A_set=sort_attractor_set(A_set)
         deallocate(count)
     end function compute_attractor
     !##########################################################################!
@@ -579,6 +578,60 @@ module lib
         y=cshift(a,j_min-1,2)
         deallocate(z)
     end function sort_attractor
+    !##########################################################################!
+    !########################    sort_attractor_set    ########################!
+    !##########################################################################!
+    function sort_attractor_set(A_set) result(y)
+        !##########    /!\ attractors must be in sorted form /!\    ###########!
+        logical::repass
+        integer::i1,i2
+        real::z2
+        real,dimension(:,:),allocatable::z1
+        type(attractor),dimension(:)::A_set
+        type(attractor),dimension(size(A_set))::y
+        y=A_set
+        allocate(z1(0,0))
+        do
+            repass=.false.
+            do i1=1,size(y)-1
+                if (size(y(i1)%a,2)>size(y(i1+1)%a,2)) then
+                    repass=.true.
+                    z1=y(i1)%a
+                    z2=y(i1)%popularity
+                    y(i1)%a=y(i1+1)%a
+                    y(i1)%popularity=y(i1+1)%popularity
+                    y(i1+1)%a=z1
+                    y(i1+1)%popularity=z2
+                end if
+            end do
+            if (.not. repass) then
+                exit
+            end if
+        end do
+        do
+            repass=.false.
+            do i1=1,size(y)-1
+                if (size(y(i1)%a,2)==size(y(i1+1)%a,2)) then
+                    do i2=1,size(y(i1)%a,1)
+                        if (y(i1)%a(i2,1)>y(i1+1)%a(i2,1)) then
+                            repass=.true.
+                            z1=y(i1)%a
+                            z2=y(i1)%popularity
+                            y(i1)%a=y(i1+1)%a
+                            y(i1)%popularity=y(i1+1)%popularity
+                            y(i1+1)%a=z1
+                            y(i1+1)%popularity=z2
+                            exit
+                        end if
+                    end do
+                end if
+            end do
+            if (.not. repass) then
+                exit
+            end if
+        end do
+        deallocate(z1)
+    end function sort_attractor_set
     !##########################################################################!
     !############################    what_to_do    ############################!
     !##########################################################################!
