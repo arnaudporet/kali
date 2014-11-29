@@ -133,7 +133,6 @@ module lib
         do i1=1,size(A_set)
             A_set(i1)%popularity=(real(count(i1))/real(size(D,2)))*100.0
         end do
-        <<<<<<<<<<<<<<<<<<<<<<<<<<
         deallocate(count)
     end function compute_attractor
     !##########################################################################!
