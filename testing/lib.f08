@@ -199,6 +199,7 @@ module lib
             end function f
         end interface
         allocate(therapeutic_bullet_set(0))
+        patho_covering=0.0
         do i1=1,size(A_patho)
             do i2=1,size(A_physio)
                 if (.not. compare_attractor(A_patho(i1)%a,A_physio(i2)%a)) then
@@ -212,7 +213,6 @@ module lib
             do i2=1,size(C_targ,1)
                 do i3=1,size(C_moda,1)
                     A_test=compute_attractor(f,C_targ(i2,:),C_moda(i3,:),D)
-                    patho_covering=0.0
                     test_covering=0.0
                     do i4=1,size(A_test)
                         do i5=1,size(A_physio)
