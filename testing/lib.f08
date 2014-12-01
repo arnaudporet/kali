@@ -1,5 +1,6 @@
 
 module lib
+    !##############    /!\ networks must be deterministic /!\    ##############!
     integer::max_targ,max_moda,size_D,n_node
     real,dimension(:),allocatable::value
     character(16),dimension(:),allocatable::V
@@ -78,9 +79,9 @@ module lib
     !##########################################################################!
 !    function compare_attractor_set(A_set1,A_set2) result(differ)
 !        logical::differ,z
+!        integer::i1,i2
 !        type(attractor),dimension(:)::A_set1,A_set2
 !        logical,dimension(size(A_set1))::in_2
-!        integer::i1,i2
 !        if (size(A_set1)/=size(A_set2)) then
 !            differ=.true.
 !        else
@@ -143,7 +144,7 @@ module lib
                     end do
                     if (.not. in_A) then
                         A_set=add_attractor(A_set,a,0.0)
-                        count=int(reshape(concatenate(reshape(real(count),[1,size(count)]),reshape([1.0],[1,1]),2),[size(count)+1]))
+                        count=int(reshape(concatenate(real(reshape(count,[1,size(count)])),reshape([1.0],[1,1]),2),[size(count)+1]))
                     end if
                     exit
                 end if
@@ -208,7 +209,7 @@ module lib
             end do
         end do
         do i1=r_min,min(r_max,n_node)
-            C_targ=generate_combination(range_int(1,n_node),i1,max_targ)
+            C_targ=int(generate_combination(real(range_int(1,n_node)),i1,max_targ))
             C_moda=generate_arrangement(value,i1,max_moda)
             do i2=1,size(C_targ,1)
                 do i3=1,size(C_moda,1)
@@ -307,10 +308,11 @@ module lib
     !##########################################################################!
     function generate_combination(deck,k,n_combi) result(combi_mat)
         !###############    /!\ only without repetition /!\    ################!
-        integer::k,i1,i2,z,n_combi
-        integer,dimension(k)::combi
-        integer,dimension(:)::deck
-        integer,dimension(:,:),allocatable::combi_mat
+        integer::k,i1,i2,n_combi
+        real::z
+        real,dimension(k)::combi
+        real,dimension(:)::deck
+        real,dimension(:,:),allocatable::combi_mat
         allocate(combi_mat(min(n_combi,int(min(facto(size(deck))/(facto(k)*facto(size(deck)-k)),real(huge(1),8)))),k))
         do i1=1,size(combi_mat,1)
             1 continue
@@ -433,9 +435,9 @@ module lib
     !##########################################################################!
     function real2char(x) result(y)
         real::x
-        character(44)::z
+        character(43)::z
         character(:),allocatable::y
-        write (unit=z,fmt="(f44.3)") x
+        write (unit=z,fmt="(f43.2)") x
         y=trim(adjustl(z))
     end function real2char
     !##########################################################################!
@@ -457,9 +459,9 @@ module lib
             else
                 n_cycle=n_cycle+1
             end if
-            report=report//"popularity: "//real2char(A_set(i1)%popularity)//"%"//new_line("a")
+            report=report//"basin: "//real2char(A_set(i1)%popularity)//"% (of the state space)"//new_line("a")//new_line("a")
             do i2=1,size(A_set(i1)%a,1)
-                report=report//V(i2)//": "
+                report=report//V(i2)//" "
                 do i3=1,size(A_set(i1)%a,2)-1
                     if (boolean) then
                         report=report//int2char(int(A_set(i1)%a(i2,i3)))//" "
@@ -558,21 +560,16 @@ module lib
     !##########################################################################!
     function sort(x) result(y)
         integer::i,i_min
-        integer,dimension(:)::x
-        integer,dimension(size(x))::y
-        integer,dimension(:),allocatable::z1,z2
-        z1=x
-        do i=1,size(x)
-            i_min=minloc(z1,1)
-            y(i)=z1(i_min)
-            z2=z1
-            deallocate(z1)
-            allocate(z1(size(x)-i))
-            z1(:i_min-1)=z2(:i_min-1)
-            z1(i_min:)=z2(i_min+1:)
-            deallocate(z2)
+        real::z
+        real,dimension(:)::x
+        real,dimension(size(x))::y
+        y=x
+        do i=1,size(y)-1
+            i_min=minloc(y(i:),1)+i-1
+            z=y(i)
+            y(i)=y(i_min)
+            y(i_min)=z
         end do
-        deallocate(z1)
     end function sort
     !##########################################################################!
     !############################    what_to_do    ############################!

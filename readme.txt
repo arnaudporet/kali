@@ -24,7 +24,7 @@ Recommended prerequisites:
 How to:
     1) read my article: freely available at http://arxiv.org/abs/1407.4374 or
        https://hal.archives-ouvertes.fr/hal-01024788
-    2) clone the project: git clone https://github.com/arnaudporet/kali-targ.git
+    2) clone kali-targ: git clone https://github.com/arnaudporet/kali-targ.git
        (or download it if you do not have git, but I strongly encourage you to
        use git)
     3) with a text editor, open the template file: example_network.f08

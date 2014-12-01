@@ -424,9 +424,9 @@ module lib
     !##########################################################################!
     function real2char(x) result(y)
         real::x
-        character(44)::z
+        character(43)::z
         character(:),allocatable::y
-        write (unit=z,fmt="(f44.3)") x
+        write (unit=z,fmt="(f43.2)") x
         y=trim(adjustl(z))
     end function real2char
     !##########################################################################!
@@ -448,9 +448,9 @@ module lib
             else
                 n_cycle=n_cycle+1
             end if
-            report=report//"popularity: "//real2char(A_set(i1)%popularity)//"%"//new_line("a")
+            report=report//"basin: "//real2char(A_set(i1)%popularity)//"% (of the state space)"//new_line("a")//new_line("a")
             do i2=1,size(A_set(i1)%a,1)
-                report=report//V(i2)//": "
+                report=report//V(i2)//" "
                 do i3=1,size(A_set(i1)%a,2)-1
                     if (boolean) then
                         report=report//int2char(int(A_set(i1)%a(i2,i3)))//" "

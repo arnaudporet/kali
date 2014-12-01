@@ -1,7 +1,7 @@
 
-! clear && gf08 lib.f08 example_network.f08 -o example_network && ./example_network && rm lib.mod example_network
+! gf08 lib.f08 example_network.f08 -o example_network && ./example_network && rm example_network lib.mod
 
-! clear && gf08dbg lib.f08 example_network.f08 && rm lib.mod a.out
+! gf08dbg lib.f08 example_network.f08 -o example_network && rm example_network lib.mod
 
 program example_network
     use lib
