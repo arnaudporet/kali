@@ -11,12 +11,12 @@ import (
 
 func main() {
     rand.Seed(int64(time.Now().Nanosecond()))
-    generate_arrangement(10,10000)
+    generate_arrangement(10,1000)
 }
 
 func generate_arrangement(k,n_arrang int) (arrang_mat [][]int) {
     ////////////////////    /!\ only with repetition /!\    ////////////////////
-    var i1,j1,i2 int
+    var i1,i2,j1 int
     var arrang []int
     var in_arrang_mat bool
     var z []bool
