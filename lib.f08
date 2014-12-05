@@ -110,7 +110,7 @@ module lib
                     do i2=1,size(A_set)
                         if (.not. compare_attractor(A_set(i2),a)) then
                             in_A=.true.
-                            A_set(i2)%popularity=A_set(i2)%popularity+1
+                            A_set(i2)%popularity=A_set(i2)%popularity+1.0
                             exit
                         end if
                     end do
@@ -126,7 +126,7 @@ module lib
         end do
         deallocate(x,a%att)
         do i1=1,size(A_set)
-            A_set(i1)%popularity=A_set(i1)%popularity*100/size(D,2)
+            A_set(i1)%popularity=A_set(i1)%popularity*100.0/real(size(D,2))
         end do
     end function compute_attractor
     !##########################################################################!
@@ -237,7 +237,7 @@ module lib
         else
             y=real(x,8)
             do i=1,x-1
-                y=y*(x-i)
+                y=y*(real(x,8)-real(i,8))
             end do
         end if
     end function facto
@@ -381,7 +381,7 @@ module lib
         integer::a,b,y
         real::x
         call random_number(x)
-        y=nint(a+x*(b-a))
+        y=nint(real(a)+x*(real(b)-real(a)))
     end function rand_int
     !##########################################################################!
     !############################    range_int    #############################!
