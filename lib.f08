@@ -13,6 +13,7 @@ module lib
         integer,dimension(:),allocatable::targ
         real,dimension(:),allocatable::moda
         character(16)::metal
+        character(16),dimension(:),allocatable::unrecovered
     end type bullet
     contains
     !##########################################################################!
@@ -115,17 +116,17 @@ module lib
         end do
         deallocate(x,a%att,c_targ,c_moda)
         A_set=sort_attractor_set(A_set)
+        if (present(A_physio)) then
+            A_check=A_physio
+        else
+            allocate(A_check(0))
+        end if
         select case (setting)
             case (1)
                 attractor_name="a_physio"
             case (2)
                 attractor_name="a_patho"
         end select
-        if (present(A_physio)) then
-            A_check=A_physio
-        else
-            allocate(A_check(0))
-        end if
         k=1
         do i1=1,size(A_set)
             A_set(i1)%popularity=A_set(i1)%popularity*100.0/real(size(D,2))
@@ -137,7 +138,7 @@ module lib
                 end if
             end do
             if (in_physio) then
-                A_set(i1)%name=A_check(i2)%name
+                A_set(i1)%name=trim(A_check(i2)%name)
             else
                 A_set(i1)%name=trim(attractor_name)//int2char(k)
                 k=k+1
@@ -163,7 +164,8 @@ module lib
     !####################    compute_therapeutic_bullet    ####################!
     !##########################################################################!
     function compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio) result(therapeutic_bullet_set)
-        integer::r_min,r_max,max_targ,max_moda,n_node,i1,i2,i3
+        logical::in_patho
+        integer::r_min,r_max,max_targ,max_moda,n_node,i1,i2,i3,i4,i5
         integer,dimension(:,:),allocatable::C_targ
         real,dimension(:)::value
         real,dimension(:,:)::D
@@ -189,12 +191,26 @@ module lib
                     bull%moda=C_moda(i3,:)
                     A_patho=compute_attractor(f,D,2,A_physio,bull)
                     if (size(compute_pathological_attractor(A_patho))==0) then
+                        allocate(bull%unrecovered(0))
                         if (compare_attractor_set(A_physio,A_patho)) then
                             bull%metal="silver"
+                            do i4=1,size(A_physio)
+                                in_patho=.false.
+                                do i5=1,size(A_patho)
+                                    if (.not. compare_attractor(A_physio(i4),A_patho(i5))) then
+                                        in_patho=.true.
+                                        exit
+                                    end if
+                                end do
+                                if (.not. in_patho) then
+                                    bull%unrecovered=[bull%unrecovered,trim(A_physio(i4)%name)]
+                                end if
+                            end do
                         else
                             bull%metal="golden"
                         end if
                         therapeutic_bullet_set=[therapeutic_bullet_set,bull]
+                        deallocate(bull%unrecovered)
                     end if
                 end do
             end do
@@ -549,7 +565,16 @@ module lib
                     report=report//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//"["//real2char(therapeutic_bullet_set(i1)%moda(i2))//"] "
                 end if
             end do
-            report=report//"("//trim(therapeutic_bullet_set(i1)%metal)//")"//new_line("a")//repeat("-",80)//new_line("a")
+            report=report//"("//trim(therapeutic_bullet_set(i1)%metal)
+            if (trim(therapeutic_bullet_set(i1)%metal)=="silver") then
+                report=report//", unrecovered:"
+                do i2=1,size(therapeutic_bullet_set(i1)%unrecovered)-1
+                    report=report//" "//trim(therapeutic_bullet_set(i1)%unrecovered(i2))//","
+                end do
+                report=report//" "//trim(therapeutic_bullet_set(i1)%unrecovered(size(therapeutic_bullet_set(i1)%unrecovered)))//")"//new_line("a")//repeat("-",80)//new_line("a")
+            else
+                report=report//")"//new_line("a")//repeat("-",80)//new_line("a")
+            end if
         end do
         report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))//" ("//int2char(n_gold)//" golden bullets, "//int2char(n_silv)//" silver bullets)"
         write (unit=*,fmt="(a)",advance="no") new_line("a")//report//new_line("a")//new_line("a")//"save [1/0] "
