@@ -18,15 +18,15 @@ Recommended prerequisites:
     * operating system: Linux, such as Ubuntu (http://www.ubuntu.com/)
     * compiler: GFortran (https://gcc.gnu.org/fortran/)
     * text editor: provided that it handle Fortran syntax highlighting, such as
-      gedit (https://wiki.gnome.org/Apps/Gedit)
-    * distributed version control system: git (http://git-scm.com/)
+      Gedit (https://wiki.gnome.org/Apps/Gedit)
+    * distributed version control system: Git (http://git-scm.com/)
 
 How to:
     1) read my article: freely available at http://arxiv.org/abs/1407.4374 or
        https://hal.archives-ouvertes.fr/hal-01024788
     2) clone kali-targ: git clone https://github.com/arnaudporet/kali-targ.git
-       (or download it if you do not have git, but I strongly encourage you to
-       use git)
+       (or download it if you do not have Git, but I strongly encourage you to
+       use Git)
     3) with a text editor, open the template file: example_network.f08
 
 The example network is a published Boolean model of the mammalian cell
