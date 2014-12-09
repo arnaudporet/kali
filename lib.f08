@@ -55,7 +55,7 @@ module lib
     !##########################################################################!
     function compute_attractor(f,D,setting,A_physio,bull) result(A_set)
         logical::a_found,in_A,in_physio
-        integer::i1,i2,k,setting
+        integer::i1,i2,k,setting,i_patho
         integer,dimension(:),allocatable::c_targ
         real,dimension(:),allocatable::c_moda
         real,dimension(:,:)::D
@@ -127,7 +127,7 @@ module lib
             case (2)
                 attractor_name="a_patho"
         end select
-        k=1
+        i_patho=1
         do i1=1,size(A_set)
             A_set(i1)%popularity=A_set(i1)%popularity*100.0/real(size(D,2))
             in_physio=.false.
@@ -140,8 +140,8 @@ module lib
             if (in_physio) then
                 A_set(i1)%name=trim(A_check(i2)%name)
             else
-                A_set(i1)%name=trim(attractor_name)//int2char(k)
-                k=k+1
+                A_set(i1)%name=trim(attractor_name)//int2char(i_patho)
+                i_patho=i_patho+1
             end if
         end do
         deallocate(A_check)

@@ -1,10 +1,6 @@
 
 // clear && golang-go run example_network.go
 
-// TODO use var intead of :=
-// TODO use multivalued logic
-// TODO implement attractors' popularity
-
 package main
 
 import (
