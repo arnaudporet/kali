@@ -642,16 +642,7 @@ module lib
                     z=y(i1)
                     y(i1)=y(i1+1)
                     y(i1+1)=z
-                end if
-            end do
-            if (.not. repass) then
-                exit
-            end if
-        end do
-        do
-            repass=.false.
-            do i1=1,size(y)-1
-                if (size(y(i1)%att,2)==size(y(i1+1)%att,2)) then
+                else if (size(y(i1)%att,2)==size(y(i1+1)%att,2)) then
                     do i2=1,size(y(i1)%att,1)
                         if (y(i1)%att(i2,1)<y(i1+1)%att(i2,1)) then
                             exit
