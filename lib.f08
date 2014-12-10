@@ -216,6 +216,7 @@ module lib
             end do
         end do
         deallocate(A_patho,C_targ,C_moda,bull%targ,bull%moda)
+        therapeutic_bullet_set=sort_therapeutic_bullet_set(therapeutic_bullet_set)
     end function compute_therapeutic_bullet
     !##########################################################################!
     !###########################    concatenate    ############################!
@@ -662,6 +663,73 @@ module lib
         end do
         deallocate(z%att)
     end function sort_attractor_set
+    !##########################################################################!
+    !###################    sort_therapeutic_bullet_set    ####################!
+    !##########################################################################!
+    function sort_therapeutic_bullet_set(therapeutic_bullet_set) result(y)
+        logical::repass
+        integer::i1,i2
+        type(bullet)::z
+        type(bullet),dimension(:)::therapeutic_bullet_set
+        type(bullet),dimension(:),allocatable::golden_set,silver_set
+        type(bullet),dimension(size(therapeutic_bullet_set))::y
+        y=therapeutic_bullet_set
+        allocate(z%targ(0))
+        allocate(z%moda(0))
+        allocate(z%unrecovered(0))
+        do
+            repass=.false.
+            do i1=1,size(y)-1
+                if (size(y(i1)%targ)>size(y(i1+1)%targ)) then
+                    repass=.true.
+                    z=y(i1)
+                    y(i1)=y(i1+1)
+                    y(i1+1)=z
+                else if (size(y(i1)%targ)==size(y(i1+1)%targ)) then
+                    if (any(y(i1)%targ/=y(i1+1)%targ)) then
+                        do i2=1,size(y(i1)%targ)
+                            if (y(i1)%targ(i2)<y(i1+1)%targ(i2)) then
+                                exit
+                            else if (y(i1)%targ(i2)>y(i1+1)%targ(i2)) then
+                                repass=.true.
+                                z=y(i1)
+                                y(i1)=y(i1+1)
+                                y(i1+1)=z
+                                exit
+                            end if
+                        end do
+                    else
+                        do i2=1,size(y(i1)%moda)
+                            if (y(i1)%moda(i2)<y(i1+1)%moda(i2)) then
+                                exit
+                            else if (y(i1)%moda(i2)>y(i1+1)%moda(i2)) then
+                                repass=.true.
+                                z=y(i1)
+                                y(i1)=y(i1+1)
+                                y(i1+1)=z
+                                exit
+                            end if
+                        end do
+                    end if
+                end if
+            end do
+            if (.not. repass) then
+                exit
+            end if
+        end do
+        deallocate(z%targ,z%moda,z%unrecovered)
+        allocate(golden_set(0))
+        allocate(silver_set(0))
+        do i1=1,size(y)
+            if (trim(y(i1)%metal)=="golden") then
+                golden_set=[golden_set,y(i1)]
+            else
+                silver_set=[silver_set,y(i1)]
+            end if
+        end do
+        y=[golden_set,silver_set]
+        deallocate(golden_set,silver_set)
+    end function sort_therapeutic_bullet_set
     !##########################################################################!
     !############################    what_to_do    ############################!
     !##########################################################################!
