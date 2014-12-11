@@ -32,3 +32,4 @@ for i in range(len(equations)):
     lines.append("y("+str(i+1)+",1)="+equations[i]+"! "+names[i])
 
 open(output_file,"w").write("\n".join(lines))
+
