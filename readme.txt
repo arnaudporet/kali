@@ -1,4 +1,3 @@
-
 ################################################################################
 ########    An in silico target identification using boolean network    ########
 ########          attractors: avoiding pathological phenotypes          ########
@@ -11,8 +10,8 @@ Contact:
 If you are interested in my work, or ultimately if you use it, feel free to let
 me know.
 
-This work is licensed under the BSD 3-Clause License (see the BSD_3-Clause.txt
-file).
+This work is licensed under the BSD 2-Clause License (see the
+BSD_2-Clause_License.txt file in the present folder).
 
 Recommended prerequisites:
     * operating system: Linux, such as Ubuntu (http://www.ubuntu.com/)
@@ -35,4 +34,3 @@ cycle [1].
 [1] Faure A., Naldi A., Chaouiya C., Thieffry D. (2006) Dynamical analysis of a
     generic Boolean model for the control of the mammalian cell cycle.
     Bioinformatics 22(14) e124-e131.
-

@@ -1,3 +1,6 @@
+! Copyright (c) 2013-2014, Arnaud Poret
+! All rights reserved.
+! This work is licensed under the BSD 2-Clause License.
 
 ! How to:
 !     1) read the comments
@@ -92,4 +95,3 @@ program example_network
         y(10,1)=min(1.0-x(7,k),1.0-x(8,k))!CycB
     end function f_patho
 end program example_network
-
