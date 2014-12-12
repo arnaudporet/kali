@@ -326,6 +326,7 @@ module lib
     !#######################    generate_state_space    #######################!
     !##########################################################################!
     function generate_state_space(n) result(y)
+        !#####################    /!\ boolean only /!\    #####################!
         integer::n,i1,i2
         real,dimension(n,2**n)::y
         if (n>30) then
