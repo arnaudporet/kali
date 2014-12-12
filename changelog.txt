@@ -13,6 +13,8 @@
 * implementation of attractor set sorting: attractor sets are always ordered in
   the same way regardless of the performed run
 
+* silver bullets: computation of the lost physiological attractors
+
 * implementation of therapeutic bullet set sorting: therapeutic bullet sets are
   always ordered in the same way regardless of the performed run
 
