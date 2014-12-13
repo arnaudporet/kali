@@ -7,66 +7,64 @@ module lib
     real,dimension(:),allocatable::value
     character(16),dimension(:),allocatable::V
     type::attractor
-        real::popularity
-        real,dimension(:,:),allocatable::att
+        real::basin
+        real,dimension(:,:),allocatable::mat
         character(16)::name
     end type attractor
     type::bullet
         integer,dimension(:),allocatable::targ
         real,dimension(:),allocatable::moda
         character(16)::metal
-        character(16),dimension(:),allocatable::unrecovered
+        character(16),dimension(:),allocatable::lost
     end type bullet
     contains
     !##########################################################################!
-    !########################    compare_attractor    #########################!
+    !##############################    diff_a    ##############################!
     !##########################################################################!
-    function compare_attractor(a1,a2) result(differ)
+    function diff_a(a1,a2) result(y)
         !##########    /!\ attractors must be in sorted form /!\    ###########!
-        logical::differ
+        logical::y
         type(attractor)::a1,a2
-        if (size(a1%att,2)/=size(a2%att,2)) then
-            differ=.true.
+        if (size(a1%mat,2)/=size(a2%mat,2)) then
+            y=.true.
         else
-            differ=.not. all(a1%att==a2%att)
+            y=.not. all(a1%mat==a2%mat)
         end if
-    end function compare_attractor
+    end function diff_a
     !##########################################################################!
-    !######################    compare_attractor_set    #######################!
+    !############################    diff_A_set    ############################!
     !##########################################################################!
-    function compare_attractor_set(A_set1,A_set2) result(differ)
+    function diff_A_set(A_set1,A_set2) result(y)
         !########    /!\ attractor sets must be in sorted form /!\    #########!
         !##########    /!\ attractors must be in sorted form /!\    ###########!
-        logical::differ
+        logical::y
         integer::i
         type(attractor),dimension(:)::A_set1,A_set2
         if (size(A_set1)/=size(A_set2)) then
-            differ=.true.
+            y=.true.
         else
-            differ=.false.
+            y=.false.
             do i=1,size(A_set1)
-                if (compare_attractor(A_set1(i),A_set2(i))) then
-                    differ=.true.
+                if (diff_a(A_set1(i),A_set2(i))) then
+                    y=.true.
                     exit
                 end if
             end do
         end if
-    end function compare_attractor_set
+    end function diff_A_set
     !##########################################################################!
-    !########################    compute_attractor    #########################!
+    !##########################    compute_A_set    ###########################!
     !##########################################################################!
-    function compute_attractor(f,D,setting,A_physio,bull) result(A_set)
-        logical::a_found,in_A,in_physio
+    function compute_A_set(f,D,setting,ref_set,b) result(A_set)
+        logical::a_found,in_A,in_ref
         integer::i1,i2,k,setting
-        integer,dimension(:),allocatable::c_targ
-        real,dimension(:),allocatable::c_moda
         real,dimension(:,:)::D
         real,dimension(:,:),allocatable::x
-        character(16)::attractor_name
+        character(16)::a_name
         type(attractor)::a
-        type(attractor),dimension(:),optional::A_physio
-        type(attractor),dimension(:),allocatable::A_set,A_check
-        type(bullet),optional::bull
+        type(attractor),dimension(:)::ref_set
+        type(attractor),dimension(:),allocatable::A_set
+        type(bullet)::b
         interface
             function f(x,k) result(y)
                 integer::k
@@ -75,39 +73,32 @@ module lib
             end function f
         end interface
         allocate(A_set(0))
-        if (present(bull)) then
-            c_targ=bull%targ
-            c_moda=bull%moda
-        else
-            allocate(c_targ(0))
-            allocate(c_moda(0))
-        end if
         do i1=1,size(D,2)
             a_found=.false.
             x=reshape(D(:,i1),[size(D,1),1])
             k=1
             do
                 x=concatenate(x,f(x,k),2)
-                x(c_targ,k+1)=c_moda
+                x(b%targ,k+1)=b%moda
                 do i2=k,1,-1
                     if (all(x(:,i2)==x(:,k+1))) then
                         a_found=.true.
-                        a%att=reshape(x(:,i2:k),[size(D,1),k-i2+1])
-                        a=sort_attractor(a)
+                        a%mat=reshape(x(:,i2:k),[size(x,1),k-i2+1])
+                        a=sort_a(a)
                         exit
                     end if
                 end do
                 if (a_found) then
                     in_A=.false.
                     do i2=1,size(A_set)
-                        if (.not. compare_attractor(A_set(i2),a)) then
+                        if (.not. diff_a(A_set(i2),a)) then
                             in_A=.true.
-                            A_set(i2)%popularity=A_set(i2)%popularity+1.0
+                            A_set(i2)%basin=A_set(i2)%basin+1.0
                             exit
                         end if
                     end do
                     if (.not. in_A) then
-                        a%popularity=1.0
+                        a%basin=1.0
                         A_set=[A_set,a]
                     end if
                     exit
@@ -116,42 +107,36 @@ module lib
                 end if
             end do
         end do
-        deallocate(x,a%att,c_targ,c_moda)
-        A_set=sort_attractor_set(A_set)
-        if (present(A_physio)) then
-            A_check=A_physio
-        else
-            allocate(A_check(0))
-        end if
+        deallocate(x,a%mat)
+        A_set=sort_A_set(A_set)
         select case (setting)
             case (1)
-                attractor_name="a_physio"
+                a_name="a_physio"
             case (2)
-                attractor_name="a_patho"
+                a_name="a_patho"
         end select
         k=1
         do i1=1,size(A_set)
-            A_set(i1)%popularity=A_set(i1)%popularity*100.0/real(size(D,2))
-            in_physio=.false.
-            do i2=1,size(A_check)
-                if (.not. compare_attractor(A_set(i1),A_check(i2))) then
-                    in_physio=.true.
+            A_set(i1)%basin=A_set(i1)%basin*100.0/real(size(D,2))
+            in_ref=.false.
+            do i2=1,size(ref_set)
+                if (.not. diff_a(A_set(i1),ref_set(i2))) then
+                    in_ref=.true.
                     exit
                 end if
             end do
-            if (in_physio) then
-                A_set(i1)%name=trim(A_check(i2)%name)
+            if (in_ref) then
+                A_set(i1)%name=trim(ref_set(i2)%name)
             else
-                A_set(i1)%name=trim(attractor_name)//int2char(k)
+                A_set(i1)%name=trim(a_name)//int2char(k)
                 k=k+1
             end if
         end do
-        deallocate(A_check)
-    end function compute_attractor
+    end function compute_A_set
     !##########################################################################!
-    !##################    compute_pathological_attractor    ##################!
+    !#######################    compute_a_patho_set    ########################!
     !##########################################################################!
-    function compute_pathological_attractor(A_patho) result(a_patho_set)
+    function compute_a_patho_set(A_patho) result(a_patho_set)
         integer::i
         type(attractor),dimension(:)::A_patho
         type(attractor),dimension(:),allocatable::a_patho_set
@@ -161,11 +146,11 @@ module lib
                 a_patho_set=[a_patho_set,A_patho(i)]
             end if
         end do
-    end function compute_pathological_attractor
+    end function compute_a_patho_set
     !##########################################################################!
-    !####################    compute_therapeutic_bullet    ####################!
+    !#######################    compute_B_therap_set    #######################!
     !##########################################################################!
-    function compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio) result(therapeutic_bullet_set)
+    function compute_B_therap_set(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio) result(B_therap)
         logical::in_patho
         integer::r_min,r_max,max_targ,max_moda,n_node,i1,i2,i3,i4,i5
         integer,dimension(:,:),allocatable::C_targ
@@ -174,8 +159,8 @@ module lib
         real,dimension(:,:),allocatable::C_moda
         type(attractor),dimension(:)::A_physio
         type(attractor),dimension(:),allocatable::A_patho
-        type(bullet)::bull
-        type(bullet),dimension(:),allocatable::therapeutic_bullet_set
+        type(bullet)::b
+        type(bullet),dimension(:),allocatable::B_therap
         interface
             function f(x,k) result(y)
                 integer::k
@@ -183,43 +168,43 @@ module lib
                 real,dimension(size(x,1),1)::y
             end function f
         end interface
-        allocate(therapeutic_bullet_set(0))
+        allocate(B_therap(0))
         do i1=r_min,min(r_max,n_node)
-            C_targ=int(generate_combination(real(range_int(1,n_node)),i1,max_targ))
-            C_moda=generate_arrangement(value,i1,max_moda)
+            C_targ=int(gen_combi(real(range_int(1,n_node)),i1,max_targ))
+            C_moda=gen_arrang(value,i1,max_moda)
             do i2=1,size(C_targ,1)
                 do i3=1,size(C_moda,1)
-                    bull%targ=C_targ(i2,:)
-                    bull%moda=C_moda(i3,:)
-                    A_patho=compute_attractor(f,D,2,A_physio,bull)
-                    if (size(compute_pathological_attractor(A_patho))==0) then
-                        allocate(bull%unrecovered(0))
-                        if (compare_attractor_set(A_physio,A_patho)) then
-                            bull%metal="silver"
+                    b%targ=C_targ(i2,:)
+                    b%moda=C_moda(i3,:)
+                    A_patho=compute_A_set(f,D,2,A_physio,b)
+                    if (size(compute_a_patho_set(A_patho))==0) then
+                        allocate(b%lost(0))
+                        if (diff_A_set(A_physio,A_patho)) then
+                            b%metal="silver"
                             do i4=1,size(A_physio)
                                 in_patho=.false.
                                 do i5=1,size(A_patho)
-                                    if (.not. compare_attractor(A_physio(i4),A_patho(i5))) then
+                                    if (.not. diff_a(A_physio(i4),A_patho(i5))) then
                                         in_patho=.true.
                                         exit
                                     end if
                                 end do
                                 if (.not. in_patho) then
-                                    bull%unrecovered=[bull%unrecovered,trim(A_physio(i4)%name)]
+                                    b%lost=[b%lost,trim(A_physio(i4)%name)]
                                 end if
                             end do
                         else
-                            bull%metal="golden"
+                            b%metal="golden"
                         end if
-                        therapeutic_bullet_set=[therapeutic_bullet_set,bull]
-                        deallocate(bull%unrecovered)
+                        B_therap=[B_therap,b]
+                        deallocate(b%lost)
                     end if
                 end do
             end do
         end do
-        deallocate(A_patho,C_targ,C_moda,bull%targ,bull%moda)
-        therapeutic_bullet_set=sort_therapeutic_bullet_set(therapeutic_bullet_set)
-    end function compute_therapeutic_bullet
+        deallocate(A_patho,C_targ,C_moda,b%targ,b%moda)
+        B_therap=sort_B_therap(B_therap)
+    end function compute_B_therap_set
     !##########################################################################!
     !###########################    concatenate    ############################!
     !##########################################################################!
@@ -269,68 +254,68 @@ module lib
         end if
     end function facto
     !##########################################################################!
-    !#######################    generate_arrangement    #######################!
+    !############################    gen_arrang    ############################!
     !##########################################################################!
-    function generate_arrangement(deck,k,n_arrang) result(arrang_mat)
+    function gen_arrang(deck,k,n_arrang) result(arrang)
         !#################    /!\ only with repetition /!\    #################!
         integer::k,n_arrang,i1,i2
-        real,dimension(k)::arrang
+        real,dimension(k)::z
         real,dimension(:)::deck
-        real,dimension(:,:),allocatable::arrang_mat
-        allocate(arrang_mat(min(n_arrang,int(min(real(size(deck),8)**real(k,8),real(huge(1),8)))),k))
-        do i1=1,size(arrang_mat,1)
+        real,dimension(:,:),allocatable::arrang
+        allocate(arrang(min(n_arrang,int(min(real(size(deck),8)**real(k,8),real(huge(1),8)))),k))
+        do i1=1,size(arrang,1)
             1 continue
             do i2=1,k
-                arrang(i2)=deck(rand_int(1,size(deck)))
+                z(i2)=deck(rand_int(1,size(deck)))
             end do
             do i2=1,i1-1
-                if (all(arrang_mat(i2,:)==arrang)) then
+                if (all(arrang(i2,:)==z)) then
                     go to 1
                 end if
             end do
-            arrang_mat(i1,:)=arrang
+            arrang(i1,:)=z
         end do
-    end function generate_arrangement
+    end function gen_arrang
     !##########################################################################!
-    !#######################    generate_combination    #######################!
+    !############################    gen_combi    #############################!
     !##########################################################################!
-    function generate_combination(deck,k,n_combi) result(combi_mat)
+    function gen_combi(deck,k,n_combi) result(combi)
         !###############    /!\ only without repetition /!\    ################!
         integer::k,n_combi,i1,i2
-        real::z
-        real,dimension(k)::combi
+        real::z1
+        real,dimension(k)::z2
         real,dimension(:)::deck
-        real,dimension(:,:),allocatable::combi_mat
-        allocate(combi_mat(min(n_combi,int(min(facto(size(deck))/(facto(k)*facto(size(deck)-k)),real(huge(1),8)))),k))
-        do i1=1,size(combi_mat,1)
+        real,dimension(:,:),allocatable::combi
+        allocate(combi(min(n_combi,int(min(facto(size(deck))/(facto(k)*facto(size(deck)-k)),real(huge(1),8)))),k))
+        do i1=1,size(combi,1)
             1 continue
             do i2=1,k
                 2 continue
-                z=deck(rand_int(1,size(deck)))
-                if (any(z==combi(:i2-1))) then
+                z1=deck(rand_int(1,size(deck)))
+                if (any(z1==z2(:i2-1))) then
                     go to 2
                 else
-                    combi(i2)=z
+                    z2(i2)=z1
                 end if
             end do
-            combi=sort(combi)
+            z2=sort(z2)
             do i2=1,i1-1
-                if (all(combi_mat(i2,:)==combi)) then
+                if (all(combi(i2,:)==z2)) then
                     go to 1
                 end if
             end do
-            combi_mat(i1,:)=combi
+            combi(i1,:)=z2
         end do
-    end function generate_combination
+    end function gen_combi
     !##########################################################################!
-    !#######################    generate_state_space    #######################!
+    !##############################    gen_S    ###############################!
     !##########################################################################!
-    function generate_state_space(n) result(y)
-        !#####################    /!\ boolean only /!\    #####################!
+    function gen_S(n) result(y)
+        !#####################    /!\ bool only /!\    #####################!
         integer::n,i1,i2
         real,dimension(n,2**n)::y
         if (n>30) then
-            write (unit=*,fmt="(a)") "generate_state_space(n): n>30 unsupported"
+            write (unit=*,fmt="(a)") "gen_S(n): n>30 unsupported"
             stop
         else
             do i1=1,n
@@ -343,7 +328,7 @@ module lib
                 end do
             end do
         end if
-    end function generate_state_space
+    end function gen_S
     !##########################################################################!
     !#########################    init_random_seed    #########################!
     !##########################################################################!
@@ -374,9 +359,9 @@ module lib
         y=trim(adjustl(z))
     end function int2char
     !##########################################################################!
-    !########################    load_attractor_set    ########################!
+    !############################    load_A_set    ############################!
     !##########################################################################!
-    function load_attractor_set(setting) result(A_set)
+    function load_A_set(setting) result(A_set)
         integer::setting,i1,i2,z,n,m
         character(32)::set_name
         type(attractor),dimension(:),allocatable::A_set
@@ -392,17 +377,17 @@ module lib
         do i1=1,size(A_set)
             read (unit=1,fmt=*) n
             read (unit=1,fmt=*) m
-            read (unit=1,fmt=*) A_set(i1)%popularity
+            read (unit=1,fmt=*) A_set(i1)%basin
             read (unit=1,fmt=*) A_set(i1)%name
-            allocate(A_set(i1)%att(n,m))
+            allocate(A_set(i1)%mat(n,m))
         end do
         do i1=1,size(A_set)
-            do i2=1,size(A_set(i1)%att,1)
-                read (unit=1,fmt=*) A_set(i1)%att(i2,:)
+            do i2=1,size(A_set(i1)%mat,1)
+                read (unit=1,fmt=*) A_set(i1)%mat(i2,:)
             end do
         end do
         close (unit=1)
-    end function load_attractor_set
+    end function load_A_set
     !##########################################################################!
     !#############################    minlocs    ##############################!
     !##########################################################################!
@@ -448,10 +433,10 @@ module lib
         y=trim(adjustl(z))
     end function real2char
     !##########################################################################!
-    !#######################    report_attractor_set    #######################!
+    !###########################    report_A_set    ###########################!
     !##########################################################################!
-    subroutine report_attractor_set(A_set,setting,V,boolean)
-        logical::boolean
+    subroutine report_A_set(A_set,setting,V,bool)
+        logical::bool
         integer::setting,n_point,n_cycle,i1,i2,i3,save_
         character(16)::set_type
         character(16),dimension(:)::V
@@ -474,25 +459,25 @@ module lib
         end do
         report=report//trim(A_set(size(A_set))%name)//"}"//new_line("a")//repeat("-",80)//new_line("a")
         do i1=1,size(A_set)
-            if (size(A_set(i1)%att,2)==1) then
+            if (size(A_set(i1)%mat,2)==1) then
                 n_point=n_point+1
             else
                 n_cycle=n_cycle+1
             end if
-            report=report//trim(A_set(i1)%name)//new_line("a")//"basin: "//real2char(A_set(i1)%popularity)//"% (of the state space)"//new_line("a")
-            do i2=1,size(A_set(i1)%att,1)
+            report=report//trim(A_set(i1)%name)//new_line("a")//"basin: "//real2char(A_set(i1)%basin)//"% (of the state space)"//new_line("a")
+            do i2=1,size(A_set(i1)%mat,1)
                 report=report//V(i2)//" "
-                do i3=1,size(A_set(i1)%att,2)-1
-                    if (boolean) then
-                        report=report//int2char(int(A_set(i1)%att(i2,i3)))//" "
+                do i3=1,size(A_set(i1)%mat,2)-1
+                    if (bool) then
+                        report=report//int2char(int(A_set(i1)%mat(i2,i3)))//" "
                     else
-                        report=report//real2char(A_set(i1)%att(i2,i3))//" "
+                        report=report//real2char(A_set(i1)%mat(i2,i3))//" "
                     end if
                 end do
-                if (boolean) then
-                    report=report//int2char(int(A_set(i1)%att(i2,size(A_set(i1)%att,2))))//new_line("a")
+                if (bool) then
+                    report=report//int2char(int(A_set(i1)%mat(i2,size(A_set(i1)%mat,2))))//new_line("a")
                 else
-                    report=report//real2char(A_set(i1)%att(i2,size(A_set(i1)%att,2)))//new_line("a")
+                    report=report//real2char(A_set(i1)%mat(i2,size(A_set(i1)%mat,2)))//new_line("a")
                 end if
             end do
             report=report//repeat("-",80)//new_line("a")
@@ -514,15 +499,15 @@ module lib
             end select
             s=int2char(size(A_set))//new_line("a")
             do i1=1,size(A_set)
-                s=s//int2char(size(A_set(i1)%att,1))//new_line("a")//int2char(size(A_set(i1)%att,2))//new_line("a")//real2char(A_set(i1)%popularity)//new_line("a")//trim(A_set(i1)%name)//new_line("a")
+                s=s//int2char(size(A_set(i1)%mat,1))//new_line("a")//int2char(size(A_set(i1)%mat,2))//new_line("a")//real2char(A_set(i1)%basin)//new_line("a")//trim(A_set(i1)%name)//new_line("a")
             end do
             do i1=1,size(A_set)
-                do i2=1,size(A_set(i1)%att,1)
-                    do i3=1,size(A_set(i1)%att,2)-1
-                        s=s//real2char(A_set(i1)%att(i2,i3))//","
+                do i2=1,size(A_set(i1)%mat,1)
+                    do i3=1,size(A_set(i1)%mat,2)-1
+                        s=s//real2char(A_set(i1)%mat(i2,i3))//","
                     end do
-                    s=s//real2char(A_set(i1)%att(i2,size(A_set(i1)%att,2)))
-                    if (i1/=size(A_set) .or. i2/=size(A_set(i1)%att,1)) then
+                    s=s//real2char(A_set(i1)%mat(i2,size(A_set(i1)%mat,2)))
+                    if (i1/=size(A_set) .or. i2/=size(A_set(i1)%mat,1)) then
                         s=s//new_line("a")
                     end if
                 end do
@@ -537,50 +522,50 @@ module lib
             deallocate(s)
         end if
         deallocate(report)
-    end subroutine report_attractor_set
+    end subroutine report_A_set
     !##########################################################################!
-    !##################    report_therapeutic_bullet_set    ###################!
+    !#########################    report_B_therap    ##########################!
     !##########################################################################!
-    subroutine report_therapeutic_bullet_set(therapeutic_bullet_set,V,boolean)
-        logical::boolean
+    subroutine report_B_therap(B_therap,V,bool)
+        logical::bool
         integer::n_gold,n_silv,i1,i2,save_
         character(1)::moda
         character(16),dimension(:)::V
         character(:),allocatable::report
-        type(bullet),dimension(:)::therapeutic_bullet_set
+        type(bullet),dimension(:)::B_therap
         n_gold=0
         n_silv=0
         report=repeat("-",80)//new_line("a")
-        do i1=1,size(therapeutic_bullet_set)
-            if (trim(therapeutic_bullet_set(i1)%metal)=="golden") then
+        do i1=1,size(B_therap)
+            if (trim(B_therap(i1)%metal)=="golden") then
                 n_gold=n_gold+1
             else
                 n_silv=n_silv+1
             end if
-            do i2=1,size(therapeutic_bullet_set(i1)%targ)
-                if (boolean) then
-                    if (therapeutic_bullet_set(i1)%moda(i2)==1.0) then
+            do i2=1,size(B_therap(i1)%targ)
+                if (bool) then
+                    if (B_therap(i1)%moda(i2)==1.0) then
                         moda="+"
                     else
                         moda="-"
                     end if
-                    report=report//moda//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//" "
+                    report=report//moda//trim(V(B_therap(i1)%targ(i2)))//" "
                 else
-                    report=report//trim(V(therapeutic_bullet_set(i1)%targ(i2)))//"["//real2char(therapeutic_bullet_set(i1)%moda(i2))//"] "
+                    report=report//trim(V(B_therap(i1)%targ(i2)))//"["//real2char(B_therap(i1)%moda(i2))//"] "
                 end if
             end do
-            report=report//"("//trim(therapeutic_bullet_set(i1)%metal)
-            if (trim(therapeutic_bullet_set(i1)%metal)=="silver") then
+            report=report//"("//trim(B_therap(i1)%metal)
+            if (trim(B_therap(i1)%metal)=="silver") then
                 report=report//", unrecovered:"
-                do i2=1,size(therapeutic_bullet_set(i1)%unrecovered)-1
-                    report=report//" "//trim(therapeutic_bullet_set(i1)%unrecovered(i2))//","
+                do i2=1,size(B_therap(i1)%lost)-1
+                    report=report//" "//trim(B_therap(i1)%lost(i2))//","
                 end do
-                report=report//" "//trim(therapeutic_bullet_set(i1)%unrecovered(size(therapeutic_bullet_set(i1)%unrecovered)))//")"//new_line("a")//repeat("-",80)//new_line("a")
+                report=report//" "//trim(B_therap(i1)%lost(size(B_therap(i1)%lost)))//")"//new_line("a")//repeat("-",80)//new_line("a")
             else
                 report=report//")"//new_line("a")//repeat("-",80)//new_line("a")
             end if
         end do
-        report=report//"found therapeutic bullets: "//int2char(size(therapeutic_bullet_set))//" ("//int2char(n_gold)//" golden bullets, "//int2char(n_silv)//" silver bullets)"
+        report=report//"found therapeutic bullets: "//int2char(size(B_therap))//" ("//int2char(n_gold)//" golden bullets, "//int2char(n_silv)//" silver bullets)"
         write (unit=*,fmt="(a)",advance="no") new_line("a")//report//new_line("a")//new_line("a")//"save [1/0] "
         read (unit=*,fmt=*) save_
         if (save_==1) then
@@ -590,7 +575,7 @@ module lib
             write (unit=*,fmt="(a)") new_line("a")//"report saved as: report_therapeutic_bullet.txt"
         end if
         deallocate(report)
-    end subroutine report_therapeutic_bullet_set
+    end subroutine report_B_therap
     !##########################################################################!
     !###############################    sort    ###############################!
     !##########################################################################!
@@ -608,28 +593,28 @@ module lib
         end do
     end function sort
     !##########################################################################!
-    !##########################    sort_attractor    ##########################!
+    !##############################    sort_a    ##############################!
     !##########################################################################!
-    function sort_attractor(a) result(y)
+    function sort_a(a) result(y)
         integer::i,j_min
         integer,dimension(:),allocatable::z
         type(attractor)::a,y
         y=a
-        z=range_int(1,size(y%att,2))
-        do i=1,size(y%att,1)
-            z=z(minlocs(y%att(i,z)))
+        z=range_int(1,size(y%mat,2))
+        do i=1,size(y%mat,1)
+            z=z(minlocs(y%mat(i,z)))
             if (size(z)==1) then
                 j_min=z(1)
                 exit
             end if
         end do
-        y%att=cshift(y%att,j_min-1,2)
+        y%mat=cshift(y%mat,j_min-1,2)
         deallocate(z)
-    end function sort_attractor
+    end function sort_a
     !##########################################################################!
-    !########################    sort_attractor_set    ########################!
+    !############################    sort_A_set    ############################!
     !##########################################################################!
-    function sort_attractor_set(A_set) result(y)
+    function sort_A_set(A_set) result(y)
         !##########    /!\ attractors must be in sorted form /!\    ###########!
         logical::repass
         integer::i1,i2
@@ -637,20 +622,20 @@ module lib
         type(attractor),dimension(:)::A_set
         type(attractor),dimension(size(A_set))::y
         y=A_set
-        allocate(z%att(0,0))
+        allocate(z%mat(0,0))
         do
             repass=.false.
             do i1=1,size(y)-1
-                if (size(y(i1)%att,2)>size(y(i1+1)%att,2)) then
+                if (size(y(i1)%mat,2)>size(y(i1+1)%mat,2)) then
                     repass=.true.
                     z=y(i1)
                     y(i1)=y(i1+1)
                     y(i1+1)=z
-                else if (size(y(i1)%att,2)==size(y(i1+1)%att,2)) then
-                    do i2=1,size(y(i1)%att,1)
-                        if (y(i1)%att(i2,1)<y(i1+1)%att(i2,1)) then
+                else if (size(y(i1)%mat,2)==size(y(i1+1)%mat,2)) then
+                    do i2=1,size(y(i1)%mat,1)
+                        if (y(i1)%mat(i2,1)<y(i1+1)%mat(i2,1)) then
                             exit
-                        else if (y(i1)%att(i2,1)>y(i1+1)%att(i2,1)) then
+                        else if (y(i1)%mat(i2,1)>y(i1+1)%mat(i2,1)) then
                             repass=.true.
                             z=y(i1)
                             y(i1)=y(i1+1)
@@ -664,22 +649,22 @@ module lib
                 exit
             end if
         end do
-        deallocate(z%att)
-    end function sort_attractor_set
+        deallocate(z%mat)
+    end function sort_A_set
     !##########################################################################!
-    !###################    sort_therapeutic_bullet_set    ####################!
+    !##########################    sort_B_therap    ###########################!
     !##########################################################################!
-    function sort_therapeutic_bullet_set(therapeutic_bullet_set) result(y)
+    function sort_B_therap(B_therap) result(y)
         logical::repass
         integer::i1,i2
         type(bullet)::z
-        type(bullet),dimension(:)::therapeutic_bullet_set
-        type(bullet),dimension(:),allocatable::golden_set,silver_set
-        type(bullet),dimension(size(therapeutic_bullet_set))::y
-        y=therapeutic_bullet_set
+        type(bullet),dimension(:)::B_therap
+        type(bullet),dimension(:),allocatable::B_golden,B_silver
+        type(bullet),dimension(size(B_therap))::y
+        y=B_therap
         allocate(z%targ(0))
         allocate(z%moda(0))
-        allocate(z%unrecovered(0))
+        allocate(z%lost(0))
         do
             repass=.false.
             do i1=1,size(y)-1
@@ -720,31 +705,33 @@ module lib
                 exit
             end if
         end do
-        deallocate(z%targ,z%moda,z%unrecovered)
-        allocate(golden_set(0))
-        allocate(silver_set(0))
+        deallocate(z%targ,z%moda,z%lost)
+        allocate(B_golden(0))
+        allocate(B_silver(0))
         do i1=1,size(y)
             if (trim(y(i1)%metal)=="golden") then
-                golden_set=[golden_set,y(i1)]
+                B_golden=[B_golden,y(i1)]
             else
-                silver_set=[silver_set,y(i1)]
+                B_silver=[B_silver,y(i1)]
             end if
         end do
-        y=[golden_set,silver_set]
-        deallocate(golden_set,silver_set)
-    end function sort_therapeutic_bullet_set
+        y=[B_golden,B_silver]
+        deallocate(B_golden,B_silver)
+    end function sort_B_therap
     !##########################################################################!
     !############################    what_to_do    ############################!
     !##########################################################################!
     subroutine what_to_do(f,value,size_D,n_node,max_targ,max_moda,V)
-        logical::boolean
-        integer::size_D,n_node,max_targ,max_moda,to_do,r_min,r_max,setting,comprehensive_D
+        logical::bool
+        integer::size_D,n_node,max_targ,max_moda,to_do,r_min,r_max,setting,whole_S
         real::start,finish
         real,dimension(:)::value
         real,dimension(:,:),allocatable::D
         character(16),dimension(:)::V
+        type(attractor),dimension(0)::null_set
         type(attractor),dimension(:),allocatable::A_physio,A_patho,a_patho_set
-        type(bullet),dimension(:),allocatable::therapeutic_bullet_set
+        type(bullet)::null_b
+        type(bullet),dimension(:),allocatable::B_therap
         interface
             function f(x,k) result(y)
                 integer::k
@@ -755,55 +742,57 @@ module lib
         call cpu_time(start)
         call init_random_seed()
         if (size(value)==2) then
-            boolean=all(value==[0.0,1.0])
+            bool=all(value==[0.0,1.0])
         else
-            boolean=.false.
+            bool=.false.
         end if
         write (unit=*,fmt="(a)",advance="no") new_line("a")//"[1] compute attractors"//new_line("a")//"[2] compute pathological attractors"//new_line("a")//"[3] compute therapeutic bullets"//new_line("a")//"[4] help"//new_line("a")//"[5] license"//new_line("a")//new_line("a")//"what to do [1/2/3/4/5] "
         read (unit=*,fmt=*) to_do
         if (to_do==1 .or. to_do==3) then
-            if (boolean) then
+            if (bool) then
                 write (unit=*,fmt="(a,es10.3e3,a)",advance="no") new_line("a")//"state space cardinality: ",real(2,8)**real(n_node,8),", comprehensive computation [1/0] "
-                read (unit=*,fmt=*) comprehensive_D
-                select case (comprehensive_D)
+                read (unit=*,fmt=*) whole_S
+                select case (whole_S)
                     case (1)
-                        D=generate_state_space(n_node)
+                        D=gen_S(n_node)
                     case (0)
-                        D=transpose(generate_arrangement(value,n_node,size_D))
+                        D=transpose(gen_arrang(value,n_node,size_D))
                 end select
             else
-                D=transpose(generate_arrangement(value,n_node,size_D))
+                D=transpose(gen_arrang(value,n_node,size_D))
             end if
         end if
         select case (to_do)
             case (1)
+                allocate(null_b%targ(0))
+                allocate(null_b%moda(0))
                 write (unit=*,fmt="(a)",advance="no") new_line("a")//"[1] physiological"//new_line("a")//"[2] pathological"//new_line("a")//new_line("a")//"setting [1/2] "
                 read (unit=*,fmt=*) setting
                 select case (setting)
                     case (1)
-                        A_physio=compute_attractor(f,D,1)
-                        call report_attractor_set(A_physio,1,V,boolean)
-                        deallocate(A_physio,D)
+                        A_physio=compute_A_set(f,D,1,null_set,null_b)
+                        call report_A_set(A_physio,1,V,bool)
                     case (2)
-                        A_physio=load_attractor_set(1)
-                        A_patho=compute_attractor(f,D,2,A_physio)
-                        call report_attractor_set(A_patho,2,V,boolean)
-                        deallocate(A_physio,A_patho,D)
+                        A_physio=load_A_set(1)
+                        A_patho=compute_A_set(f,D,2,A_physio,null_b)
+                        call report_A_set(A_patho,2,V,bool)
+                        deallocate(A_patho)
                 end select
+                deallocate(null_b%targ,null_b%moda,D,A_physio)
             case (2)
-                A_patho=load_attractor_set(2)
-                a_patho_set=compute_pathological_attractor(A_patho)
-                call report_attractor_set(a_patho_set,3,V,boolean)
+                A_patho=load_A_set(2)
+                a_patho_set=compute_a_patho_set(A_patho)
+                call report_A_set(a_patho_set,3,V,bool)
                 deallocate(A_patho,a_patho_set)
             case (3)
-                A_physio=load_attractor_set(1)
+                A_physio=load_A_set(1)
                 write (unit=*,fmt="(a)",advance="no") new_line("a")//"number of targets per bullet (lower bound): "
                 read (unit=*,fmt=*) r_min
                 write (unit=*,fmt="(a)",advance="no") "number of targets per bullet (upper bound): "
                 read (unit=*,fmt=*) r_max
-                therapeutic_bullet_set=compute_therapeutic_bullet(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio)
-                call report_therapeutic_bullet_set(therapeutic_bullet_set,V,boolean)
-                deallocate(A_physio,therapeutic_bullet_set,D)
+                B_therap=compute_B_therap_set(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio)
+                call report_B_therap(B_therap,V,bool)
+                deallocate(A_physio,B_therap,D)
             case (4)
                 write (unit=*,fmt="(a)") new_line("a")//"1) compute attractors with f_physio"//new_line("a")//"2) compute attractors with f_patho"//new_line("a")//"3) eventually compute pathological attractors"//new_line("a")//"4) compute therapeutic bullets with f_patho"//new_line("a")//new_line("a")//"do not forget to recompile the sources following any modification"
             case (5)
