@@ -17,5 +17,3 @@
 
 * implementation of therapeutic bullet set sorting: therapeutic bullet sets are
   always ordered in the same way regardless of the performed run
-
-* license changed from the BSD 3-Clause License to the BSD 2-Clause License

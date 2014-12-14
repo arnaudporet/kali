@@ -1,6 +1,6 @@
-! Copyright (c) 2013-2014, Arnaud Poret
-! All rights reserved.
-! This work is licensed under the BSD 2-Clause License.
+! Copyright (C) 2013-2014 Arnaud Poret
+! This program is licensed under the GNU General Public License.
+! To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
 module lib
     !##############    /!\ networks must be deterministic /!\    ##############!
     integer::max_targ,max_moda,size_D,n_node
@@ -357,9 +357,9 @@ module lib
         type(attractor),dimension(:),allocatable::A_set
         select case (setting)
             case (1)
-                set_name="set_physio.csv"
+                set_name="A_physio.csv"
             case (2)
-                set_name="set_patho.csv"
+                set_name="A_patho.csv"
         end select
         open (unit=1,file=trim(set_name),status="old")
         read (unit=1,fmt=*) z
@@ -478,14 +478,14 @@ module lib
         if (save_==1) then
             select case (setting)
                 case (1)
-                    set_name="set_physio.csv"
-                    report_name="report_physio.txt"
+                    set_name="A_physio.csv"
+                    report_name="A_physio.txt"
                 case (2)
-                    set_name="set_patho.csv"
-                    report_name="report_patho.txt"
+                    set_name="A_patho.csv"
+                    report_name="A_patho.txt"
                 case (3)
-                    set_name="set_versus.csv"
-                    report_name="report_versus.txt"
+                    set_name="A_versus.csv"
+                    report_name="A_versus.txt"
             end select
             s=int2char(size(A_set))//new_line("a")
             do i1=1,size(A_set)
@@ -559,10 +559,10 @@ module lib
         write (unit=*,fmt="(a)",advance="no") new_line("a")//report//new_line("a")//new_line("a")//"save [1/0] "
         read (unit=*,fmt=*) save_
         if (save_==1) then
-            open (unit=1,file="report_therapeutic_bullet.txt",status="replace")
+            open (unit=1,file="B_therap.txt",status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
-            write (unit=*,fmt="(a)") new_line("a")//"report saved as: report_therapeutic_bullet.txt"
+            write (unit=*,fmt="(a)") new_line("a")//"report saved as: B_therap.txt"
         end if
         deallocate(report)
     end subroutine report_B_therap
@@ -784,9 +784,9 @@ module lib
                 call report_B_therap(B_therap,V,bool)
                 deallocate(A_physio,B_therap,D)
             case (4)
-                write (unit=*,fmt="(a)") new_line("a")//"1) compute attractors with f_physio: returns the physiological attractor set"//new_line("a")//"2) compute attractors with f_patho: returns the pathological attractor set"//new_line("a")//"3) eventually compute the pathological attractors"//new_line("a")//"4) compute therapeutic bullets with f_patho"//new_line("a")//new_line("a")//"do not forget to recompile the sources following any modification"
+                write (unit=*,fmt="(a)") new_line("a")//"1) compute attractors with f_physio: returns A_physio"//new_line("a")//"2) compute attractors with f_patho: returns A_patho"//new_line("a")//"3) eventually compute pathological attractors: returns A_versus"//new_line("a")//"4) compute therapeutic bullets with f_patho: returns B_therap"//new_line("a")//new_line("a")//"do not forget to recompile the sources following any modification"
             case (5)
-                write (unit=*,fmt="(a)") new_line("a")//'The BSD 2-Clause License'//new_line("a")//new_line("a")//'Copyright (c) 2013-2014, Arnaud Poret'//new_line("a")//'All rights reserved.'//new_line("a")//new_line("a")//'Redistribution and use in source and binary forms, with or without modification,'//new_line("a")//'are permitted provided that the following conditions are met:'//new_line("a")//new_line("a")//'1. Redistributions of source code must retain the above copyright notice, this'//new_line("a")//'   list of conditions and the following disclaimer.'//new_line("a")//new_line("a")//'2. Redistributions in binary form must reproduce the above copyright notice,'//new_line("a")//'   this list of conditions and the following disclaimer in the documentation'//new_line("a")//'   and/or other materials provided with the distribution.'//new_line("a")//new_line("a")//'THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND'//new_line("a")//'ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED'//new_line("a")//'WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE'//new_line("a")//'DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR'//new_line("a")//'ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES'//new_line("a")//'(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;'//new_line("a")//'LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON'//new_line("a")//'ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT'//new_line("a")//'(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS'//new_line("a")//'SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.'
+                write (unit=*,fmt="(a)") new_line("a")//"kali-targ: a tool for in silico target identification."//new_line("a")//"Copyright (C) 2013-2014 Arnaud Poret"//new_line("a")//new_line("a")//"This program is free software: you can redistribute it and/or modify it under"//new_line("a")//"the terms of the GNU General Public License as published by the Free Software"//new_line("a")//"Foundation, either version 3 of the License, or (at your option) any later"//new_line("a")//"version."//new_line("a")//new_line("a")//"This program is distributed in the hope that it will be useful, but WITHOUT ANY"//new_line("a")//"WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A"//new_line("a")//"PARTICULAR PURPOSE. See the GNU General Public License for more details."//new_line("a")//new_line("a")//"You should have received a copy of the GNU General Public License along with"//new_line("a")//"this program. If not, see https://www.gnu.org/licenses/gpl.html."
         end select
         call cpu_time(finish)
         write (unit=*,fmt="(a)") new_line("a")//"done in "//int2char(int(finish-start))//" CPU seconds"//new_line("a")

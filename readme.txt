@@ -3,15 +3,17 @@
 ########          attractors: avoiding pathological phenotypes          ########
 ################################################################################
 
+Copyright (C) 2013-2014 Arnaud Poret
+This program is licensed under the GNU General Public License.
+To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html or
+see the GNU_General_Public_License.txt file in the present folder.
+
 Contact:
     Arnaud Poret
     arnaud.poret@gmail.com
 
 If you are interested in my work, or ultimately if you use it, feel free to let
 me know.
-
-This work is licensed under the BSD 2-Clause License (see the
-BSD_2-Clause_License.txt file in the present folder).
 
 Recommended prerequisites:
     * operating system: Linux, such as Ubuntu (http://www.ubuntu.com/)

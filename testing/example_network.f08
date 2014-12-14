@@ -1,6 +1,6 @@
-! Copyright (c) 2013-2014, Arnaud Poret
-! All rights reserved.
-! This work is licensed under the BSD 2-Clause License.
+! Copyright (C) 2013-2014 Arnaud Poret
+! This program is licensed under the GNU General Public License.
+! To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
 
 ! gf08 lib.f08 example_network.f08 -o example_network && ./example_network && rm example_network lib.mod
 
