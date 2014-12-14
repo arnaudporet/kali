@@ -19,9 +19,9 @@ module lib
     end type bullet
     contains
     !##########################################################################!
-    !##############################    diff_a    ##############################!
+    !############################    compare_a    #############################!
     !##########################################################################!
-    function diff_a(a1,a2) result(y)
+    function compare_a(a1,a2) result(y)
         !##########    /!\ attractors must be in sorted form /!\    ###########!
         logical::y
         type(attractor)::a1,a2
@@ -30,28 +30,7 @@ module lib
         else
             y=.not. all(a1%mat==a2%mat)
         end if
-    end function diff_a
-    !##########################################################################!
-    !############################    diff_A_set    ############################!
-    !##########################################################################!
-    function diff_A_set(A_set1,A_set2) result(y)
-        !########    /!\ attractor sets must be in sorted form /!\    #########!
-        !##########    /!\ attractors must be in sorted form /!\    ###########!
-        logical::y
-        integer::i
-        type(attractor),dimension(:)::A_set1,A_set2
-        if (size(A_set1)/=size(A_set2)) then
-            y=.true.
-        else
-            y=.false.
-            do i=1,size(A_set1)
-                if (diff_a(A_set1(i),A_set2(i))) then
-                    y=.true.
-                    exit
-                end if
-            end do
-        end if
-    end function diff_A_set
+    end function compare_a
     !##########################################################################!
     !##########################    compute_A_set    ###########################!
     !##########################################################################!
@@ -91,7 +70,7 @@ module lib
                 if (a_found) then
                     in_A=.false.
                     do i2=1,size(A_set)
-                        if (.not. diff_a(A_set(i2),a)) then
+                        if (.not. compare_a(A_set(i2),a)) then
                             in_A=.true.
                             A_set(i2)%basin=A_set(i2)%basin+1.0
                             exit
@@ -120,7 +99,7 @@ module lib
             A_set(i1)%basin=A_set(i1)%basin*100.0/real(size(D,2))
             in_ref=.false.
             do i2=1,size(ref_set)
-                if (.not. diff_a(A_set(i1),ref_set(i2))) then
+                if (.not. compare_a(A_set(i1),ref_set(i2))) then
                     in_ref=.true.
                     exit
                 end if
@@ -151,7 +130,7 @@ module lib
     !#######################    compute_B_therap_set    #######################!
     !##########################################################################!
     function compute_B_therap_set(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio) result(B_therap)
-        logical::in_patho
+        logical::in_patho,golden
         integer::r_min,r_max,max_targ,max_moda,n_node,i1,i2,i3,i4,i5
         integer,dimension(:,:),allocatable::C_targ
         real,dimension(:)::value
@@ -179,12 +158,23 @@ module lib
                     A_patho=compute_A_set(f,D,2,A_physio,b)
                     if (size(compute_a_patho_set(A_patho))==0) then
                         allocate(b%lost(0))
-                        if (diff_A_set(A_physio,A_patho)) then
+                        if (size(A_patho)/=size(A_physio)) then
+                            golden=.false.
+                        else
+                            golden=.true.
+                            do i4=1,size(A_patho)
+                                if (compare_a(A_patho(i4),A_physio(i4))) then
+                                    golden=.false.
+                                    exit
+                                end if
+                            end do
+                        end if
+                        if (.not. golden) then
                             b%metal="silver"
                             do i4=1,size(A_physio)
                                 in_patho=.false.
                                 do i5=1,size(A_patho)
-                                    if (.not. diff_a(A_physio(i4),A_patho(i5))) then
+                                    if (.not. compare_a(A_physio(i4),A_patho(i5))) then
                                         in_patho=.true.
                                         exit
                                     end if
@@ -794,7 +784,7 @@ module lib
                 call report_B_therap(B_therap,V,bool)
                 deallocate(A_physio,B_therap,D)
             case (4)
-                write (unit=*,fmt="(a)") new_line("a")//"1) compute attractors with f_physio"//new_line("a")//"2) compute attractors with f_patho"//new_line("a")//"3) eventually compute pathological attractors"//new_line("a")//"4) compute therapeutic bullets with f_patho"//new_line("a")//new_line("a")//"do not forget to recompile the sources following any modification"
+                write (unit=*,fmt="(a)") new_line("a")//"1) compute attractors with f_physio: returns the physiological attractor set"//new_line("a")//"2) compute attractors with f_patho: returns the pathological attractor set"//new_line("a")//"3) eventually compute the pathological attractors"//new_line("a")//"4) compute therapeutic bullets with f_patho"//new_line("a")//new_line("a")//"do not forget to recompile the sources following any modification"
             case (5)
                 write (unit=*,fmt="(a)") new_line("a")//'The BSD 2-Clause License'//new_line("a")//new_line("a")//'Copyright (c) 2013-2014, Arnaud Poret'//new_line("a")//'All rights reserved.'//new_line("a")//new_line("a")//'Redistribution and use in source and binary forms, with or without modification,'//new_line("a")//'are permitted provided that the following conditions are met:'//new_line("a")//new_line("a")//'1. Redistributions of source code must retain the above copyright notice, this'//new_line("a")//'   list of conditions and the following disclaimer.'//new_line("a")//new_line("a")//'2. Redistributions in binary form must reproduce the above copyright notice,'//new_line("a")//'   this list of conditions and the following disclaimer in the documentation'//new_line("a")//'   and/or other materials provided with the distribution.'//new_line("a")//new_line("a")//'THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND'//new_line("a")//'ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED'//new_line("a")//'WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE'//new_line("a")//'DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR'//new_line("a")//'ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES'//new_line("a")//'(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;'//new_line("a")//'LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON'//new_line("a")//'ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT'//new_line("a")//'(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS'//new_line("a")//'SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.'
         end select
