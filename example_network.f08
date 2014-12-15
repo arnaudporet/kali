@@ -5,13 +5,11 @@
 ! How to:
 !     1) read the comments
 !     2) fill the template
-!     3) compile: gfortran -ffree-line-length-none -fimplicit-none -std=f2008 lib.f08 example_network.f08 -o example_network
+!     3) compile: gfortran -Jlib/ -ffree-line-length-none -fimplicit-none -std=f2008 lib/lib.o example_network.f08 -o example_network
 !     4) execute: ./example_network
 
 ! GFortran (https://gcc.gnu.org/fortran/) is the Fortran compiler front end and
 ! run-time libraries for GCC, the GNU Compiler Collection.
-
-! Do not forget to recompile the sources following any modification.
 
 ! The example network is a published Boolean model of the mammalian cell
 ! cycle [1].
@@ -46,10 +44,7 @@ program example_network
     V(8)="Cdh1"
     V(9)="UbcH10"
     V(10)="CycB"
-    ! pass either f_physio (for computing the physiological attractor set) or
-    ! f_patho (for computing the phathological attractor set or to compute
-    ! therapeutic bullets)
-    call what_to_do(f_physio,value,size_D,n_node,max_targ,max_moda,V)
+    call what_to_do(f_physio,f_patho,value,size_D,n_node,max_targ,max_moda,V)
     deallocate(value,V)
     contains
     !##########################################################################!

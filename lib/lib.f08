@@ -473,7 +473,7 @@ module lib
             report=report//repeat("-",80)//new_line("a")
         end do
         report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//" cycles)"
-        write (unit=*,fmt="(a)",advance="no") new_line("a")//report//new_line("a")//new_line("a")//"save [1/0] "
+        write (unit=*,fmt="(a)") new_line("a")//report//new_line("a")//new_line("a")//"Save?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
         read (unit=*,fmt=*) save_
         if (save_==1) then
             select case (setting)
@@ -508,7 +508,7 @@ module lib
             open (unit=1,file=trim(report_name),status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
-            write (unit=*,fmt="(a)") new_line("a")//"set saved as: "//trim(set_name)//new_line("a")//"report saved as: "//trim(report_name)
+            write (unit=*,fmt="(a)") new_line("a")//"Set saved as "//trim(set_name)//"."//new_line("a")//"Report saved as "//trim(report_name)//"."
             deallocate(s)
         end if
         deallocate(report)
@@ -556,13 +556,13 @@ module lib
             end if
         end do
         report=report//"found therapeutic bullets: "//int2char(size(B_therap))//" ("//int2char(n_gold)//" golden bullets, "//int2char(n_silv)//" silver bullets)"
-        write (unit=*,fmt="(a)",advance="no") new_line("a")//report//new_line("a")//new_line("a")//"save [1/0] "
+        write (unit=*,fmt="(a)") new_line("a")//report//new_line("a")//new_line("a")//"Save?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
         read (unit=*,fmt=*) save_
         if (save_==1) then
             open (unit=1,file="B_therap.txt",status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
-            write (unit=*,fmt="(a)") new_line("a")//"report saved as: B_therap.txt"
+            write (unit=*,fmt="(a)") new_line("a")//"Report saved as B_therap.txt."
         end if
         deallocate(report)
     end subroutine report_B_therap
@@ -711,9 +711,9 @@ module lib
     !##########################################################################!
     !############################    what_to_do    ############################!
     !##########################################################################!
-    subroutine what_to_do(f,value,size_D,n_node,max_targ,max_moda,V)
-        logical::bool
-        integer::size_D,n_node,max_targ,max_moda,to_do,r_min,r_max,setting,whole_S
+    subroutine what_to_do(f1,f2,value,size_D,n_node,max_targ,max_moda,V)
+        logical::bool,z
+        integer::size_D,n_node,max_targ,max_moda,to_do,r_min,r_max,setting,whole_S,go_back
         real::start,finish
         real,dimension(:)::value
         real,dimension(:,:),allocatable::D
@@ -723,24 +723,32 @@ module lib
         type(bullet)::null_b
         type(bullet),dimension(:),allocatable::B_therap
         interface
-            function f(x,k) result(y)
+            function f1(x,k) result(y)
                 integer::k
                 real,dimension(:,:)::x
                 real,dimension(size(x,1),1)::y
-            end function f
+            end function f1
         end interface
-        call cpu_time(start)
+        interface
+            function f2(x,k) result(y)
+                integer::k
+                real,dimension(:,:)::x
+                real,dimension(size(x,1),1)::y
+            end function f2
+        end interface
+        1 continue
         call init_random_seed()
         if (size(value)==2) then
             bool=all(value==[0.0,1.0])
         else
             bool=.false.
         end if
-        write (unit=*,fmt="(a)",advance="no") new_line("a")//"[1] compute attractors"//new_line("a")//"[2] compute pathological attractors"//new_line("a")//"[3] compute therapeutic bullets"//new_line("a")//"[4] help"//new_line("a")//"[5] license"//new_line("a")//new_line("a")//"what to do [1/2/3/4/5] "
+        call cpu_time(start)
+        write (unit=*,fmt="(a)") new_line("a")//"What to do?"//new_line("a")//"    [1] compute an attractor set"//new_line("a")//"    [2] compute the pathological attractors"//new_line("a")//"    [3] compute the therapeutic bullets"//new_line("a")//"    [4] show help"//new_line("a")//"    [5] show license"
         read (unit=*,fmt=*) to_do
         if (to_do==1 .or. to_do==3) then
             if (bool) then
-                write (unit=*,fmt="(a,es10.3e3,a)",advance="no") new_line("a")//"state space cardinality: ",real(2,8)**real(n_node,8),", comprehensive computation [1/0] "
+                write (unit=*,fmt="(a,es10.3e3,a)") new_line("a")//"State space cardinality: ",real(2,8)**real(n_node,8),", compute the whole state space?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
                 read (unit=*,fmt=*) whole_S
                 select case (whole_S)
                     case (1)
@@ -756,39 +764,60 @@ module lib
             case (1)
                 allocate(null_b%targ(0))
                 allocate(null_b%moda(0))
-                write (unit=*,fmt="(a)",advance="no") new_line("a")//"[1] physiological"//new_line("a")//"[2] pathological"//new_line("a")//new_line("a")//"setting [1/2] "
+                write (unit=*,fmt="(a)") new_line("a")//"Setting?"//new_line("a")//"    [1] physiological"//new_line("a")//"    [2] pathological"
                 read (unit=*,fmt=*) setting
                 select case (setting)
                     case (1)
-                        A_physio=compute_A_set(f,D,1,null_set,null_b)
+                        A_physio=compute_A_set(f1,D,1,null_set,null_b)
                         call report_A_set(A_physio,1,V,bool)
+                        deallocate(A_physio)
                     case (2)
-                        A_physio=load_A_set(1)
-                        A_patho=compute_A_set(f,D,2,A_physio,null_b)
-                        call report_A_set(A_patho,2,V,bool)
-                        deallocate(A_patho)
+                        inquire (file="A_physio.csv",exist=z)
+                        if (.not. z) then
+                            write (unit=*,fmt="(a)") new_line("a")//"The file A_physio.csv does not exist. Please compute the physiological attractor"//new_line("a")//"set before computing the pathological attractor set."
+                        else
+                            A_physio=load_A_set(1)
+                            A_patho=compute_A_set(f2,D,2,A_physio,null_b)
+                            call report_A_set(A_patho,2,V,bool)
+                            deallocate(A_physio,A_patho)
+                        end if
                 end select
-                deallocate(null_b%targ,null_b%moda,D,A_physio)
+                deallocate(D,null_b%targ,null_b%moda)
             case (2)
-                A_patho=load_A_set(2)
-                a_patho_set=compute_a_patho_set(A_patho)
-                call report_A_set(a_patho_set,3,V,bool)
-                deallocate(A_patho,a_patho_set)
+                inquire (file="A_patho.csv",exist=z)
+                if (.not. z) then
+                    write (unit=*,fmt="(a)") new_line("a")//"The file A_patho.csv does not exist. Please compute the pathological attractor"//new_line("a")//"set before computing the pathological attractors."
+                else
+                    A_patho=load_A_set(2)
+                    a_patho_set=compute_a_patho_set(A_patho)
+                    call report_A_set(a_patho_set,3,V,bool)
+                    deallocate(A_patho,a_patho_set)
+                end if
             case (3)
-                A_physio=load_A_set(1)
-                write (unit=*,fmt="(a)",advance="no") new_line("a")//"number of targets per bullet (lower bound): "
-                read (unit=*,fmt=*) r_min
-                write (unit=*,fmt="(a)",advance="no") "number of targets per bullet (upper bound): "
-                read (unit=*,fmt=*) r_max
-                B_therap=compute_B_therap_set(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio)
-                call report_B_therap(B_therap,V,bool)
-                deallocate(A_physio,B_therap,D)
+                inquire (file="A_physio.csv",exist=z)
+                if (.not. z) then
+                    write (unit=*,fmt="(a)") new_line("a")//"The file A_physio.csv does not exist. Please compute the physiological attractor"//new_line("a")//"set before computing the therapeutic bullets."
+                else
+                    A_physio=load_A_set(1)
+                    write (unit=*,fmt="(a)",advance="no") new_line("a")//"number of targets per bullet (lower bound): "
+                    read (unit=*,fmt=*) r_min
+                    write (unit=*,fmt="(a)",advance="no") "number of targets per bullet (upper bound): "
+                    read (unit=*,fmt=*) r_max
+                    B_therap=compute_B_therap_set(f2,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio)
+                    call report_B_therap(B_therap,V,bool)
+                    deallocate(A_physio,B_therap)
+                end if
+                deallocate(D)
             case (4)
-                write (unit=*,fmt="(a)") new_line("a")//"1) compute attractors with f_physio: returns A_physio"//new_line("a")//"2) compute attractors with f_patho: returns A_patho"//new_line("a")//"3) eventually compute pathological attractors: returns A_versus"//new_line("a")//"4) compute therapeutic bullets with f_patho: returns B_therap"//new_line("a")//new_line("a")//"do not forget to recompile the sources following any modification"
+                write (unit=*,fmt="(a)") new_line("a")//"How to:"//new_line("a")//"    1) compute the physiological attractor set ([1], returns A_physio)"//new_line("a")//"    2) compute the pathological attractor set ([1], returns A_patho)"//new_line("a")//"    3) compute the pathological attractors ([2], returns A_versus)"//new_line("a")//"    4) compute the therapeutic bullets ([3], returns B_therap)"
             case (5)
                 write (unit=*,fmt="(a)") new_line("a")//"kali-targ: a tool for in silico target identification."//new_line("a")//"Copyright (C) 2013-2014 Arnaud Poret"//new_line("a")//new_line("a")//"This program is free software: you can redistribute it and/or modify it under"//new_line("a")//"the terms of the GNU General Public License as published by the Free Software"//new_line("a")//"Foundation, either version 3 of the License, or (at your option) any later"//new_line("a")//"version."//new_line("a")//new_line("a")//"This program is distributed in the hope that it will be useful, but WITHOUT ANY"//new_line("a")//"WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A"//new_line("a")//"PARTICULAR PURPOSE. See the GNU General Public License for more details."//new_line("a")//new_line("a")//"You should have received a copy of the GNU General Public License along with"//new_line("a")//"this program. If not, see https://www.gnu.org/licenses/gpl.html."
         end select
         call cpu_time(finish)
-        write (unit=*,fmt="(a)") new_line("a")//"done in "//int2char(int(finish-start))//" CPU seconds"//new_line("a")
+        write (unit=*,fmt="(a)") new_line("a")//"Done in "//int2char(int(finish-start))//" CPU seconds."//new_line("a")//new_line("a")//"Go back to the todo list?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
+    read (unit=*,fmt=*) go_back
+    if (go_back==1) then
+        go to 1
+    end if
     end subroutine what_to_do
 end module lib
