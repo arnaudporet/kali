@@ -301,7 +301,7 @@ module lib
     !##############################    gen_S    ###############################!
     !##########################################################################!
     function gen_S(n) result(y)
-        !#####################    /!\ bool only /!\    #####################!
+        !#####################    /!\ boolean only /!\    #####################!
         integer::n,i1,i2
         real,dimension(n,2**n)::y
         if (n>30) then
@@ -712,9 +712,8 @@ module lib
     !############################    what_to_do    ############################!
     !##########################################################################!
     subroutine what_to_do(f1,f2,value,size_D,n_node,max_targ,max_moda,V)
-        logical::bool,z
-        integer::size_D,n_node,max_targ,max_moda,to_do,r_min,r_max,setting,whole_S,go_back
-        real::start,finish
+        logical::bool,z,go_back
+        integer::size_D,n_node,max_targ,max_moda,to_do,r_min,r_max,setting,whole_S
         real,dimension(:)::value
         real,dimension(:,:),allocatable::D
         character(16),dimension(:)::V
@@ -736,6 +735,7 @@ module lib
                 real,dimension(size(x,1),1)::y
             end function f2
         end interface
+        go_back=.true.
         1 continue
         call init_random_seed()
         if (size(value)==2) then
@@ -743,8 +743,7 @@ module lib
         else
             bool=.false.
         end if
-        call cpu_time(start)
-        write (unit=*,fmt="(a)") new_line("a")//"What to do?"//new_line("a")//"    [1] compute an attractor set"//new_line("a")//"    [2] compute the pathological attractors"//new_line("a")//"    [3] compute the therapeutic bullets"//new_line("a")//"    [4] show help"//new_line("a")//"    [5] show license"
+        write (unit=*,fmt="(a)") new_line("a")//"What to do?"//new_line("a")//"    [1] compute an attractor set"//new_line("a")//"    [2] compute the pathological attractors"//new_line("a")//"    [3] compute the therapeutic bullets"//new_line("a")//"    [4] show the help"//new_line("a")//"    [5] show the license"//new_line("a")//"    [6] quit the algorithm"
         read (unit=*,fmt=*) to_do
         if (to_do==1 .or. to_do==3) then
             if (bool) then
@@ -812,12 +811,11 @@ module lib
                 write (unit=*,fmt="(a)") new_line("a")//"How to:"//new_line("a")//"    1) compute the physiological attractor set ([1], returns A_physio)"//new_line("a")//"    2) compute the pathological attractor set ([1], returns A_patho)"//new_line("a")//"    3) compute the pathological attractors ([2], returns A_versus)"//new_line("a")//"    4) compute the therapeutic bullets ([3], returns B_therap)"
             case (5)
                 write (unit=*,fmt="(a)") new_line("a")//"kali-targ: a tool for in silico target identification."//new_line("a")//"Copyright (C) 2013-2014 Arnaud Poret"//new_line("a")//new_line("a")//"This program is free software: you can redistribute it and/or modify it under"//new_line("a")//"the terms of the GNU General Public License as published by the Free Software"//new_line("a")//"Foundation, either version 3 of the License, or (at your option) any later"//new_line("a")//"version."//new_line("a")//new_line("a")//"This program is distributed in the hope that it will be useful, but WITHOUT ANY"//new_line("a")//"WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A"//new_line("a")//"PARTICULAR PURPOSE. See the GNU General Public License for more details."//new_line("a")//new_line("a")//"You should have received a copy of the GNU General Public License along with"//new_line("a")//"this program. If not, see https://www.gnu.org/licenses/gpl.html."
+            case (6)
+                go_back=.false.
         end select
-        call cpu_time(finish)
-        write (unit=*,fmt="(a)") new_line("a")//"Done in "//int2char(int(finish-start))//" CPU seconds."//new_line("a")//new_line("a")//"Go back to the todo list?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
-    read (unit=*,fmt=*) go_back
-    if (go_back==1) then
-        go to 1
-    end if
+        if (go_back) then
+            go to 1
+        end if
     end subroutine what_to_do
 end module lib
