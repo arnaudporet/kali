@@ -5,8 +5,10 @@
 ! How to:
 !     1) read the comments
 !     2) fill the template
-!     3) compile: gfortran -Jlib/ -ffree-line-length-none -fimplicit-none -std=f2008 lib/lib.o example_network.f08 -o example_network
+!     3) compile: gfortran -ffree-line-length-none -fimplicit-none -std=f2008 -fmax-errors=1 lib.f08 example_network.f08 -o example_network
 !     4) execute: ./example_network
+
+! Do not forget to recompile the sources following any modification.
 
 ! GFortran (https://gcc.gnu.org/fortran/) is the Fortran compiler front end and
 ! run-time libraries for GCC, the GNU Compiler Collection.

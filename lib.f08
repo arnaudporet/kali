@@ -232,7 +232,7 @@ module lib
         integer::x,i
         real(8)::y
         if (x>170) then
-            write (unit=*,fmt="(a)") "facto(x): x>170 unsupported"
+            write (unit=*,fmt="(a)") "facto(x): x>170 unsupported."//new_line("a")
             stop
         else if (x==0) then
             y=real(1,8)
@@ -305,7 +305,7 @@ module lib
         integer::n,i1,i2
         real,dimension(n,2**n)::y
         if (n>30) then
-            write (unit=*,fmt="(a)") "gen_S(n): n>30 unsupported"
+            write (unit=*,fmt="(a)") "gen_S(n): n>30 unsupported."//new_line("a")
             stop
         else
             do i1=1,n
@@ -334,7 +334,7 @@ module lib
             call random_seed(put=seed)
             deallocate(seed)
         else
-            write (unit=*,fmt="(a)") "Too bad, your operating system does not provide a random number generator."
+            write (unit=*,fmt="(a)") "Too bad, your operating system does not provide a random number generator."//new_line("a")
             stop
         end if
     end subroutine init_random_seed
@@ -798,9 +798,9 @@ module lib
                     write (unit=*,fmt="(a)") new_line("a")//"The file A_physio.csv does not exist. Please compute the physiological attractor"//new_line("a")//"set before computing the therapeutic bullets."
                 else
                     A_physio=load_A_set(1)
-                    write (unit=*,fmt="(a)",advance="no") new_line("a")//"number of targets per bullet (lower bound): "
+                    write (unit=*,fmt="(a)",advance="no") new_line("a")//"Number of targets per bullet (lower bound): "
                     read (unit=*,fmt=*) r_min
-                    write (unit=*,fmt="(a)",advance="no") "number of targets per bullet (upper bound): "
+                    write (unit=*,fmt="(a)",advance="no") "Number of targets per bullet (upper bound): "
                     read (unit=*,fmt=*) r_max
                     B_therap=compute_B_therap_set(f2,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio)
                     call report_B_therap(B_therap,V,bool)
@@ -808,11 +808,12 @@ module lib
                 end if
                 deallocate(D)
             case (4)
-                write (unit=*,fmt="(a)") new_line("a")//"How to:"//new_line("a")//"    1) compute the physiological attractor set ([1], returns A_physio)"//new_line("a")//"    2) compute the pathological attractor set ([1], returns A_patho)"//new_line("a")//"    3) compute the pathological attractors ([2], returns A_versus)"//new_line("a")//"    4) compute the therapeutic bullets ([3], returns B_therap)"
+                write (unit=*,fmt="(a)") new_line("a")//"How to:"//new_line("a")//"    1) compute the physiological attractor set ([1], returns A_physio)"//new_line("a")//"    2) compute the pathological attractor set ([1], returns A_patho)"//new_line("a")//"    3) compute the pathological attractors ([2], returns A_versus)"//new_line("a")//"    4) compute the therapeutic bullets ([3], returns B_therap)"//new_line("a")//new_line("a")//"Do not forget to recompile the sources following any modification."
             case (5)
                 write (unit=*,fmt="(a)") new_line("a")//"kali-targ: a tool for in silico target identification."//new_line("a")//"Copyright (C) 2013-2014 Arnaud Poret"//new_line("a")//new_line("a")//"This program is free software: you can redistribute it and/or modify it under"//new_line("a")//"the terms of the GNU General Public License as published by the Free Software"//new_line("a")//"Foundation, either version 3 of the License, or (at your option) any later"//new_line("a")//"version."//new_line("a")//new_line("a")//"This program is distributed in the hope that it will be useful, but WITHOUT ANY"//new_line("a")//"WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A"//new_line("a")//"PARTICULAR PURPOSE. See the GNU General Public License for more details."//new_line("a")//new_line("a")//"You should have received a copy of the GNU General Public License along with"//new_line("a")//"this program. If not, see https://www.gnu.org/licenses/gpl.html."
             case (6)
                 go_back=.false.
+                write (unit=*,fmt="(a)") new_line("a")//"Goodbye."//new_line("a")
         end select
         if (go_back) then
             go to 1
