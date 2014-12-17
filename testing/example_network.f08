@@ -4,8 +4,6 @@
 
 ! gf08 lib.f08 example_network.f08 -o example_network && ./example_network && rm example_network lib.mod
 
-! gf08W lib.f08 example_network.f08 -o example_network && rm example_network lib.mod
-
 program example_network
     use lib
     n_node=10
@@ -24,7 +22,7 @@ program example_network
     V(8)="Cdh1"
     V(9)="UbcH10"
     V(10)="CycB"
-    call what_to_do(f_physio,value,size_D,n_node,max_targ,max_moda,V)
+    call what_to_do(f_physio,f_patho,value,size_D,n_node,max_targ,max_moda,V)
     deallocate(value,V)
     contains
     !##########################################################################!

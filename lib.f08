@@ -21,14 +21,14 @@ module lib
     !##########################################################################!
     !############################    compare_a    #############################!
     !##########################################################################!
-    function compare_a(a1,a2) result(y)
+    function compare_a(a1,a2) result(diff)
         !##########    /!\ attractors must be in sorted form /!\    ###########!
-        logical::y
+        logical::diff
         type(attractor)::a1,a2
         if (size(a1%mat,2)/=size(a2%mat,2)) then
-            y=.true.
+            diff=.true.
         else
-            y=.not. all(a1%mat==a2%mat)
+            diff=.not. all(a1%mat==a2%mat)
         end if
     end function compare_a
     !##########################################################################!
@@ -127,9 +127,9 @@ module lib
         end do
     end function compute_a_patho_set
     !##########################################################################!
-    !#######################    compute_B_therap_set    #######################!
+    !#########################    compute_B_therap    #########################!
     !##########################################################################!
-    function compute_B_therap_set(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio) result(B_therap)
+    function compute_B_therap(f,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio) result(B_therap)
         logical::in_patho,golden
         integer::r_min,r_max,max_targ,max_moda,n_node,i1,i2,i3,i4,i5
         integer,dimension(:,:),allocatable::C_targ
@@ -194,7 +194,7 @@ module lib
         end do
         deallocate(A_patho,C_targ,C_moda,b%targ,b%moda)
         B_therap=sort_B_therap(B_therap)
-    end function compute_B_therap_set
+    end function compute_B_therap
     !##########################################################################!
     !###########################    concatenate    ############################!
     !##########################################################################!
@@ -300,21 +300,21 @@ module lib
     !##########################################################################!
     !##############################    gen_S    ###############################!
     !##########################################################################!
-    function gen_S(n) result(y)
+    function gen_S(n) result(S)
         !#####################    /!\ boolean only /!\    #####################!
         integer::n,i1,i2
-        real,dimension(n,2**n)::y
+        real,dimension(n,2**n)::S
         if (n>30) then
             write (unit=*,fmt="(a)") "gen_S(n): n>30 unsupported."//new_line("a")
             stop
         else
             do i1=1,n
-                y(:i1-1,(2**i1)/2+1:2**i1)=y(:i1-1,:2**(i1-1))
+                S(:i1-1,(2**i1)/2+1:2**i1)=S(:i1-1,:2**(i1-1))
                 do i2=1,2**(i1-1)
-                    y(i1,i2)=0.0
+                    S(i1,i2)=0.0
                 end do
                 do i2=(2**i1)/2+1,2**i1
-                    y(i1,i2)=1.0
+                    S(i1,i2)=1.0
                 end do
             end do
         end if
@@ -802,7 +802,7 @@ module lib
                     read (unit=*,fmt=*) r_min
                     write (unit=*,fmt="(a)",advance="no") "Number of targets per bullet (upper bound): "
                     read (unit=*,fmt=*) r_max
-                    B_therap=compute_B_therap_set(f2,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio)
+                    B_therap=compute_B_therap(f2,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio)
                     call report_B_therap(B_therap,V,bool)
                     deallocate(A_physio,B_therap)
                 end if
