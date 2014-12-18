@@ -38,7 +38,7 @@ module lib
         logical::a_found,in_A,in_ref
         integer::i1,i2,k,setting
         real,dimension(:,:)::D
-        real,dimension(:,:),allocatable::x
+        real,dimension(:,:),allocatable::x,z
         character(16)::a_name
         type(attractor)::a
         type(attractor),dimension(:)::ref_set
@@ -48,7 +48,7 @@ module lib
             function f(x,k) result(y)
                 integer::k
                 real,dimension(:,:)::x
-                real,dimension(size(x,1),1)::y
+                real,dimension(size(x,1))::y
             end function f
         end interface
         allocate(A_set(0))
@@ -57,7 +57,11 @@ module lib
             x=reshape(D(:,i1),[size(D,1),1])
             k=1
             do
-                x=concatenate(x,f(x,k),2)
+                allocate(z(size(x,1),size(x,2)+1))
+                z(:,:size(z,2)-1)=x(:,:)
+                z(:,size(z,2))=f(x,k)
+                x=z
+                deallocate(z)
                 x(b%targ,k+1)=b%moda
                 do i2=k,1,-1
                     if (all(x(:,i2)==x(:,k+1))) then
@@ -144,7 +148,7 @@ module lib
             function f(x,k) result(y)
                 integer::k
                 real,dimension(:,:)::x
-                real,dimension(size(x,1),1)::y
+                real,dimension(size(x,1))::y
             end function f
         end interface
         allocate(B_therap(0))
@@ -195,36 +199,6 @@ module lib
         deallocate(A_patho,C_targ,C_moda,b%targ,b%moda)
         B_therap=sort_B_therap(B_therap)
     end function compute_B_therap
-    !##########################################################################!
-    !###########################    concatenate    ############################!
-    !##########################################################################!
-    function concatenate(x1,x2,d) result(y)
-        integer::d
-        real,dimension(:,:)::x1,x2
-        real,dimension(:,:),allocatable::y
-        select case (d)
-            case (1)
-                if (size(x1,1)==0) then
-                    y=x2
-                else if (size(x2,1)==0) then
-                    y=x1
-                else
-                    allocate(y(size(x1,1)+size(x2,1),size(x1,2)))
-                    y(:size(x1,1),:)=x1
-                    y(size(x1,1)+1:,:)=x2
-                end if
-            case (2)
-                if (size(x1,2)==0) then
-                    y=x2
-                else if (size(x2,2)==0) then
-                    y=x1
-                else
-                    allocate(y(size(x1,1),size(x1,2)+size(x2,2)))
-                    y(:,:size(x1,2))=x1
-                    y(:,size(x1,2)+1:)=x2
-                end if
-        end select
-    end function concatenate
     !##########################################################################!
     !##############################    facto    ###############################!
     !##########################################################################!
@@ -725,14 +699,14 @@ module lib
             function f1(x,k) result(y)
                 integer::k
                 real,dimension(:,:)::x
-                real,dimension(size(x,1),1)::y
+                real,dimension(size(x,1))::y
             end function f1
         end interface
         interface
             function f2(x,k) result(y)
                 integer::k
                 real,dimension(:,:)::x
-                real,dimension(size(x,1),1)::y
+                real,dimension(size(x,1))::y
             end function f2
         end interface
         go_back=.true.
