@@ -37,9 +37,9 @@ module lib
     function compute_A_set(f,D,setting,ref_set,b) result(A_set)
         logical::a_found,in_A,in_ref,repass
         integer::i1,i2,i3,k,setting
-        integer,dimension(:),allocatable::z2
+        integer,dimension(:),allocatable::j_min
         real,dimension(:,:)::D
-        real,dimension(:,:),allocatable::x,z1
+        real,dimension(:,:),allocatable::x,z
         character(16)::a_name
         type(attractor)::a
         type(attractor),dimension(:)::ref_set
@@ -58,22 +58,21 @@ module lib
             x=reshape(D(:,i1),[size(D,1),1])
             k=1
             do
-                allocate(z1(size(x,1),size(x,2)+1))
-                z1(:,:size(z1,2)-1)=x(:,:)
-                z1(:,size(z1,2))=f(x,k)
-                x=z1
-                deallocate(z1)
+                allocate(z(size(x,1),size(x,2)+1))
+                z(:,:size(z,2)-1)=x(:,:)
+                z(:,size(z,2))=f(x,k)
+                x=z
+                deallocate(z)
                 x(b%targ,k+1)=b%moda
                 do i2=k,1,-1
                     if (all(x(:,i2)==x(:,k+1))) then
                         a_found=.true.
                         a%mat=reshape(x(:,i2:k),[size(x,1),k-i2+1])
-                        z2=range_int(1,size(a%mat,2))
+                        j_min=range_int(1,size(a%mat,2))
                         do i3=1,size(a%mat,1)
-                            z2=z2(minlocs(a%mat(i3,z2)))
-                            if (size(z2)==1) then
-                                a%mat=cshift(a%mat,z2(1)-1,2)
-                                deallocate(z2)
+                            j_min=j_min(minlocs(a%mat(i3,j_min)))
+                            if (size(j_min)==1) then
+                                a%mat=cshift(a%mat,j_min(1)-1,2)
                                 exit
                             end if
                         end do
@@ -99,7 +98,7 @@ module lib
                 end if
             end do
         end do
-        deallocate(x)
+        deallocate(x,j_min)
         do
             repass=.false.
             do i1=1,size(A_set)-1
@@ -307,28 +306,28 @@ module lib
     !##########################################################################!
     !############################    gen_arrang    ############################!
     !##########################################################################!
-    function gen_arrang(deck,k,n_arrang) result(arrang)
+    function gen_arrang(deck,k,n_arrang) result(arrang_mat)
         !#################    /!\ only with repetition /!\    #################!
-        logical::in_arrang
+        logical::in_arrang_mat
         integer::k,n_arrang,i1,i2
-        real,dimension(k)::z
+        real,dimension(k)::arrang
         real,dimension(:)::deck
-        real,dimension(:,:),allocatable::arrang
-        allocate(arrang(min(n_arrang,int(min(real(size(deck),8)**real(k,8),real(huge(1),8)))),k))
-        do i1=1,size(arrang,1)
+        real,dimension(:,:),allocatable::arrang_mat
+        allocate(arrang_mat(min(n_arrang,int(min(real(size(deck),8)**real(k,8),real(huge(1),8)))),k))
+        do i1=1,size(arrang_mat,1)
             do
                 do i2=1,k
-                    z(i2)=deck(rand_int(1,size(deck)))
+                    arrang(i2)=deck(rand_int(1,size(deck)))
                 end do
-                in_arrang=.false.
+                in_arrang_mat=.false.
                 do i2=1,i1-1
-                    if (all(arrang(i2,:)==z)) then
-                        in_arrang=.true.
+                    if (all(arrang_mat(i2,:)==arrang)) then
+                        in_arrang_mat=.true.
                         exit
                     end if
                 end do
-                if (.not. in_arrang) then
-                    arrang(i1,:)=z
+                if (.not. in_arrang_mat) then
+                    arrang_mat(i1,:)=arrang
                     exit
                 end if
             end do
@@ -337,36 +336,36 @@ module lib
     !##########################################################################!
     !############################    gen_combi    #############################!
     !##########################################################################!
-    function gen_combi(deck,k,n_combi) result(combi)
+    function gen_combi(deck,k,n_combi) result(combi_mat)
         !###############    /!\ only without repetition /!\    ################!
-        logical::in_combi
+        logical::in_combi_mat
         integer::k,n_combi,i1,i2
-        real::z1
-        real,dimension(k)::z2
+        real::z
+        real,dimension(k)::combi
         real,dimension(:)::deck
-        real,dimension(:,:),allocatable::combi
-        allocate(combi(min(n_combi,int(min(facto(size(deck))/(facto(k)*facto(size(deck)-k)),real(huge(1),8)))),k))
-        do i1=1,size(combi,1)
+        real,dimension(:,:),allocatable::combi_mat
+        allocate(combi_mat(min(n_combi,int(min(facto(size(deck))/(facto(k)*facto(size(deck)-k)),real(huge(1),8)))),k))
+        do i1=1,size(combi_mat,1)
             do
                 do i2=1,k
                     do
-                        z1=deck(rand_int(1,size(deck)))
-                        if (all(z1/=z2(:i2-1))) then
-                            z2(i2)=z1
+                        z=deck(rand_int(1,size(deck)))
+                        if (all(z/=combi(:i2-1))) then
+                            combi(i2)=z
                             exit
                         end if
                     end do
                 end do
-                z2=sort(z2)
-                in_combi=.false.
+                combi=sort(combi)
+                in_combi_mat=.false.
                 do i2=1,i1-1
-                    if (all(combi(i2,:)==z2)) then
-                        in_combi=.true.
+                    if (all(combi_mat(i2,:)==combi)) then
+                        in_combi_mat=.true.
                         exit
                     end if
                 end do
-                if (.not. in_combi) then
-                    combi(i1,:)=z2
+                if (.not. in_combi_mat) then
+                    combi_mat(i1,:)=combi
                     exit
                 end if
             end do
@@ -427,7 +426,7 @@ module lib
     !############################    load_A_set    ############################!
     !##########################################################################!
     function load_A_set(setting) result(A_set)
-        integer::setting,i1,i2,z,n,m
+        integer::setting,i1,i2,size_,n,m
         character(32)::set_name
         type(attractor),dimension(:),allocatable::A_set
         select case (setting)
@@ -437,8 +436,8 @@ module lib
                 set_name="A_patho.csv"
         end select
         open (unit=1,file=trim(set_name),status="old")
-        read (unit=1,fmt=*) z
-        allocate(A_set(z))
+        read (unit=1,fmt=*) size_
+        allocate(A_set(size_))
         do i1=1,size(A_set)
             read (unit=1,fmt=*) n
             read (unit=1,fmt=*) m
@@ -529,7 +528,7 @@ module lib
             else
                 n_cycle=n_cycle+1
             end if
-            report=report//trim(A_set(i1)%name)//new_line("a")//"basin: "//real2char(A_set(i1)%basin)//"% (of the state space)"//new_line("a")
+            report=report//trim(A_set(i1)%name)//new_line("a")//"basin: "//real2char(A_set(i1)%basin)//"% of the state space"//new_line("a")
             do i2=1,size(A_set(i1)%mat,1)
                 report=report//V(i2)//" "
                 do i3=1,size(A_set(i1)%mat,2)-1
@@ -663,7 +662,7 @@ module lib
     !############################    what_to_do    ############################!
     !##########################################################################!
     subroutine what_to_do(f1,f2,value,size_D,n_node,max_targ,max_moda,V)
-        logical::bool,z
+        logical::bool,exist_
         integer::size_D,n_node,max_targ,max_moda,to_do,r_min,r_max,setting,whole_S
         real,dimension(:)::value
         real,dimension(:,:),allocatable::D
@@ -693,7 +692,7 @@ module lib
             bool=.false.
         end if
         do
-            write (unit=*,fmt="(a)") new_line("a")//"What to do?"//new_line("a")//"    [1] compute an attractor set"//new_line("a")//"    [2] compute the pathological attractors"//new_line("a")//"    [3] compute the therapeutic bullets"//new_line("a")//"    [4] show the help"//new_line("a")//"    [5] show the license"//new_line("a")//"    [6] quit the algorithm"
+            write (unit=*,fmt="(a)") new_line("a")//"What to do?"//new_line("a")//"    [1] compute attractor set"//new_line("a")//"    [2] compute pathological attractors"//new_line("a")//"    [3] compute therapeutic bullets"//new_line("a")//"    [4] help"//new_line("a")//"    [5] license"//new_line("a")//"    [6] quit"
             read (unit=*,fmt=*) to_do
             if (to_do==1 .or. to_do==3) then
                 if (bool) then
@@ -721,8 +720,8 @@ module lib
                             call report_A_set(A_physio,1,V,bool)
                             deallocate(A_physio)
                         case (2)
-                            inquire (file="A_physio.csv",exist=z)
-                            if (.not. z) then
+                            inquire (file="A_physio.csv",exist=exist_)
+                            if (.not. exist_) then
                                 write (unit=*,fmt="(a)") new_line("a")//"The file A_physio.csv does not exist. Please compute the physiological attractor"//new_line("a")//"set before computing the pathological attractor set."
                             else
                                 A_physio=load_A_set(1)
@@ -733,8 +732,8 @@ module lib
                     end select
                     deallocate(D,null_b%targ,null_b%moda)
                 case (2)
-                    inquire (file="A_patho.csv",exist=z)
-                    if (.not. z) then
+                    inquire (file="A_patho.csv",exist=exist_)
+                    if (.not. exist_) then
                         write (unit=*,fmt="(a)") new_line("a")//"The file A_patho.csv does not exist. Please compute the pathological attractor"//new_line("a")//"set before computing the pathological attractors."
                     else
                         A_patho=load_A_set(2)
@@ -743,8 +742,8 @@ module lib
                         deallocate(A_patho,a_patho_set)
                     end if
                 case (3)
-                    inquire (file="A_physio.csv",exist=z)
-                    if (.not. z) then
+                    inquire (file="A_physio.csv",exist=exist_)
+                    if (.not. exist_) then
                         write (unit=*,fmt="(a)") new_line("a")//"The file A_physio.csv does not exist. Please compute the physiological attractor"//new_line("a")//"set before computing the therapeutic bullets."
                     else
                         A_physio=load_A_set(1)
