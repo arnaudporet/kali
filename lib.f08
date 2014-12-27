@@ -3,6 +3,8 @@
 ! To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
 module lib
     !##############    /!\ networks must be deterministic /!\    ##############!
+    !#########    /!\ default integer kind must be 4 (32 bits) /!\    #########!
+    !##########    /!\ default real kind must be 4 (32 bits) /!\    ###########!
     integer::max_targ,max_moda,size_D,n_node
     real,dimension(:),allocatable::value
     character(16),dimension(:),allocatable::V
@@ -416,6 +418,7 @@ module lib
     !#############################    int2char    #############################!
     !##########################################################################!
     function int2char(x) result(y)
+        !############    /!\ x must be of kind 4 (32 bits) /!\    #############!
         integer::x
         character(11)::z
         character(:),allocatable::y
@@ -489,19 +492,21 @@ module lib
     !##########################################################################!
     !############################    real2char    #############################!
     !##########################################################################!
-    function real2char(x) result(y)
+    function real2char(x,dec) result(y)
+        !############    /!\ x must be of kind 4 (32 bits) /!\    #############!
+        integer::dec
         real::x
-        character(42)::z
+        character(41+dec)::z
         character(:),allocatable::y
-        write (unit=z,fmt="(f42.1)") x
+        write (unit=z,fmt="(f"//int2char(41+dec)//"."//int2char(dec)//")") x
         y=trim(adjustl(z))
     end function real2char
     !##########################################################################!
     !###########################    report_A_set    ###########################!
     !##########################################################################!
-    subroutine report_A_set(A_set,setting,V,bool)
+    subroutine report_A_set(A_set,setting,V,bool,dec)
         logical::bool
-        integer::setting,n_point,n_cycle,i1,i2,i3,save_
+        integer::setting,n_point,n_cycle,i1,i2,i3,save_,dec
         character(16)::set_type
         character(16),dimension(:)::V
         character(32)::set_name,report_name
@@ -528,20 +533,20 @@ module lib
             else
                 n_cycle=n_cycle+1
             end if
-            report=report//trim(A_set(i1)%name)//new_line("a")//"basin: "//real2char(A_set(i1)%basin)//"% of the state space"//new_line("a")
+            report=report//trim(A_set(i1)%name)//new_line("a")//"basin: "//real2char(A_set(i1)%basin,1)//"% of the state space"//new_line("a")
             do i2=1,size(A_set(i1)%mat,1)
                 report=report//V(i2)//" "
                 do i3=1,size(A_set(i1)%mat,2)-1
                     if (bool) then
                         report=report//int2char(int(A_set(i1)%mat(i2,i3)))//" "
                     else
-                        report=report//real2char(A_set(i1)%mat(i2,i3))//" "
+                        report=report//real2char(A_set(i1)%mat(i2,i3),dec)//" "
                     end if
                 end do
                 if (bool) then
                     report=report//int2char(int(A_set(i1)%mat(i2,size(A_set(i1)%mat,2))))//new_line("a")
                 else
-                    report=report//real2char(A_set(i1)%mat(i2,size(A_set(i1)%mat,2)))//new_line("a")
+                    report=report//real2char(A_set(i1)%mat(i2,size(A_set(i1)%mat,2)),dec)//new_line("a")
                 end if
             end do
             report=report//repeat("-",80)//new_line("a")
@@ -563,14 +568,14 @@ module lib
             end select
             s=int2char(size(A_set))//new_line("a")
             do i1=1,size(A_set)
-                s=s//int2char(size(A_set(i1)%mat,1))//new_line("a")//int2char(size(A_set(i1)%mat,2))//new_line("a")//real2char(A_set(i1)%basin)//new_line("a")//trim(A_set(i1)%name)//new_line("a")
+                s=s//int2char(size(A_set(i1)%mat,1))//new_line("a")//int2char(size(A_set(i1)%mat,2))//new_line("a")//real2char(A_set(i1)%basin,1)//new_line("a")//trim(A_set(i1)%name)//new_line("a")
             end do
             do i1=1,size(A_set)
                 do i2=1,size(A_set(i1)%mat,1)
                     do i3=1,size(A_set(i1)%mat,2)-1
-                        s=s//real2char(A_set(i1)%mat(i2,i3))//","
+                        s=s//real2char(A_set(i1)%mat(i2,i3),dec)//","
                     end do
-                    s=s//real2char(A_set(i1)%mat(i2,size(A_set(i1)%mat,2)))
+                    s=s//real2char(A_set(i1)%mat(i2,size(A_set(i1)%mat,2)),dec)
                     if (i1/=size(A_set) .or. i2/=size(A_set(i1)%mat,1)) then
                         s=s//new_line("a")
                     end if
@@ -590,9 +595,9 @@ module lib
     !##########################################################################!
     !#########################    report_B_therap    ##########################!
     !##########################################################################!
-    subroutine report_B_therap(B_therap,V,bool)
+    subroutine report_B_therap(B_therap,V,bool,dec)
         logical::bool
-        integer::n_gold,n_silv,i1,i2,save_
+        integer::n_gold,n_silv,i1,i2,save_,dec
         character(1)::moda
         character(16),dimension(:)::V
         character(:),allocatable::report
@@ -615,7 +620,7 @@ module lib
                     end if
                     report=report//moda//trim(V(B_therap(i1)%targ(i2)))//" "
                 else
-                    report=report//trim(V(B_therap(i1)%targ(i2)))//"["//real2char(B_therap(i1)%moda(i2))//"] "
+                    report=report//trim(V(B_therap(i1)%targ(i2)))//"["//real2char(B_therap(i1)%moda(i2),dec)//"] "
                 end if
             end do
             report=report//"("//trim(B_therap(i1)%metal)
@@ -663,8 +668,9 @@ module lib
     !##########################################################################!
     subroutine what_to_do(f1,f2,value,size_D,n_node,max_targ,max_moda,V)
         logical::bool,exist_
-        integer::size_D,n_node,max_targ,max_moda,to_do,r_min,r_max,setting,whole_S
+        integer::size_D,n_node,max_targ,max_moda,to_do,r_min,r_max,setting,whole_S,dec,i1,i2
         real,dimension(:)::value
+        integer,dimension(size(value))::z
         real,dimension(:,:),allocatable::D
         character(16),dimension(:)::V
         type(attractor),dimension(0)::null_set
@@ -691,6 +697,16 @@ module lib
         else
             bool=.false.
         end if
+        z=3
+        do i1=1,size(value)
+            do i2=1,2
+                if (modulo(value(i1)*real(10**i2),1.0)==0.0) then
+                    z(i1)=i2
+                    exit
+                end if
+            end do
+        end do
+        dec=maxval(z)
         do
             write (unit=*,fmt="(a)") new_line("a")//"What to do?"//new_line("a")//"    [1] compute attractor set"//new_line("a")//"    [2] compute pathological attractors"//new_line("a")//"    [3] compute therapeutic bullets"//new_line("a")//"    [4] help"//new_line("a")//"    [5] license"//new_line("a")//"    [6] quit"
             read (unit=*,fmt=*) to_do
@@ -713,7 +729,7 @@ module lib
                     select case (setting)
                         case (1)
                             A_physio=compute_A_set(f1,D,1,null_set,null_b)
-                            call report_A_set(A_physio,1,V,bool)
+                            call report_A_set(A_physio,1,V,bool,dec)
                             deallocate(A_physio)
                         case (2)
                             inquire (file="A_physio.csv",exist=exist_)
@@ -722,7 +738,7 @@ module lib
                             else
                                 A_physio=load_A_set(1)
                                 A_patho=compute_A_set(f2,D,2,A_physio,null_b)
-                                call report_A_set(A_patho,2,V,bool)
+                                call report_A_set(A_patho,2,V,bool,dec)
                                 deallocate(A_physio,A_patho)
                             end if
                     end select
@@ -734,7 +750,7 @@ module lib
                     else
                         A_patho=load_A_set(2)
                         a_patho_set=compute_a_patho_set(A_patho)
-                        call report_A_set(a_patho_set,3,V,bool)
+                        call report_A_set(a_patho_set,3,V,bool,dec)
                         deallocate(A_patho,a_patho_set)
                     end if
                 case (3)
@@ -748,7 +764,7 @@ module lib
                         write (unit=*,fmt="(a)",advance="no") "Number of targets per bullet (upper bound): "
                         read (unit=*,fmt=*) r_max
                         B_therap=compute_B_therap(f2,D,r_min,r_max,max_targ,max_moda,n_node,value,A_physio)
-                        call report_B_therap(B_therap,V,bool)
+                        call report_B_therap(B_therap,V,bool,dec)
                         deallocate(A_physio,B_therap)
                     end if
                     deallocate(D)
