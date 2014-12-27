@@ -22,7 +22,7 @@
 
 program example_network
     use lib
-    ! the number of nodes
+    ! the number of nodes (A WRONG VALUE CAN CAUSE VICIOUS RUN-TIME ERRORS)
     n_node=10
     ! the domain of value: [0.0,1.0] for Boolean logic or, for example,
     ! [0.0,0.5,1.0] for three-valued logic
