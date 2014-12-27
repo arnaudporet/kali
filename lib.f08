@@ -374,21 +374,21 @@ module lib
     !##########################################################################!
     !##############################    gen_S    ###############################!
     !##########################################################################!
-    function gen_S(n) result(S)
-        !#####################    /!\ boolean only /!\    #####################!
-        integer::n,i1,i2
-        real,dimension(n,2**n)::S
-        if (n>30) then
-            write (unit=*,fmt="(a)") "gen_S(n): n>30 unsupported."//new_line("a")
+    function gen_S(n,value) result(S)
+        integer::i1,i2,n
+        real,dimension(:)::value
+        real,dimension(:,:),allocatable::S
+        if (real(size(value),8)**real(n,8)>real(huge(1),8)) then
+            write (unit=*,fmt="(a)") "gen_S(n,value): S too big to be generated."//new_line("a")
             stop
         else
+            allocate(S(n,size(value)**n))
             do i1=1,n
-                S(:i1-1,(2**i1)/2+1:2**i1)=S(:i1-1,:2**(i1-1))
-                do i2=1,2**(i1-1)
-                    S(i1,i2)=0.0
+                do i2=1,size(value)-1
+                    S(:size(value)-1,i2*size(value)**(i1-1)+1:(i2+1)*size(value)**(i1-1))=S(:i1-1,:size(value)**(i1-1))
                 end do
-                do i2=(2**i1)/2+1,2**i1
-                    S(i1,i2)=1.0
+                do i2=1,size(value)
+                    S(i1,(i2-1)*size(value)**(i1-1)+1:i2*size(value)**(i1-1))=value(i2)
                 end do
             end do
         end if
@@ -695,18 +695,14 @@ module lib
             write (unit=*,fmt="(a)") new_line("a")//"What to do?"//new_line("a")//"    [1] compute attractor set"//new_line("a")//"    [2] compute pathological attractors"//new_line("a")//"    [3] compute therapeutic bullets"//new_line("a")//"    [4] help"//new_line("a")//"    [5] license"//new_line("a")//"    [6] quit"
             read (unit=*,fmt=*) to_do
             if (to_do==1 .or. to_do==3) then
-                if (bool) then
-                    write (unit=*,fmt="(a,es10.3e3,a)") new_line("a")//"State space cardinality: ",real(2,8)**real(n_node,8),", compute the whole state space?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
-                    read (unit=*,fmt=*) whole_S
-                    select case (whole_S)
-                        case (1)
-                            D=gen_S(n_node)
-                        case (0)
-                            D=transpose(gen_arrang(value,n_node,size_D))
-                    end select
-                else
-                    D=transpose(gen_arrang(value,n_node,size_D))
-                end if
+                write (unit=*,fmt="(a,es10.3e3,a)") new_line("a")//"State space cardinality: ",real(size(value),8)**real(n_node,8),", compute the whole state space?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
+                read (unit=*,fmt=*) whole_S
+                select case (whole_S)
+                    case (1)
+                        D=gen_S(n_node,value)
+                    case (0)
+                        D=transpose(gen_arrang(value,n_node,size_D))
+                end select
             end if
             select case (to_do)
                 case (1)
