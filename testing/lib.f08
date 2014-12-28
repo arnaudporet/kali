@@ -3,6 +3,8 @@
 ! To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
 module lib
     !##############    /!\ networks must be deterministic /!\    ##############!
+    !#########    /!\ default integer kind must be 4 (32 bits) /!\    #########!
+    !##########    /!\ default real kind must be 4 (32 bits) /!\    ###########!
     integer::max_targ,max_moda,size_D,n_node
     real,dimension(:),allocatable::value
     character(16),dimension(:),allocatable::V
@@ -370,21 +372,21 @@ module lib
     !##########################################################################!
     !##############################    gen_S    ###############################!
     !##########################################################################!
-    function gen_S(n) result(S)
-        !#####################    /!\ boolean only /!\    #####################!
-        integer::n,i1,i2
-        real,dimension(n,2**n)::S
-        if (n>30) then
-            write (unit=*,fmt="(a)") "gen_S(n): n>30 unsupported."//new_line("a")
+    function gen_S(n,value) result(S)
+        integer::i1,i2,n
+        real,dimension(:)::value
+        real,dimension(:,:),allocatable::S
+        if (real(size(value),8)**real(n,8)>real(huge(1),8)) then
+            write (unit=*,fmt="(a)") "gen_S(n,value): S too big to be generated."//new_line("a")
             stop
         else
+            allocate(S(n,size(value)**n))
             do i1=1,n
-                S(:i1-1,(2**i1)/2+1:2**i1)=S(:i1-1,:2**(i1-1))
-                do i2=1,2**(i1-1)
-                    S(i1,i2)=0.0
+                do i2=1,size(value)-1
+                    S(:size(value)-1,i2*size(value)**(i1-1)+1:(i2+1)*size(value)**(i1-1))=S(:i1-1,:size(value)**(i1-1))
                 end do
-                do i2=(2**i1)/2+1,2**i1
-                    S(i1,i2)=1.0
+                do i2=1,size(value)
+                    S(i1,(i2-1)*size(value)**(i1-1)+1:i2*size(value)**(i1-1))=value(i2)
                 end do
             end do
         end if
@@ -412,6 +414,7 @@ module lib
     !#############################    int2char    #############################!
     !##########################################################################!
     function int2char(x) result(y)
+        !############    /!\ x must be of kind 4 (32 bits) /!\    #############!
         integer::x
         character(11)::z
         character(:),allocatable::y
@@ -485,19 +488,21 @@ module lib
     !##########################################################################!
     !############################    real2char    #############################!
     !##########################################################################!
-    function real2char(x) result(y)
+    function real2char(x,dec) result(y)
+        !############    /!\ x must be of kind 4 (32 bits) /!\    #############!
+        integer::dec
         real::x
-        character(42)::z
+        character(41+dec)::z
         character(:),allocatable::y
-        write (unit=z,fmt="(f42.1)") x
+        write (unit=z,fmt="(f"//int2char(41+dec)//"."//int2char(dec)//")") x
         y=trim(adjustl(z))
     end function real2char
     !##########################################################################!
     !###########################    report_A_set    ###########################!
     !##########################################################################!
-    subroutine report_A_set(A_set,setting,V,bool)
+    subroutine report_A_set(A_set,setting,V,bool,dec)
         logical::bool
-        integer::setting,n_point,n_cycle,i1,i2,i3,save_
+        integer::setting,n_point,n_cycle,i1,i2,i3,save_,dec
         character(16)::set_type
         character(16),dimension(:)::V
         character(32)::set_name,report_name
@@ -524,20 +529,20 @@ module lib
             else
                 n_cycle=n_cycle+1
             end if
-            report=report//trim(A_set(i1)%name)//new_line("a")//"basin: "//real2char(A_set(i1)%basin)//"% of the state space"//new_line("a")
+            report=report//trim(A_set(i1)%name)//new_line("a")//"basin: "//real2char(A_set(i1)%basin,1)//"% of the state space"//new_line("a")
             do i2=1,size(A_set(i1)%mat,1)
                 report=report//V(i2)//" "
                 do i3=1,size(A_set(i1)%mat,2)-1
                     if (bool) then
                         report=report//int2char(int(A_set(i1)%mat(i2,i3)))//" "
                     else
-                        report=report//real2char(A_set(i1)%mat(i2,i3))//" "
+                        report=report//real2char(A_set(i1)%mat(i2,i3),dec)//" "
                     end if
                 end do
                 if (bool) then
                     report=report//int2char(int(A_set(i1)%mat(i2,size(A_set(i1)%mat,2))))//new_line("a")
                 else
-                    report=report//real2char(A_set(i1)%mat(i2,size(A_set(i1)%mat,2)))//new_line("a")
+                    report=report//real2char(A_set(i1)%mat(i2,size(A_set(i1)%mat,2)),dec)//new_line("a")
                 end if
             end do
             report=report//repeat("-",80)//new_line("a")
@@ -559,14 +564,14 @@ module lib
             end select
             s=int2char(size(A_set))//new_line("a")
             do i1=1,size(A_set)
-                s=s//int2char(size(A_set(i1)%mat,1))//new_line("a")//int2char(size(A_set(i1)%mat,2))//new_line("a")//real2char(A_set(i1)%basin)//new_line("a")//trim(A_set(i1)%name)//new_line("a")
+                s=s//int2char(size(A_set(i1)%mat,1))//new_line("a")//int2char(size(A_set(i1)%mat,2))//new_line("a")//real2char(A_set(i1)%basin,1)//new_line("a")//trim(A_set(i1)%name)//new_line("a")
             end do
             do i1=1,size(A_set)
                 do i2=1,size(A_set(i1)%mat,1)
                     do i3=1,size(A_set(i1)%mat,2)-1
-                        s=s//real2char(A_set(i1)%mat(i2,i3))//","
+                        s=s//real2char(A_set(i1)%mat(i2,i3),dec)//","
                     end do
-                    s=s//real2char(A_set(i1)%mat(i2,size(A_set(i1)%mat,2)))
+                    s=s//real2char(A_set(i1)%mat(i2,size(A_set(i1)%mat,2)),dec)
                     if (i1/=size(A_set) .or. i2/=size(A_set(i1)%mat,1)) then
                         s=s//new_line("a")
                     end if
@@ -586,9 +591,9 @@ module lib
     !##########################################################################!
     !#########################    report_B_therap    ##########################!
     !##########################################################################!
-    subroutine report_B_therap(B_therap,V,bool)
+    subroutine report_B_therap(B_therap,V,bool,dec)
         logical::bool
-        integer::i1,i2,save_
+        integer::i1,i2,save_,dec
         character(1)::moda
         character(16),dimension(:)::V
         character(:),allocatable::report
@@ -604,10 +609,10 @@ module lib
                     end if
                     report=report//moda//trim(V(B_therap(i1)%targ(i2)))//" "
                 else
-                    report=report//trim(V(B_therap(i1)%targ(i2)))//"["//real2char(B_therap(i1)%moda(i2))//"] "
+                    report=report//trim(V(B_therap(i1)%targ(i2)))//"["//real2char(B_therap(i1)%moda(i2),dec)//"] "
                 end if
             end do
-            report=report//"("//real2char(B_therap(i1)%gain(1))//"% --> "//real2char(B_therap(i1)%gain(2))//"%)"//new_line("a")//repeat("-",80)//new_line("a")
+            report=report//"("//real2char(B_therap(i1)%gain(1),1)//"% --> "//real2char(B_therap(i1)%gain(2),1)//"%)"//new_line("a")//repeat("-",80)//new_line("a")
         end do
         report=report//"found therapeutic bullets: "//int2char(size(B_therap))
         write (unit=*,fmt="(a)") new_line("a")//report//new_line("a")//new_line("a")//"Save?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
@@ -643,8 +648,9 @@ module lib
     !##########################################################################!
     subroutine what_to_do(f1,f2,value,size_D,n_node,max_targ,max_moda,V)
         logical::bool,exist1,exist2
-        integer::size_D,n_node,max_targ,max_moda,to_do,r_min,r_max,setting,whole_S,de_novo
+        integer::size_D,n_node,max_targ,max_moda,to_do,r_min,r_max,setting,whole_S,de_novo,dec,i1,i2
         real,dimension(:)::value
+        integer,dimension(size(value))::z
         real,dimension(:,:),allocatable::D
         character(16),dimension(:)::V
         type(attractor),dimension(0)::null_set
@@ -671,22 +677,28 @@ module lib
         else
             bool=.false.
         end if
+        z=3
+        do i1=1,size(value)
+            do i2=1,2
+                if (modulo(value(i1)*real(10**i2),1.0)==0.0) then
+                    z(i1)=i2
+                    exit
+                end if
+            end do
+        end do
+        dec=maxval(z)
         do
             write (unit=*,fmt="(a)") new_line("a")//"What to do?"//new_line("a")//"    [1] compute attractor set"//new_line("a")//"    [2] compute pathological attractors"//new_line("a")//"    [3] compute therapeutic bullets"//new_line("a")//"    [4] help"//new_line("a")//"    [5] license"//new_line("a")//"    [6] quit"
             read (unit=*,fmt=*) to_do
             if (to_do==1 .or. to_do==3) then
-                if (bool) then
-                    write (unit=*,fmt="(a,es10.3e3,a)") new_line("a")//"State space cardinality: ",real(2,8)**real(n_node,8),", compute the whole state space?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
-                    read (unit=*,fmt=*) whole_S
-                    select case (whole_S)
-                        case (1)
-                            D=gen_S(n_node)
-                        case (0)
-                            D=transpose(gen_arrang(value,n_node,size_D))
-                    end select
-                else
-                    D=transpose(gen_arrang(value,n_node,size_D))
-                end if
+                write (unit=*,fmt="(a,es10.3e3,a)") new_line("a")//"State space cardinality: ",real(size(value),8)**real(n_node,8),", compute the whole state space?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
+                read (unit=*,fmt=*) whole_S
+                select case (whole_S)
+                    case (1)
+                        D=gen_S(n_node,value)
+                    case (0)
+                        D=transpose(gen_arrang(value,n_node,size_D))
+                end select
             end if
             select case (to_do)
                 case (1)
@@ -697,7 +709,7 @@ module lib
                     select case (setting)
                         case (1)
                             A_physio=compute_A_set(f1,D,1,null_set,null_b)
-                            call report_A_set(A_physio,1,V,bool)
+                            call report_A_set(A_physio,1,V,bool,dec)
                             deallocate(A_physio)
                         case (2)
                             inquire (file="A_physio.csv",exist=exist1)
@@ -706,7 +718,7 @@ module lib
                             else
                                 A_physio=load_A_set(1)
                                 A_patho=compute_A_set(f2,D,2,A_physio,null_b)
-                                call report_A_set(A_patho,2,V,bool)
+                                call report_A_set(A_patho,2,V,bool,dec)
                                 deallocate(A_physio,A_patho)
                             end if
                     end select
@@ -718,7 +730,7 @@ module lib
                     else
                         A_patho=load_A_set(2)
                         a_patho_set=compute_a_patho_set(A_patho)
-                        call report_A_set(a_patho_set,3,V,bool)
+                        call report_A_set(a_patho_set,3,V,bool,dec)
                         deallocate(A_patho,a_patho_set)
                     end if
                 case (3)
@@ -740,12 +752,12 @@ module lib
                         write (unit=*,fmt="(a)",advance="no") "Number of targets per bullet (upper bound): "
                         read (unit=*,fmt=*) r_max
                         B_therap=compute_B_therap(f2,D,r_min,r_max,max_targ,max_moda,de_novo,n_node,value,A_physio,A_patho)
-                        call report_B_therap(B_therap,V,bool)
+                        call report_B_therap(B_therap,V,bool,dec)
                         deallocate(A_physio,A_patho,B_therap)
                     end if
                     deallocate(D)
                 case (4)
-                    write (unit=*,fmt="(a)") new_line("a")//"How to:"//new_line("a")//"    1) compute the physiological attractor set ([1], returns A_physio)"//new_line("a")//"    2) compute the pathological attractor set ([1], returns A_patho)"//new_line("a")//"    3) compute the pathological attractors ([2], returns A_versus)"//new_line("a")//"    4) compute the therapeutic bullets ([3], returns B_therap)"//new_line("a")//new_line("a")//"Do not forget to recompile the sources following any modification."
+                    write (unit=*,fmt="(a)") new_line("a")//"How to:"//new_line("a")//"    1) compute the physiological attractor set: [1]"//new_line("a")//"        * when prompted by the algorithm, set the setting to physiological"//new_line("a")//"        * returns A_physio"//new_line("a")//"        * when prompted by the algorithm, saving A_physio is necessary for the"//new_line("a")//"          next steps"//new_line("a")//"    2) compute the pathological attractor set: [1]"//new_line("a")//"        * when prompted by the algorithm, set the setting to pathological"//new_line("a")//"        * returns A_patho"//new_line("a")//"        * when prompted by the algorithm, saving A_patho is necessary for the"//new_line("a")//"          next steps"//new_line("a")//"    3) compute the pathological attractors: [2]"//new_line("a")//"        * this step is optional"//new_line("a")//"        * returns A_versus"//new_line("a")//"    4) compute the therapeutic bullets: [3]"//new_line("a")//"        * returns B_therap"//new_line("a")//"        * in case of multivalued logic, therapeutic bullets are reported as"//new_line("a")//"          follow: ... X[y] ... where the variable X has to be set to the value y"//new_line("a")//new_line("a")//"If you rename/move the csv files saved by the algorithm then it will not"//new_line("a")//"recognize them when requiered, if any."//new_line("a")//new_line("a")//"Do not forget to recompile the sources following any modification."
                 case (5)
                     write (unit=*,fmt="(a)") new_line("a")//"kali-targ: a tool for in silico target identification."//new_line("a")//"Copyright (C) 2013-2014 Arnaud Poret"//new_line("a")//new_line("a")//"This program is free software: you can redistribute it and/or modify it under"//new_line("a")//"the terms of the GNU General Public License as published by the Free Software"//new_line("a")//"Foundation, either version 3 of the License, or (at your option) any later"//new_line("a")//"version."//new_line("a")//new_line("a")//"This program is distributed in the hope that it will be useful, but WITHOUT ANY"//new_line("a")//"WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A"//new_line("a")//"PARTICULAR PURPOSE. See the GNU General Public License for more details."//new_line("a")//new_line("a")//"You should have received a copy of the GNU General Public License along with"//new_line("a")//"this program. If not, see https://www.gnu.org/licenses/gpl.html."
                 case (6)
