@@ -2,27 +2,48 @@
 ! This program is licensed under the GNU General Public License.
 ! To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
 
-! How to:
-!     1) read the comments
-!     2) fill the template
-!     3) compile: gfortran -ffree-line-length-none -fimplicit-none -std=f2008 -fmax-errors=1 lib.f08 example_network.f08 -o example_network
-!     4) execute: ./example_network
+!################################    HOW TO    ################################!
 
-! Do not forget to recompile the sources following any modification.
+! 1) read the comments
+! 2) fill the template
+! 3) compile:
+!        gfortran -ffree-line-length-none -fimplicit-none -std=f2008 -fmax-errors=1 lib.f08 example_network.f08 -o example_network
+!    it will generate the following files:
+!        example_network
+!        lib.mod
+!    you can safely remove the lib.mod file
+! 4) execute:
+!        ./example_network
 
-! Tips: for a faster execution time (at the expense of a longer compilation
-! time) pass the -Ofast option to gfortran: gfortran -Ofast -ffree-line-length-none -fimplicit-none -std=f2008 -fmax-errors=1 lib.f08 example_network.f08 -o example_network
-! then execute: ./example_network
+!##############################################################################!
 
-! GFortran (https://gcc.gnu.org/fortran/) is the Fortran compiler front end and
-! run-time libraries for GCC, the GNU Compiler Collection.
+! DO NOT FORGET TO RECOMPILE THE SOURCES FOLLOWING ANY MODIFICATION.
 
-! The example network is a published Boolean model of the mammalian cell
-! cycle [1].
+!#################################    TIPS    #################################!
 
-! [1] Faure A., Naldi A., Chaouiya C., Thieffry D. (2006) Dynamical analysis of
-!     a generic Boolean model for the control of the mammalian cell cycle.
-!     Bioinformatics 22(14) e124-e131.
+! Create the following alias:
+!     alias gf08="gfortran -ffree-line-length-none -fimplicit-none -std=f2008 -fmax-errors=1"
+! Now to compile:
+!     gf08 lib.f08 example_network.f08 -o example_network
+
+! For a faster execution time (at the expense of a longer compilation time) pass
+! the -Ofast option to gfortran when compiling:
+!     gf08 -Ofast lib.f08 example_network.f08 -o example_network
+
+! If you do not envision to edit the lib.f08 file, compile it only once:
+!     gf08 -c lib.f08
+! eventually with the -Ofast option:
+!     gf08 -Ofast -c lib.f08
+! It will generate the following files:
+!     lib.o
+!     lib.mod
+! DO NOT REMOVE THE lib.mod FILE.
+! Now to compile:
+!     gf08 lib.o example_network.f08 -o example_network
+! eventually with the -Ofast option:
+!     gf08 -Ofast lib.o example_network.f08 -o example_network
+
+!##############################################################################!
 
 program example_network
     use lib
