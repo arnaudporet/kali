@@ -169,7 +169,7 @@ module lib
     !#########################    compute_B_therap    #########################!
     !##########################################################################!
     function compute_B_therap(f,D,r_min,r_max,max_targ,max_moda,de_novo,n_node,value,A_physio,A_patho) result(B_therap)
-        logical::repass,allowed,in_patho
+        logical::in_patho,repass,allowed
         integer::r_min,r_max,max_targ,max_moda,n_node,i1,i2,i3,i4,i5,de_novo
         integer,dimension(:,:),allocatable::C_targ
         real,dimension(:)::value
@@ -272,7 +272,7 @@ module lib
     function compute_cover(A_set1,A_set2) result(cover)
         integer::i1,i2
         real::cover
-        type(attractor),dimension(:)::A_set2,A_set1
+        type(attractor),dimension(:)::A_set1,A_set2
         cover=0.0
         do i1=1,size(A_set2)
             do i2=1,size(A_set1)
@@ -503,7 +503,7 @@ module lib
     subroutine report_A_set(A_set,setting,V,bool,dec)
         logical::bool
         integer::setting,n_point,n_cycle,i1,i2,i3,save_,dec
-        character(16)::set_type
+        character(16)::set_type,space_type
         character(16),dimension(:)::V
         character(32)::set_name,report_name
         character(:),allocatable::report,s
@@ -513,10 +513,13 @@ module lib
         select case (setting)
             case (1)
                 set_type="A_physio"
+                space_type="physiological"
             case (2)
                 set_type="A_patho"
+                space_type="pathological"
             case (3)
                 set_type="A_versus"
+                space_type="pathological"
         end select
         report=trim(set_type)//"={"
         do i1=1,size(A_set)-1
@@ -529,7 +532,7 @@ module lib
             else
                 n_cycle=n_cycle+1
             end if
-            report=report//trim(A_set(i1)%name)//new_line("a")//"basin: "//real2char(A_set(i1)%basin,1)//"% of the state space"//new_line("a")
+            report=report//trim(A_set(i1)%name)//new_line("a")//"basin: "//real2char(A_set(i1)%basin,1)//"% (of the "//trim(space_type)//" state space)"//new_line("a")
             do i2=1,size(A_set(i1)%mat,1)
                 report=report//V(i2)//" "
                 do i3=1,size(A_set(i1)%mat,2)-1
@@ -757,7 +760,7 @@ module lib
                     end if
                     deallocate(D)
                 case (4)
-                    write (unit=*,fmt="(a)") new_line("a")//"How to:"//new_line("a")//"    1) compute the physiological attractor set: [1]"//new_line("a")//"        * when prompted by the algorithm, set the setting to physiological"//new_line("a")//"        * returns A_physio"//new_line("a")//"        * when prompted by the algorithm, saving A_physio is necessary for the"//new_line("a")//"          next steps"//new_line("a")//"    2) compute the pathological attractor set: [1]"//new_line("a")//"        * when prompted by the algorithm, set the setting to pathological"//new_line("a")//"        * returns A_patho"//new_line("a")//"        * when prompted by the algorithm, saving A_patho is necessary for the"//new_line("a")//"          next steps"//new_line("a")//"    3) compute the pathological attractors: [2]"//new_line("a")//"        * this step is optional"//new_line("a")//"        * returns A_versus"//new_line("a")//"    4) compute the therapeutic bullets: [3]"//new_line("a")//"        * returns B_therap"//new_line("a")//"        * in case of multivalued logic, therapeutic bullets are reported as"//new_line("a")//"          follow: ... X[y] ... where the variable X has to be set to the value y"//new_line("a")//new_line("a")//"If you rename/move the csv files saved by the algorithm then it will not"//new_line("a")//"recognize them when requiered, if any."//new_line("a")//new_line("a")//"Do not forget to recompile the sources following any modification."
+                    write (unit=*,fmt="(a)") new_line("a")//"How to:"//new_line("a")//"    1) compute the physiological attractor set: [1]"//new_line("a")//"        * when prompted by the algorithm, set the setting to physiological"//new_line("a")//"        * returns A_physio"//new_line("a")//"        * when prompted by the algorithm, saving A_physio is necessary for the"//new_line("a")//"          next steps"//new_line("a")//"    2) compute the pathological attractor set: [1]"//new_line("a")//"        * when prompted by the algorithm, set the setting to pathological"//new_line("a")//"        * returns A_patho"//new_line("a")//"        * when prompted by the algorithm, saving A_patho is necessary for the"//new_line("a")//"          next steps"//new_line("a")//"    3) compute the pathological attractors: [2]"//new_line("a")//"        * this step is optional"//new_line("a")//"        * returns A_versus"//new_line("a")//"    4) compute the therapeutic bullets: [3]"//new_line("a")//"        * returns B_therap"//new_line("a")//"        * in case of multivalued logic, therapeutic bullets are reported as"//new_line("a")//"          follow: ... X[y] ... where the variable X has to be set to the value y"//new_line("a")//new_line("a")//"If you rename/move/delete the csv files generated by the algorithm, it will not"//new_line("a")//"recognize them when requiered, if any."//new_line("a")//new_line("a")//"Do not forget to recompile the sources following any modification."
                 case (5)
                     write (unit=*,fmt="(a)") new_line("a")//"kali-targ: a tool for in silico target identification."//new_line("a")//"Copyright (C) 2013-2014 Arnaud Poret"//new_line("a")//new_line("a")//"This program is free software: you can redistribute it and/or modify it under"//new_line("a")//"the terms of the GNU General Public License as published by the Free Software"//new_line("a")//"Foundation, either version 3 of the License, or (at your option) any later"//new_line("a")//"version."//new_line("a")//new_line("a")//"This program is distributed in the hope that it will be useful, but WITHOUT ANY"//new_line("a")//"WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A"//new_line("a")//"PARTICULAR PURPOSE. See the GNU General Public License for more details."//new_line("a")//new_line("a")//"You should have received a copy of the GNU General Public License along with"//new_line("a")//"this program. If not, see https://www.gnu.org/licenses/gpl.html."
                 case (6)

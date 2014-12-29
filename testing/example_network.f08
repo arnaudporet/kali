@@ -7,7 +7,7 @@
 program example_network
     use lib
     n_node=7
-    value=[0.0,1.0]
+    value=[0.0,0.5,1.0]
     max_targ=int(1e2)
     max_moda=int(1e2)
     size_D=int(1e4)
