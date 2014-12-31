@@ -117,8 +117,8 @@ module lib
     !#########################    compute_B_therap    #########################!
     !##########################################################################!
     function compute_B_therap(f,D,r_min,r_max,max_targ,max_moda,de_novo,n_node,value,A_physio,A_patho) result(B_therap)
-        logical::repass,allowed
-        integer::r_min,r_max,max_targ,max_moda,n_node,i1,i2,i3,i4,de_novo,in_patho
+        logical::allowed
+        integer::i1,i2,i3,i4,r_min,r_max,max_targ,max_moda,de_novo,n_node,in_patho
         integer,dimension(:,:),allocatable::C_targ
         real,dimension(:)::value
         real,dimension(:,:)::D
@@ -165,48 +165,8 @@ module lib
                 end do
             end do
         end do
-        deallocate(A_test,C_targ,C_moda)
-        do
-            repass=.false.
-            do i1=1,size(B_therap)-1
-                if (size(B_therap(i1)%targ)>size(B_therap(i1+1)%targ)) then
-                    repass=.true.
-                    b=B_therap(i1)
-                    B_therap(i1)=B_therap(i1+1)
-                    B_therap(i1+1)=b
-                else if (size(B_therap(i1)%targ)==size(B_therap(i1+1)%targ)) then
-                    if (any(B_therap(i1)%targ/=B_therap(i1+1)%targ)) then
-                        do i2=1,size(B_therap(i1)%targ)
-                            if (B_therap(i1)%targ(i2)<B_therap(i1+1)%targ(i2)) then
-                                exit
-                            else if (B_therap(i1)%targ(i2)>B_therap(i1+1)%targ(i2)) then
-                                repass=.true.
-                                b=B_therap(i1)
-                                B_therap(i1)=B_therap(i1+1)
-                                B_therap(i1+1)=b
-                                exit
-                            end if
-                        end do
-                    else
-                        do i2=1,size(B_therap(i1)%moda)
-                            if (B_therap(i1)%moda(i2)<B_therap(i1+1)%moda(i2)) then
-                                exit
-                            else if (B_therap(i1)%moda(i2)>B_therap(i1+1)%moda(i2)) then
-                                repass=.true.
-                                b=B_therap(i1)
-                                B_therap(i1)=B_therap(i1+1)
-                                B_therap(i1+1)=b
-                                exit
-                            end if
-                        end do
-                    end if
-                end if
-            end do
-            if (.not. repass) then
-                exit
-            end if
-        end do
-        deallocate(b%targ,b%moda)
+        deallocate(C_targ,C_moda,A_test,b%targ,b%moda)
+        B_therap=sort_B_therap(B_therap)
     end function compute_B_therap
     !##########################################################################!
     !##########################    compute_cover    ###########################!
@@ -410,8 +370,9 @@ module lib
     !############################    load_A_set    ############################!
     !##########################################################################!
     function load_A_set(setting) result(A_set)
-        integer::setting,i1,i2,size_,n,m
-        character(32)::set_name
+        integer::setting,i1,i2,size1
+        integer,dimension(2)::size2
+        character(16)::set_name
         type(attractor),dimension(:),allocatable::A_set
         select case (setting)
             case (1)
@@ -420,14 +381,13 @@ module lib
                 set_name="A_patho.csv"
         end select
         open (unit=1,file=trim(set_name),status="old")
-        read (unit=1,fmt=*) size_
-        allocate(A_set(size_))
+        read (unit=1,fmt=*) size1
+        allocate(A_set(size1))
         do i1=1,size(A_set)
-            read (unit=1,fmt=*) n
-            read (unit=1,fmt=*) m
+            read (unit=1,fmt=*) size2
             read (unit=1,fmt=*) A_set(i1)%basin
             read (unit=1,fmt=*) A_set(i1)%name
-            allocate(A_set(i1)%mat(n,m))
+            allocate(A_set(i1)%mat(size2(1),size2(2)))
         end do
         do i1=1,size(A_set)
             do i2=1,size(A_set(i1)%mat,1)
@@ -513,11 +473,10 @@ module lib
     !##########################################################################!
     subroutine report_A_set(A_set,setting,V,bool,dec)
         logical::bool
-        integer::setting,n_point,n_cycle,i1,i2,i3,save_,dec
-        character(16)::set_type,space_type
+        integer::n_point,n_cycle,setting,i1,i2,i3,save_,dec
+        character(16)::set_type,space_type,report_name
         character(16),dimension(:)::V
-        character(32)::set_name,report_name
-        character(:),allocatable::report,s
+        character(:),allocatable::report
         type(attractor),dimension(:)::A_set
         n_point=0
         n_cycle=0
@@ -565,42 +524,22 @@ module lib
         write (unit=*,fmt="(a)") new_line("a")//report//new_line("a")//new_line("a")//"Save?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
         read (unit=*,fmt=*) save_
         if (save_==1) then
+            write (unit=*,fmt="(a)") ""
+            call save_A_set(A_set,setting,dec)
             select case (setting)
                 case (1)
-                    set_name="A_physio.csv"
                     report_name="A_physio.txt"
                 case (2)
-                    set_name="A_patho.csv"
                     report_name="A_patho.txt"
                 case (3)
-                    set_name="A_versus.csv"
                     report_name="A_versus.txt"
             end select
-            s=int2char(size(A_set))//new_line("a")
-            do i1=1,size(A_set)
-                s=s//int2char(size(A_set(i1)%mat,1))//new_line("a")//int2char(size(A_set(i1)%mat,2))//new_line("a")//real2char(A_set(i1)%basin,1)//new_line("a")//trim(A_set(i1)%name)//new_line("a")
-            end do
-            do i1=1,size(A_set)
-                do i2=1,size(A_set(i1)%mat,1)
-                    do i3=1,size(A_set(i1)%mat,2)-1
-                        s=s//real2char(A_set(i1)%mat(i2,i3),dec)//","
-                    end do
-                    s=s//real2char(A_set(i1)%mat(i2,size(A_set(i1)%mat,2)),dec)
-                    if (i1/=size(A_set) .or. i2/=size(A_set(i1)%mat,1)) then
-                        s=s//new_line("a")
-                    end if
-                end do
-            end do
-            open (unit=1,file=trim(set_name),status="replace")
-            write (unit=1,fmt="(a)") s
-            close (unit=1)
             open (unit=1,file=trim(report_name),status="replace")
             write (unit=1,fmt="(a)") report
             close (unit=1)
-            write (unit=*,fmt="(a)") new_line("a")//"Set saved as "//trim(set_name)//"."//new_line("a")//"Report saved as "//trim(report_name)//"."
-            deallocate(s)
+            deallocate(report)
+            write (unit=*,fmt="(a)") "Report saved as "//trim(report_name)//"."
         end if
-        deallocate(report)
     end subroutine report_A_set
     !##########################################################################!
     !#########################    report_B_therap    ##########################!
@@ -639,6 +578,43 @@ module lib
         end if
         deallocate(report)
     end subroutine report_B_therap
+    !##########################################################################!
+    !############################    save_A_set    ############################!
+    !##########################################################################!
+    subroutine save_A_set(A_set,setting,dec)
+        integer::setting,i1,i2,i3,dec
+        character(16)::set_name
+        character(:),allocatable::s
+        type(attractor),dimension(:)::A_set
+        select case (setting)
+            case (1)
+                set_name="A_physio.csv"
+            case (2)
+                set_name="A_patho.csv"
+            case (3)
+                set_name="A_versus.csv"
+        end select
+        s=int2char(size(A_set))//new_line("a")
+        do i1=1,size(A_set)
+            s=s//int2char(size(A_set(i1)%mat,1))//","//int2char(size(A_set(i1)%mat,2))//new_line("a")//real2char(A_set(i1)%basin,1)//new_line("a")//trim(A_set(i1)%name)//new_line("a")
+        end do
+        do i1=1,size(A_set)
+            do i2=1,size(A_set(i1)%mat,1)
+                do i3=1,size(A_set(i1)%mat,2)-1
+                    s=s//real2char(A_set(i1)%mat(i2,i3),dec)//","
+                end do
+                s=s//real2char(A_set(i1)%mat(i2,size(A_set(i1)%mat,2)),dec)
+                if (i1/=size(A_set) .or. i2/=size(A_set(i1)%mat,1)) then
+                    s=s//new_line("a")
+                end if
+            end do
+        end do
+        open (unit=1,file=trim(set_name),status="replace")
+        write (unit=1,fmt="(a)") s
+        close (unit=1)
+        deallocate(s)
+        write (unit=*,fmt="(a)") "Set saved as "//trim(set_name)//"."
+    end subroutine save_A_set
     !##########################################################################!
     !###############################    sort    ###############################!
     !##########################################################################!
@@ -714,6 +690,60 @@ module lib
             end if
         end do
     end function sort_A_set
+    !##########################################################################!
+    !##########################    sort_B_therap    ###########################!
+    !##########################################################################!
+    function sort_B_therap(B_therap) result(y)
+        logical::repass
+        integer::i1,i2
+        type(bullet)::b
+        type(bullet),dimension(:)::B_therap
+        type(bullet),dimension(size(B_therap))::y
+        y=B_therap
+        allocate(b%targ(0))
+        allocate(b%moda(0))
+        do
+            repass=.false.
+            do i1=1,size(y)-1
+                if (size(y(i1)%targ)>size(y(i1+1)%targ)) then
+                    repass=.true.
+                    b=y(i1)
+                    y(i1)=y(i1+1)
+                    y(i1+1)=b
+                else if (size(y(i1)%targ)==size(y(i1+1)%targ)) then
+                    if (any(y(i1)%targ/=y(i1+1)%targ)) then
+                        do i2=1,size(y(i1)%targ)
+                            if (y(i1)%targ(i2)<y(i1+1)%targ(i2)) then
+                                exit
+                            else if (y(i1)%targ(i2)>y(i1+1)%targ(i2)) then
+                                repass=.true.
+                                b=y(i1)
+                                y(i1)=y(i1+1)
+                                y(i1+1)=b
+                                exit
+                            end if
+                        end do
+                    else
+                        do i2=1,size(y(i1)%moda)
+                            if (y(i1)%moda(i2)<y(i1+1)%moda(i2)) then
+                                exit
+                            else if (y(i1)%moda(i2)>y(i1+1)%moda(i2)) then
+                                repass=.true.
+                                b=y(i1)
+                                y(i1)=y(i1+1)
+                                y(i1+1)=b
+                                exit
+                            end if
+                        end do
+                    end if
+                end if
+            end do
+            if (.not. repass) then
+                deallocate(b%targ,b%moda)
+                exit
+            end if
+        end do
+    end function sort_B_therap
     !##########################################################################!
     !############################    what_to_do    ############################!
     !##########################################################################!
