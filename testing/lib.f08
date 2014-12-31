@@ -33,15 +33,43 @@ module lib
         end if
     end function compare_a
     !##########################################################################!
+    !############################    compute_a    #############################!
+    !##########################################################################!
+    function compute_a(f,x0,b) result(a)
+        integer::k,i
+        real,dimension(:,:)::x0
+        real,dimension(:,:),allocatable::x
+        type(attractor)::a
+        type(bullet)::b
+        interface
+            function f(x,k) result(y)
+                integer::k
+                real,dimension(:,:)::x
+                real,dimension(size(x,1),1)::y
+            end function f
+        end interface
+        x=x0
+        k=1
+        do1:do
+            x=concat(x,f(x,k),2)
+            x(b%targ,k+1)=b%moda
+            do i=k,1,-1
+                if (all(x(:,i)==x(:,k+1))) then
+                    a%mat=reshape(x(:,i:k),[size(x,1),k-i+1])
+                    a=sort_a(a)
+                    deallocate(x)
+                    exit do1
+                end if
+            end do
+            k=k+1
+        end do do1
+    end function compute_a
+    !##########################################################################!
     !##########################    compute_A_set    ###########################!
     !##########################################################################!
     function compute_A_set(f,D,setting,ref_set,b) result(A_set)
-        logical::a_found,in_A,in_ref,repass
-        integer::i1,i2,i3,k,setting
-        integer,dimension(:),allocatable::j_min
+        integer::i,in_A,setting
         real,dimension(:,:)::D
-        real,dimension(:,:),allocatable::x,z
-        character(16)::a_name
         type(attractor)::a
         type(attractor),dimension(:)::ref_set
         type(attractor),dimension(:),allocatable::A_set
@@ -50,106 +78,26 @@ module lib
             function f(x,k) result(y)
                 integer::k
                 real,dimension(:,:)::x
-                real,dimension(size(x,1))::y
+                real,dimension(size(x,1),1)::y
             end function f
         end interface
         allocate(A_set(0))
-        do i1=1,size(D,2)
-            a_found=.false.
-            x=reshape(D(:,i1),[size(D,1),1])
-            k=1
-            do
-                allocate(z(size(x,1),size(x,2)+1))
-                z(:,:size(z,2)-1)=x(:,:)
-                z(:,size(z,2))=f(x,k)
-                x=z
-                deallocate(z)
-                x(b%targ,k+1)=b%moda
-                do i2=k,1,-1
-                    if (all(x(:,i2)==x(:,k+1))) then
-                        a_found=.true.
-                        a%mat=reshape(x(:,i2:k),[size(x,1),k-i2+1])
-                        j_min=range_int(1,size(a%mat,2))
-                        do i3=1,size(a%mat,1)
-                            j_min=j_min(minlocs(a%mat(i3,j_min)))
-                            if (size(j_min)==1) then
-                                a%mat=cshift(a%mat,j_min(1)-1,2)
-                                exit
-                            end if
-                        end do
-                        exit
-                    end if
-                end do
-                if (a_found) then
-                    in_A=.false.
-                    do i2=1,size(A_set)
-                        if (.not. compare_a(A_set(i2),a)) then
-                            in_A=.true.
-                            A_set(i2)%basin=A_set(i2)%basin+1.0
-                            exit
-                        end if
-                    end do
-                    if (.not. in_A) then
-                        a%basin=1.0
-                        A_set=[A_set,a]
-                    end if
-                    exit
-                else
-                    k=k+1
-                end if
-            end do
-        end do
-        deallocate(x,j_min)
-        do
-            repass=.false.
-            do i1=1,size(A_set)-1
-                if (size(A_set(i1)%mat,2)>size(A_set(i1+1)%mat,2)) then
-                    repass=.true.
-                    a=A_set(i1)
-                    A_set(i1)=A_set(i1+1)
-                    A_set(i1+1)=a
-                else if (size(A_set(i1)%mat,2)==size(A_set(i1+1)%mat,2)) then
-                    do i2=1,size(A_set(i1)%mat,1)
-                        if (A_set(i1)%mat(i2,1)<A_set(i1+1)%mat(i2,1)) then
-                            exit
-                        else if (A_set(i1)%mat(i2,1)>A_set(i1+1)%mat(i2,1)) then
-                            repass=.true.
-                            a=A_set(i1)
-                            A_set(i1)=A_set(i1+1)
-                            A_set(i1+1)=a
-                            exit
-                        end if
-                    end do
-                end if
-            end do
-            if (.not. repass) then
-                exit
+        do i=1,size(D,2)
+            a=compute_a(f,reshape(D(:,i),[size(D,1),1]),b)
+            in_A=in_A_set(a,A_set)
+            if (in_A>0) then
+                A_set(in_A)%basin=A_set(in_A)%basin+1.0
+            else
+                a%basin=1.0
+                A_set=[A_set,a]
             end if
         end do
         deallocate(a%mat)
-        select case (setting)
-            case (1)
-                a_name="a_physio"
-            case (2)
-                a_name="a_patho"
-        end select
-        k=1
-        do i1=1,size(A_set)
-            A_set(i1)%basin=A_set(i1)%basin*100.0/real(size(D,2))
-            in_ref=.false.
-            do i2=1,size(ref_set)
-                if (.not. compare_a(A_set(i1),ref_set(i2))) then
-                    in_ref=.true.
-                    exit
-                end if
-            end do
-            if (in_ref) then
-                A_set(i1)%name=trim(ref_set(i2)%name)
-            else
-                A_set(i1)%name=trim(a_name)//int2char(k)
-                k=k+1
-            end if
+        do i=1,size(A_set)
+            A_set(i)%basin=A_set(i)%basin*100.0/real(size(D,2))
         end do
+        A_set=sort_A_set(A_set)
+        A_set=name_A_set(A_set,ref_set,setting)
     end function compute_A_set
     !##########################################################################!
     !#######################    compute_a_patho_set    ########################!
@@ -169,8 +117,8 @@ module lib
     !#########################    compute_B_therap    #########################!
     !##########################################################################!
     function compute_B_therap(f,D,r_min,r_max,max_targ,max_moda,de_novo,n_node,value,A_physio,A_patho) result(B_therap)
-        logical::in_patho,repass,allowed
-        integer::r_min,r_max,max_targ,max_moda,n_node,i1,i2,i3,i4,i5,de_novo
+        logical::repass,allowed
+        integer::r_min,r_max,max_targ,max_moda,n_node,i1,i2,i3,i4,de_novo,in_patho
         integer,dimension(:,:),allocatable::C_targ
         real,dimension(:)::value
         real,dimension(:,:)::D
@@ -183,7 +131,7 @@ module lib
             function f(x,k) result(y)
                 integer::k
                 real,dimension(:,:)::x
-                real,dimension(size(x,1))::y
+                real,dimension(size(x,1),1)::y
             end function f
         end interface
         allocate(B_therap(0))
@@ -202,14 +150,8 @@ module lib
                         if (de_novo==0) then
                             do i4=1,size(A_test)
                                 if (index(trim(A_test(i4)%name),"patho")/=0) then
-                                    in_patho=.false.
-                                    do i5=1,size(A_patho)
-                                        if (.not. compare_a(A_test(i4),A_patho(i5))) then
-                                            in_patho=.true.
-                                            exit
-                                        end if
-                                    end do
-                                    if (.not. in_patho) then
+                                    in_patho=in_A_set(A_test(i4),A_patho)
+                                    if (in_patho==0) then
                                         allowed=.false.
                                         exit
                                     end if
@@ -270,19 +212,47 @@ module lib
     !##########################    compute_cover    ###########################!
     !##########################################################################!
     function compute_cover(A_set1,A_set2) result(cover)
-        integer::i1,i2
+        integer::i,in_1
         real::cover
         type(attractor),dimension(:)::A_set1,A_set2
         cover=0.0
-        do i1=1,size(A_set2)
-            do i2=1,size(A_set1)
-                if (.not. compare_a(A_set2(i1),A_set1(i2))) then
-                    cover=cover+A_set2(i1)%basin
-                    exit
-                end if
-            end do
+        do i=1,size(A_set2)
+            in_1=in_A_set(A_set2(i),A_set1)
+            if (in_1>0) then
+                cover=cover+A_set2(i)%basin
+            end if
         end do
     end function compute_cover
+    !##########################################################################!
+    !##############################    concat    ##############################!
+    !##########################################################################!
+    function concat(x1,x2,d) result(y)
+        integer::d
+        real,dimension(:,:)::x1,x2
+        real,dimension(:,:),allocatable::y
+        select case (d)
+            case (1)
+                if (size(x1,1)==0) then
+                    y=x2
+                else if (size(x2,1)==0) then
+                    y=x1
+                else
+                    allocate(y(size(x1,1)+size(x2,1),size(x1,2)))
+                    y(:size(x1,1),:)=x1
+                    y(size(x1,1)+1:,:)=x2
+                end if
+            case (2)
+                if (size(x1,2)==0) then
+                    y=x2
+                else if (size(x2,2)==0) then
+                    y=x1
+                else
+                    allocate(y(size(x1,1),size(x1,2)+size(x2,2)))
+                    y(:,:size(x1,2))=x1
+                    y(:,size(x1,2)+1:)=x2
+                end if
+        end select
+    end function concat
     !##########################################################################!
     !##############################    facto    ###############################!
     !##########################################################################!
@@ -392,6 +362,21 @@ module lib
         end if
     end function gen_S
     !##########################################################################!
+    !#############################    in_A_set    #############################!
+    !##########################################################################!
+    function in_A_set(a,A_set) result(in_A)
+        integer::in_A,i
+        type(attractor)::a
+        type(attractor),dimension(:)::A_set
+        in_A=0
+        do i=1,size(A_set)
+            if (.not. compare_a(a,A_set(i))) then
+                in_A=i
+                exit
+            end if
+        end do
+    end function in_A_set
+    !##########################################################################!
     !#########################    init_random_seed    #########################!
     !##########################################################################!
     subroutine init_random_seed()
@@ -466,6 +451,32 @@ module lib
             end if
         end do
     end function minlocs
+    !##########################################################################!
+    !############################    name_A_set    ############################!
+    !##########################################################################!
+    function name_A_set(A_set,ref_set,setting) result(y)
+        integer::setting,k,i,in_ref
+        character(16)::a_name
+        type(attractor),dimension(:)::A_set,ref_set
+        type(attractor),dimension(size(A_set))::y
+        y=A_set
+        select case (setting)
+            case (1)
+                a_name="a_physio"
+            case (2)
+                a_name="a_patho"
+        end select
+        k=1
+        do i=1,size(y)
+            in_ref=in_A_set(y(i),ref_set)
+            if (in_ref>0) then
+                y(i)%name=trim(ref_set(in_ref)%name)
+            else
+                y(i)%name=trim(a_name)//int2char(k)
+                k=k+1
+            end if
+        end do
+    end function name_A_set
     !##########################################################################!
     !#############################    rand_int    #############################!
     !##########################################################################!
@@ -647,6 +658,63 @@ module lib
         end do
     end function sort
     !##########################################################################!
+    !##############################    sort_a    ##############################!
+    !##########################################################################!
+    function sort_a(a) result(y)
+        integer::i
+        integer,dimension(:),allocatable::j_min
+        type(attractor)::a,y
+        y=a
+        j_min=range_int(1,size(y%mat,2))
+        do i=1,size(y%mat,1)
+            j_min=j_min(minlocs(y%mat(i,j_min)))
+            if (size(j_min)==1) then
+                y%mat=cshift(y%mat,j_min(1)-1,2)
+                deallocate(j_min)
+                exit
+            end if
+        end do
+    end function sort_a
+    !##########################################################################!
+    !############################    sort_A_set    ############################!
+    !##########################################################################!
+    function sort_A_set(A_set) result(y)
+        logical::repass
+        integer::i1,i2
+        type(attractor)::a
+        type(attractor),dimension(:)::A_set
+        type(attractor),dimension(size(A_set))::y
+        y=A_set
+        allocate(a%mat(0,0))
+        do
+            repass=.false.
+            do i1=1,size(y)-1
+                if (size(y(i1)%mat,2)>size(y(i1+1)%mat,2)) then
+                    repass=.true.
+                    a=y(i1)
+                    y(i1)=y(i1+1)
+                    y(i1+1)=a
+                else if (size(y(i1)%mat,2)==size(y(i1+1)%mat,2)) then
+                    do i2=1,size(y(i1)%mat,1)
+                        if (y(i1)%mat(i2,1)<y(i1+1)%mat(i2,1)) then
+                            exit
+                        else if (y(i1)%mat(i2,1)>y(i1+1)%mat(i2,1)) then
+                            repass=.true.
+                            a=y(i1)
+                            y(i1)=y(i1+1)
+                            y(i1+1)=a
+                            exit
+                        end if
+                    end do
+                end if
+            end do
+            if (.not. repass) then
+                deallocate(a%mat)
+                exit
+            end if
+        end do
+    end function sort_A_set
+    !##########################################################################!
     !############################    what_to_do    ############################!
     !##########################################################################!
     subroutine what_to_do(f1,f2,value,size_D,n_node,max_targ,max_moda,V)
@@ -664,14 +732,14 @@ module lib
             function f1(x,k) result(y)
                 integer::k
                 real,dimension(:,:)::x
-                real,dimension(size(x,1))::y
+                real,dimension(size(x,1),1)::y
             end function f1
         end interface
         interface
             function f2(x,k) result(y)
                 integer::k
                 real,dimension(:,:)::x
-                real,dimension(size(x,1))::y
+                real,dimension(size(x,1),1)::y
             end function f2
         end interface
         call init_random_seed()
