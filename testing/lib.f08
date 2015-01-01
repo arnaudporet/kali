@@ -15,8 +15,8 @@ module lib
     end type attractor
     type::bullet
         integer,dimension(:),allocatable::targ
-        real,dimension(2)::gain
         real,dimension(:),allocatable::moda
+        real,dimension(:,:),allocatable::gain
     end type bullet
     contains
     !##########################################################################!
@@ -29,7 +29,7 @@ module lib
         if (size(a1%mat,2)/=size(a2%mat,2)) then
             diff=.true.
         else
-            diff=.not. all(a1%mat==a2%mat)
+            diff=any(a1%mat/=a2%mat)
         end if
     end function compare_a
     !##########################################################################!
@@ -116,14 +116,14 @@ module lib
     !##########################################################################!
     !#########################    compute_B_therap    #########################!
     !##########################################################################!
-    function compute_B_therap(f,D,r_min,r_max,max_targ,max_moda,de_novo,n_node,value,A_physio,A_patho) result(B_therap)
+    function compute_B_therap(f,D,r_min,r_max,max_targ,max_moda,de_novo,n_node,value,A_physio,A_patho,a_patho_set) result(B_therap)
         logical::allowed
-        integer::i1,i2,i3,i4,r_min,r_max,max_targ,max_moda,de_novo,n_node,in_patho
+        integer::i1,i2,i3,i4,r_min,r_max,max_targ,max_moda,de_novo,n_node,in_patho,in_test
         integer,dimension(:,:),allocatable::C_targ
         real,dimension(:)::value
         real,dimension(:,:)::D
         real,dimension(:,:),allocatable::C_moda
-        type(attractor),dimension(:)::A_physio,A_patho
+        type(attractor),dimension(:)::A_physio,A_patho,a_patho_set
         type(attractor),dimension(:),allocatable::A_test
         type(bullet)::b
         type(bullet),dimension(:),allocatable::B_therap
@@ -135,7 +135,8 @@ module lib
             end function f
         end interface
         allocate(B_therap(0))
-        b%gain(1)=compute_cover(A_physio,A_patho)
+        allocate(b%gain(size(A_physio)+size(a_patho_set)+1,2))
+        b%gain(1,1)=compute_cover(A_physio,A_patho)
         do i1=r_min,min(r_max,n_node)
             C_targ=int(gen_combi(real(range_int(1,n_node)),i1,max_targ))
             C_moda=gen_arrang(value,i1,max_moda)
@@ -144,14 +145,13 @@ module lib
                     b%targ=C_targ(i2,:)
                     b%moda=C_moda(i3,:)
                     A_test=compute_A_set(f,D,2,A_physio,b)
-                    b%gain(2)=compute_cover(A_physio,A_test)
-                    if (b%gain(2)>b%gain(1)) then
+                    b%gain(1,2)=compute_cover(A_physio,A_test)
+                    if (b%gain(1,2)>b%gain(1,1)) then
                         allowed=.true.
                         if (de_novo==0) then
                             do i4=1,size(A_test)
                                 if (index(trim(A_test(i4)%name),"patho")/=0) then
-                                    in_patho=in_A_set(A_test(i4),A_patho)
-                                    if (in_patho==0) then
+                                    if (in_A_set(A_test(i4),a_patho_set)==0) then
                                         allowed=.false.
                                         exit
                                     end if
@@ -159,26 +159,49 @@ module lib
                             end do
                         end if
                         if (allowed) then
+                            do i4=1,size(A_physio)
+                                in_patho=in_A_set(A_physio(i4),A_patho)
+                                if (in_patho>0) then
+                                    b%gain(i4+1,1)=A_patho(in_patho)%basin
+                                else
+                                    b%gain(i4+1,1)=0.0
+                                end if
+                                in_test=in_A_set(A_physio(i4),A_test)
+                                if (in_test>0) then
+                                    b%gain(i4+1,2)=A_test(in_test)%basin
+                                else
+                                    b%gain(i4+1,2)=0.0
+                                end if
+                            end do
+                            do i4=1,size(a_patho_set)
+                                in_patho=in_A_set(a_patho_set(i4),A_patho)
+                                b%gain(i4+size(A_physio)+1,1)=A_patho(in_patho)%basin
+                                in_test=in_A_set(a_patho_set(i4),A_test)
+                                if (in_test>0) then
+                                    b%gain(i4+size(A_physio)+1,2)=A_test(in_test)%basin
+                                else
+                                    b%gain(i4+size(A_physio)+1,2)=0.0
+                                end if
+                            end do
                             B_therap=[B_therap,b]
                         end if
                     end if
                 end do
             end do
         end do
-        deallocate(C_targ,C_moda,A_test,b%targ,b%moda)
+        deallocate(C_targ,C_moda,A_test,b%targ,b%moda,b%gain)
         B_therap=sort_B_therap(B_therap)
     end function compute_B_therap
     !##########################################################################!
     !##########################    compute_cover    ###########################!
     !##########################################################################!
     function compute_cover(A_set1,A_set2) result(cover)
-        integer::i,in_1
+        integer::i
         real::cover
         type(attractor),dimension(:)::A_set1,A_set2
         cover=0.0
         do i=1,size(A_set2)
-            in_1=in_A_set(A_set2(i),A_set1)
-            if (in_1>0) then
+            if (in_A_set(A_set2(i),A_set1)>0) then
                 cover=cover+A_set2(i)%basin
             end if
         end do
@@ -227,7 +250,7 @@ module lib
         else
             y=real(x,8)
             do i=1,x-1
-                y=y*(real(x,8)-real(i,8))
+                y=y*real(x-i,8)
             end do
         end if
     end function facto
@@ -379,6 +402,8 @@ module lib
                 set_name="A_physio.csv"
             case (2)
                 set_name="A_patho.csv"
+            case (3)
+                set_name="A_versus.csv"
         end select
         open (unit=1,file=trim(set_name),status="old")
         read (unit=1,fmt=*) size1
@@ -544,12 +569,13 @@ module lib
     !##########################################################################!
     !#########################    report_B_therap    ##########################!
     !##########################################################################!
-    subroutine report_B_therap(B_therap,V,bool,dec)
+    subroutine report_B_therap(B_therap,V,bool,dec,A_physio,a_patho_set)
         logical::bool
         integer::i1,i2,save_,dec
         character(1)::moda
         character(16),dimension(:)::V
         character(:),allocatable::report
+        type(attractor),dimension(:)::A_physio,a_patho_set
         type(bullet),dimension(:)::B_therap
         report=repeat("-",80)//new_line("a")
         do i1=1,size(B_therap)
@@ -565,7 +591,14 @@ module lib
                     report=report//trim(V(B_therap(i1)%targ(i2)))//"["//real2char(B_therap(i1)%moda(i2),dec)//"] "
                 end if
             end do
-            report=report//"("//real2char(B_therap(i1)%gain(1),1)//"% --> "//real2char(B_therap(i1)%gain(2),1)//"%)"//new_line("a")//repeat("-",80)//new_line("a")
+            report=report//"("//real2char(B_therap(i1)%gain(1,1),1)//"% --> "//real2char(B_therap(i1)%gain(1,2),1)//"%)"//new_line("a")
+            do i2=1,size(A_physio)
+                report=report//trim(A_physio(i2)%name)//": "//real2char(B_therap(i1)%gain(i2+1,1),1)//" --> "//real2char(B_therap(i1)%gain(i2+1,2),1)//new_line("a")
+            end do
+            do i2=1,size(a_patho_set)
+                report=report//trim(a_patho_set(i2)%name)//": "//real2char(B_therap(i1)%gain(i2+size(A_physio)+1,1),1)//" --> "//real2char(B_therap(i1)%gain(i2+size(A_physio)+1,2),1)//new_line("a")
+            end do
+            report=report//repeat("-",80)//new_line("a")
         end do
         report=report//"found therapeutic bullets: "//int2char(size(B_therap))
         write (unit=*,fmt="(a)") new_line("a")//report//new_line("a")//new_line("a")//"Save?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
@@ -702,6 +735,7 @@ module lib
         y=B_therap
         allocate(b%targ(0))
         allocate(b%moda(0))
+        allocate(b%gain(0,0))
         do
             repass=.false.
             do i1=1,size(y)-1
@@ -739,7 +773,7 @@ module lib
                 end if
             end do
             if (.not. repass) then
-                deallocate(b%targ,b%moda)
+                deallocate(b%targ,b%moda,b%gain)
                 exit
             end if
         end do
@@ -748,7 +782,7 @@ module lib
     !############################    what_to_do    ############################!
     !##########################################################################!
     subroutine what_to_do(f1,f2,value,size_D,n_node,max_targ,max_moda,V)
-        logical::bool,exist1,exist2
+        logical::bool,exist1,exist2,exist3
         integer::size_D,n_node,max_targ,max_moda,to_do,r_min,r_max,setting,whole_S,de_novo,dec,i1,i2
         real,dimension(:)::value
         integer,dimension(size(value))::z
@@ -815,7 +849,7 @@ module lib
                         case (2)
                             inquire (file="A_physio.csv",exist=exist1)
                             if (.not. exist1) then
-                                write (unit=*,fmt="(a)") new_line("a")//"The file A_physio.csv does not exist. Please compute the physiological attractor"//new_line("a")//"set before computing the pathological attractor set."
+                                write (unit=*,fmt="(a)") new_line("a")//"The file A_physio.csv is required for computing the pathological attractor set."//new_line("a")//"Please ensure that the physiological attractor set is already computed."
                             else
                                 A_physio=load_A_set(1)
                                 A_patho=compute_A_set(f2,D,2,A_physio,null_b)
@@ -827,7 +861,7 @@ module lib
                 case (2)
                     inquire (file="A_patho.csv",exist=exist1)
                     if (.not. exist1) then
-                        write (unit=*,fmt="(a)") new_line("a")//"The file A_patho.csv does not exist. Please compute the pathological attractor"//new_line("a")//"set before computing the pathological attractors."
+                        write (unit=*,fmt="(a)") new_line("a")//"The file A_patho.csv is required for computing the pathological attractors."//new_line("a")//"Please ensure that the pathological attractor set is already computed."
                     else
                         A_patho=load_A_set(2)
                         a_patho_set=compute_a_patho_set(A_patho)
@@ -837,27 +871,25 @@ module lib
                 case (3)
                     inquire (file="A_physio.csv",exist=exist1)
                     inquire (file="A_patho.csv",exist=exist2)
-                    if ((.not. exist1) .and. exist2) then
-                        write (unit=*,fmt="(a)") new_line("a")//"The file A_physio.csv does not exist. Please compute the physiological attractor"//new_line("a")//"set before computing the therapeutic bullets."
-                    else if (exist1 .and. (.not. exist2)) then
-                        write (unit=*,fmt="(a)") new_line("a")//"The file A_patho.csv does not exist. Please compute the pathological attractor"//new_line("a")//"set before computing the therapeutic bullets."
-                    else if ((.not. exist1) .and. (.not. exist2)) then
-                        write (unit=*,fmt="(a)") new_line("a")//"The files A_physio.csv and A_patho.csv do not exist. Please compute the"//new_line("a")//"physiological attractor set and the pathological attractor set before computing"//new_line("a")//"the therapeutic bullets."
+                    inquire (file="A_versus.csv",exist=exist3)
+                    if (.not. (exist1 .and. exist2 .and. exist3)) then
+                        write (unit=*,fmt="(a)") new_line("a")//"The files A_physio.csv, A_patho.csv and A_versus.csv are required for computing"//new_line("a")//"the therapeutic bullets. Please ensure that the physiological attractor set, the"//new_line("a")//"pathological attractor set and the pathological attractors are already computed."
                     else
                         A_physio=load_A_set(1)
                         A_patho=load_A_set(2)
-                        write (unit=*,fmt="(a)") new_line("a")//"Allow de novo attractors?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
-                        read (unit=*,fmt=*) de_novo
+                        a_patho_set=load_A_set(3)
+                        !write (unit=*,fmt="(a)") new_line("a")//"Allow de novo attractors?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
+                        de_novo=0!read (unit=*,fmt=*) de_novo<<<<<<<<<<<<<<<<<<<<<<<<<
                         write (unit=*,fmt="(a)",advance="no") new_line("a")//"Number of targets per bullet (lower bound): "
                         read (unit=*,fmt=*) r_min
                         write (unit=*,fmt="(a)",advance="no") "Number of targets per bullet (upper bound): "
                         read (unit=*,fmt=*) r_max
-                        B_therap=compute_B_therap(f2,D,r_min,r_max,max_targ,max_moda,de_novo,n_node,value,A_physio,A_patho)
-                        call report_B_therap(B_therap,V,bool,dec)
-                        deallocate(A_physio,A_patho,B_therap)
+                        B_therap=compute_B_therap(f2,D,r_min,r_max,max_targ,max_moda,de_novo,n_node,value,A_physio,A_patho,a_patho_set)
+                        call report_B_therap(B_therap,V,bool,dec,A_physio,a_patho_set)
+                        deallocate(A_physio,A_patho,a_patho_set,B_therap)
                     end if
                     deallocate(D)
-                case (4)
+                case (4)!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     write (unit=*,fmt="(a)") new_line("a")//"How to:"//new_line("a")//"    1) compute the physiological attractor set: [1]"//new_line("a")//"        * when prompted by the algorithm, set the setting to physiological"//new_line("a")//"        * returns A_physio"//new_line("a")//"        * when prompted by the algorithm, saving A_physio is necessary for the"//new_line("a")//"          next steps"//new_line("a")//"    2) compute the pathological attractor set: [1]"//new_line("a")//"        * when prompted by the algorithm, set the setting to pathological"//new_line("a")//"        * returns A_patho"//new_line("a")//"        * when prompted by the algorithm, saving A_patho is necessary for the"//new_line("a")//"          next steps"//new_line("a")//"    3) compute the pathological attractors: [2]"//new_line("a")//"        * this step is optional"//new_line("a")//"        * returns A_versus"//new_line("a")//"    4) compute the therapeutic bullets: [3]"//new_line("a")//"        * returns B_therap"//new_line("a")//"        * in case of multivalued logic, therapeutic bullets are reported as"//new_line("a")//"          follow: ... X[y] ... where the variable X has to be set to the value y"//new_line("a")//new_line("a")//"If you rename/move/delete the csv files generated by the algorithm, it will not"//new_line("a")//"recognize them when requiered, if any."//new_line("a")//new_line("a")//"Do not forget to recompile the sources following any modification."
                 case (5)
                     write (unit=*,fmt="(a)") new_line("a")//"kali-targ: a tool for in silico target identification."//new_line("a")//"Copyright (C) 2013-2014 Arnaud Poret"//new_line("a")//new_line("a")//"This program is free software: you can redistribute it and/or modify it under"//new_line("a")//"the terms of the GNU General Public License as published by the Free Software"//new_line("a")//"Foundation, either version 3 of the License, or (at your option) any later"//new_line("a")//"version."//new_line("a")//new_line("a")//"This program is distributed in the hope that it will be useful, but WITHOUT ANY"//new_line("a")//"WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A"//new_line("a")//"PARTICULAR PURPOSE. See the GNU General Public License for more details."//new_line("a")//new_line("a")//"You should have received a copy of the GNU General Public License along with"//new_line("a")//"this program. If not, see https://www.gnu.org/licenses/gpl.html."
