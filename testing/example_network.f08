@@ -10,6 +10,7 @@ program example_network
     value=[0.0,0.5,1.0]
     max_targ=int(1e2)
     max_moda=int(1e2)
+    min_gain=5.0
     size_D=int(1e4)
     allocate(V(n_node))
     V(1)="CycD"
@@ -19,7 +20,7 @@ program example_network
     V(5)="p27"
     V(6)="UbcH10"
     V(7)="CycB"
-    call what_to_do(f_physio,f_patho,value,size_D,n_node,max_targ,max_moda,V)
+    call what_to_do(f_physio,f_patho,value,size_D,n_node,max_targ,max_moda,min_gain,V)
     deallocate(value,V)
     contains
     !##########################################################################!
