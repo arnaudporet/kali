@@ -2,9 +2,9 @@
 ! This program is licensed under the GNU General Public License.
 ! To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
 module lib
-    !##############    /!\ networks must be deterministic /!\    ##############!
-    !#########    /!\ default integer kind must be 4 (32 bits) /!\    #########!
-    !##########    /!\ default real kind must be 4 (32 bits) /!\    ###########!
+    !############    /!\ the network must be deterministic /!\    #############!
+    !#######    /!\ the default integer kind must be 4 (32 bits) /!\    #######!
+    !########    /!\ the default real kind must be 4 (32 bits) /!\    #########!
     integer::max_targ,max_moda,size_D,n_node
     real::min_gain
     real,dimension(:),allocatable::value
@@ -24,7 +24,7 @@ module lib
     !############################    compare_a    #############################!
     !##########################################################################!
     function compare_a(a1,a2) result(diff)
-        !##########    /!\ attractors must be in sorted form /!\    ###########!
+        !########    /!\ the attractors must be in sorted form /!\    #########!
         logical::diff
         type(attractor)::a1,a2
         if (size(a1%mat,2)/=size(a2%mat,2)) then
@@ -37,7 +37,7 @@ module lib
     !############################    compute_a    #############################!
     !##########################################################################!
     function compute_a(f,x0,b) result(a)
-        !############    /!\ networks must be deterministic /!\    ############!
+        !###########    /!\ the network must be deterministic /!\    ###########!
         integer::k,i
         real,dimension(:,:)::x0
         real,dimension(:,:),allocatable::x
@@ -105,7 +105,7 @@ module lib
     !#######################    compute_a_patho_set    ########################!
     !##########################################################################!
     function compute_a_patho_set(A_patho) result(a_patho_set)
-        !###############    /!\ attractors must be named /!\    ###############!
+        !#############    /!\ the attractors must be named /!\    #############!
         integer::i
         type(attractor),dimension(:)::A_patho
         type(attractor),dimension(:),allocatable::a_patho_set
@@ -529,7 +529,7 @@ module lib
             end do
             report=report//repeat("-",80)//new_line("a")
         end do
-        report=report//"found attractors: "//int2char(size(A_set))//" ("//int2char(n_point)//" points, "//int2char(n_cycle)//" cycles)"
+        report=report//"Found attractors: "//int2char(size(A_set))//new_line("a")//"    point(s): "//int2char(n_point)//new_line("a")//"    cycle(s): "//int2char(n_cycle)
         write (unit=*,fmt="(a)") new_line("a")//report//new_line("a")//new_line("a")//"Save?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
         read (unit=*,fmt=*) save_
         if (save_==1) then
@@ -553,17 +553,20 @@ module lib
     !##########################################################################!
     !#########################    report_B_therap    ##########################!
     !##########################################################################!
-    subroutine report_B_therap(B_therap,V,bool,dec,A_physio,a_patho_set,min_gain)
+    subroutine report_B_therap(B_therap,V,bool,dec,A_physio,a_patho_set,min_gain,r_min,r_max)
         logical::bool
-        integer::i1,i2,save_,dec
+        integer::i1,i2,save_,dec,r_min,r_max
+        integer,dimension(r_max-r_min+1)::barrel
         real::min_gain
         character(1)::moda
         character(16),dimension(:)::V
         character(:),allocatable::report
         type(attractor),dimension(:)::A_physio,a_patho_set
         type(bullet),dimension(:)::B_therap
-        report="minimum gain: "//real2char(min_gain,1)//"%"//new_line("a")//repeat("-",80)//new_line("a")
+        report="Minimum gain: "//real2char(min_gain,1)//"%"//new_line("a")//"Number of targets per bullet: "//int2char(r_min)//"-"//int2char(r_max)//new_line("a")//repeat("-",80)//new_line("a")
+        barrel=0
         do i1=1,size(B_therap)
+            barrel(size(B_therap(i1)%targ)-r_min+1)=barrel(size(B_therap(i1)%targ)-r_min+1)+1
             report=report//"Bullet: "
             do i2=1,size(B_therap(i1)%targ)
                 if (bool) then
@@ -587,7 +590,11 @@ module lib
             end do
             report=report//repeat("-",80)//new_line("a")
         end do
-        report=report//"found therapeutic bullets: "//int2char(size(B_therap))
+        report=report//"Found therapeutic bullets: "//int2char(size(B_therap))//new_line("a")
+        do i1=1,size(barrel)-1
+            report=report//"    "//int2char(i1+r_min-1)//"-bullet(s): "//int2char(barrel(i1)+r_min-1)//new_line("a")
+        end do
+        report=report//"    "//int2char(size(barrel)+r_min-1)//"-bullet(s): "//int2char(barrel(size(barrel))+r_min-1)
         write (unit=*,fmt="(a)") new_line("a")//report//new_line("a")//new_line("a")//"Save?"//new_line("a")//"    [0] no"//new_line("a")//"    [1] yes"
         read (unit=*,fmt=*) save_
         if (save_==1) then
@@ -657,7 +664,7 @@ module lib
     !##############################    sort_a    ##############################!
     !##########################################################################!
     function sort_a(a) result(y)
-        !############    /!\ networks must be deterministic /!\    ############!
+        !###########    /!\ the network must be deterministic /!\    ###########!
         integer::i
         integer,dimension(:),allocatable::j_min
         type(attractor)::a,y
@@ -874,7 +881,7 @@ module lib
                         write (unit=*,fmt="(a)",advance="no") "Number of targets per bullet (upper bound): "
                         read (unit=*,fmt=*) r_max
                         B_therap=compute_B_therap(f2,D,r_min,r_max,max_targ,max_moda,min_gain,de_novo,n_node,value,A_physio,A_patho,a_patho_set)
-                        call report_B_therap(B_therap,V,bool,dec,A_physio,a_patho_set,min_gain)
+                        call report_B_therap(B_therap,V,bool,dec,A_physio,a_patho_set,min_gain,r_min,r_max)
                         deallocate(A_physio,A_patho,a_patho_set,B_therap)
                     end if
                     deallocate(D)
