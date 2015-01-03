@@ -483,7 +483,7 @@ module lib
     subroutine report_A_set(A_set,setting,V,bool,dec)
         logical::bool
         integer::n_point,n_cycle,setting,i1,i2,i3,save_,dec
-        character(16)::set_type,space_type,report_name
+        character(16)::set_type,report_name
         character(16),dimension(:)::V
         character(:),allocatable::report
         type(attractor),dimension(:)::A_set
@@ -492,13 +492,10 @@ module lib
         select case (setting)
             case (1)
                 set_type="A_physio"
-                space_type="physiological"
             case (2)
                 set_type="A_patho"
-                space_type="pathological"
             case (3)
                 set_type="A_versus"
-                space_type="pathological"
         end select
         report=trim(set_type)//"={"
         do i1=1,size(A_set)-1
@@ -511,7 +508,7 @@ module lib
             else
                 n_cycle=n_cycle+1
             end if
-            report=report//"Name: "//trim(A_set(i1)%name)//new_line("a")//"Basin: "//real2char(A_set(i1)%basin,1)//"% (of the "//trim(space_type)//" state space)"//new_line("a")//"Matrix:"//new_line("a")
+            report=report//"Name: "//trim(A_set(i1)%name)//new_line("a")//"Basin: "//real2char(A_set(i1)%basin,1)//"%"//new_line("a")//"Matrix:"//new_line("a")
             do i2=1,size(A_set(i1)%mat,1)
                 report=report//"    "//V(i2)//" "
                 do i3=1,size(A_set(i1)%mat,2)-1
