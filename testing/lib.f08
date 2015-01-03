@@ -1,4 +1,4 @@
-! Copyright (C) 2013-2014 Arnaud Poret
+! Copyright (C) 2013-2015 Arnaud Poret
 ! This program is licensed under the GNU General Public License.
 ! To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
 module lib
@@ -6,7 +6,6 @@ module lib
     !#######    /!\ the default integer kind must be 4 (32 bits) /!\    #######!
     !########    /!\ the default real kind must be 4 (32 bits) /!\    #########!
     integer::max_targ,max_moda,size_D,n_node
-    real::min_gain
     real,dimension(:),allocatable::value
     character(16),dimension(:),allocatable::V
     type::attractor
@@ -16,8 +15,8 @@ module lib
     end type attractor
     type::bullet
         integer,dimension(:),allocatable::targ
-        real,dimension(:),allocatable::moda
-        real,dimension(:,:),allocatable::gain
+        real,dimension(2)::gain
+        real,dimension(:),allocatable::moda,cover
     end type bullet
     contains
     !##########################################################################!
@@ -119,11 +118,10 @@ module lib
     !##########################################################################!
     !#########################    compute_B_therap    #########################! TODO modularize?
     !##########################################################################!
-    function compute_B_therap(f,D,r_min,r_max,max_targ,max_moda,min_gain,de_novo,n_node,value,A_physio,A_patho,a_patho_set) result(B_therap)
+    function compute_B_therap(f,D,r_min,r_max,max_targ,max_moda,de_novo,n_node,value,A_physio,A_patho,a_patho_set) result(B_therap)
         logical::allowed
         integer::i1,i2,i3,i4,r_min,r_max,max_targ,max_moda,de_novo,n_node
         integer,dimension(:,:),allocatable::C_targ
-        real::min_gain
         real,dimension(:)::value
         real,dimension(:,:)::D
         real,dimension(:,:),allocatable::C_moda
@@ -139,9 +137,8 @@ module lib
             end function f
         end interface
         allocate(B_therap(0))
-        allocate(b%gain(size(A_physio)+size(a_patho_set),2))
-        b%gain(:size(A_physio),1)=compute_cover(A_physio,A_patho)
-        b%gain(size(A_physio)+1:,1)=compute_cover(a_patho_set,A_patho)
+        allocate(b%cover(0))
+        b%gain(1)=sum(compute_cover(A_physio,A_patho))
         do i1=r_min,min(r_max,n_node)
             C_targ=int(gen_combi(real(range_int(1,n_node)),i1,max_targ))
             C_moda=gen_arrang(value,i1,max_moda)
@@ -150,9 +147,8 @@ module lib
                     b%targ=C_targ(i2,:)
                     b%moda=C_moda(i3,:)
                     A_test=compute_A_set(f,D,2,A_physio,b)
-                    b%gain(:size(A_physio),2)=compute_cover(A_physio,A_test)
-                    b%gain(size(A_physio)+1:,2)=compute_cover(a_patho_set,A_test)
-                    if (sum(b%gain(:size(A_physio),2))>sum(b%gain(:size(A_physio),1))+min_gain) then
+                    b%gain(2)=sum(compute_cover(A_physio,A_test))
+                    if (b%gain(2)>b%gain(1)+1) then! +1% to avoid roundoff-induced false positive
                         allowed=.true.
                         if (de_novo==0) then
                             do i4=1,size(A_test)
@@ -165,13 +161,14 @@ module lib
                             end do
                         end if
                         if (allowed) then
+                            b%cover=compute_cover([A_physio,a_patho_set],A_test)
                             B_therap=[B_therap,b]
                         end if
                     end if
                 end do
             end do
         end do
-        deallocate(C_targ,C_moda,A_test,b%targ,b%moda,b%gain)
+        deallocate(C_targ,C_moda,A_test,b%targ,b%moda,b%cover)
         B_therap=sort_B_therap(B_therap)
     end function compute_B_therap
     !##########################################################################!
@@ -550,17 +547,16 @@ module lib
     !##########################################################################!
     !#########################    report_B_therap    ##########################!
     !##########################################################################!
-    subroutine report_B_therap(B_therap,V,bool,dec,A_physio,a_patho_set,min_gain,r_min,r_max)
+    subroutine report_B_therap(B_therap,V,bool,dec,A_physio,a_patho_set,r_min,r_max)
         logical::bool
         integer::i1,i2,save_,dec,r_min,r_max
         integer,dimension(r_max-r_min+1)::barrel
-        real::min_gain
         character(1)::moda
         character(16),dimension(:)::V
         character(:),allocatable::report
         type(attractor),dimension(:)::A_physio,a_patho_set
         type(bullet),dimension(:)::B_therap
-        report="Minimum gain: "//real2char(min_gain,1)//"%"//new_line("a")//"Number of targets per bullet: "//int2char(r_min)//"-"//int2char(r_max)//new_line("a")//repeat("-",80)//new_line("a")
+        report="Number of targets per bullet: "//int2char(r_min)//"-"//int2char(r_max)//new_line("a")//repeat("-",80)//new_line("a")
         barrel=0
         do i1=1,size(B_therap)
             barrel(size(B_therap(i1)%targ)-r_min+1)=barrel(size(B_therap(i1)%targ)-r_min+1)+1
@@ -577,13 +573,13 @@ module lib
                     report=report//trim(V(B_therap(i1)%targ(i2)))//"["//real2char(B_therap(i1)%moda(i2),dec)//"] "
                 end if
             end do
-            report=report//new_line("a")//"Union of the physiological basins: "//real2char(sum(B_therap(i1)%gain(:size(A_physio),1)),1)//"% --> "//real2char(sum(B_therap(i1)%gain(:size(A_physio),2)),1)//"%"//new_line("a")//"Physiological basins:"//new_line("a")
+            report=report//new_line("a")//"Gain: "//real2char(B_therap(i1)%gain(1),1)//"% --> "//real2char(B_therap(i1)%gain(2),1)//"%"//new_line("a")//"Physiological basins:"//new_line("a")
             do i2=1,size(A_physio)
-                report=report//"    "//trim(A_physio(i2)%name)//": "//real2char(B_therap(i1)%gain(i2,1),1)//"% --> "//real2char(B_therap(i1)%gain(i2,2),1)//"%"//new_line("a")
+                report=report//"    "//trim(A_physio(i2)%name)//": "//real2char(B_therap(i1)%cover(i2),1)//"%"//new_line("a")
             end do
             report=report//"Pathological basins:"//new_line("a")
             do i2=1,size(a_patho_set)
-                report=report//"    "//trim(a_patho_set(i2)%name)//": "//real2char(B_therap(i1)%gain(i2+size(A_physio),1),1)//"% --> "//real2char(B_therap(i1)%gain(i2+size(A_physio),2),1)//"%"//new_line("a")
+                report=report//"    "//trim(a_patho_set(i2)%name)//": "//real2char(B_therap(i1)%cover(i2+size(A_physio)),1)//"%"//new_line("a")
             end do
             report=report//repeat("-",80)//new_line("a")
         end do
@@ -620,7 +616,7 @@ module lib
         end select
         s=int2char(size(A_set))//new_line("a")
         do i1=1,size(A_set)
-            s=s//int2char(size(A_set(i1)%mat,1))//","//int2char(size(A_set(i1)%mat,2))//new_line("a")//real2char(A_set(i1)%basin,1)//new_line("a")//trim(A_set(i1)%name)//new_line("a")
+            s=s//int2char(size(A_set(i1)%mat,1))//","//int2char(size(A_set(i1)%mat,2))//new_line("a")//real2char(A_set(i1)%basin,5)//new_line("a")//trim(A_set(i1)%name)//new_line("a")
         end do
         do i1=1,size(A_set)
             do i2=1,size(A_set(i1)%mat,1)
@@ -727,7 +723,7 @@ module lib
         y=B_therap
         allocate(b%targ(0))
         allocate(b%moda(0))
-        allocate(b%gain(0,0))
+        allocate(b%cover(0))
         do
             repass=.false.
             do i1=1,size(y)-1
@@ -765,7 +761,7 @@ module lib
                 end if
             end do
             if (.not. repass) then
-                deallocate(b%targ,b%moda,b%gain)
+                deallocate(b%targ,b%moda,b%cover)
                 exit
             end if
         end do
@@ -773,10 +769,9 @@ module lib
     !##########################################################################!
     !############################    what_to_do    ############################!
     !##########################################################################!
-    subroutine what_to_do(f1,f2,value,size_D,n_node,max_targ,max_moda,min_gain,V)
+    subroutine what_to_do(f1,f2,value,size_D,n_node,max_targ,max_moda,V)
         logical::bool,exist1,exist2,exist3
         integer::size_D,n_node,max_targ,max_moda,to_do,r_min,r_max,setting,whole_S,de_novo,dec,i1,i2
-        real::min_gain
         real,dimension(:)::value
         integer,dimension(size(value))::z
         real,dimension(:,:),allocatable::D
@@ -877,15 +872,15 @@ module lib
                         read (unit=*,fmt=*) r_min
                         write (unit=*,fmt="(a)",advance="no") "Number of targets per bullet (upper bound): "
                         read (unit=*,fmt=*) r_max
-                        B_therap=compute_B_therap(f2,D,r_min,r_max,max_targ,max_moda,min_gain,de_novo,n_node,value,A_physio,A_patho,a_patho_set)
-                        call report_B_therap(B_therap,V,bool,dec,A_physio,a_patho_set,min_gain,r_min,r_max)
+                        B_therap=compute_B_therap(f2,D,r_min,r_max,max_targ,max_moda,de_novo,n_node,value,A_physio,A_patho,a_patho_set)
+                        call report_B_therap(B_therap,V,bool,dec,A_physio,a_patho_set,r_min,r_max)
                         deallocate(A_physio,A_patho,a_patho_set,B_therap)
                     end if
                     deallocate(D)
                 case (4)
                     write (unit=*,fmt="(a)") new_line("a")//"How to:"//new_line("a")//"    1) compute the physiological attractor set: [1]"//new_line("a")//"        * when prompted by the algorithm, set the setting to physiological"//new_line("a")//"        * returns A_physio"//new_line("a")//"        * when prompted by the algorithm, saving A_physio is necessary for the"//new_line("a")//"          next steps"//new_line("a")//"    2) compute the pathological attractor set: [1]"//new_line("a")//"        * when prompted by the algorithm, set the setting to pathological"//new_line("a")//"        * returns A_patho"//new_line("a")//"        * when prompted by the algorithm, saving A_patho is necessary for the"//new_line("a")//"          next steps"//new_line("a")//"    3) compute the pathological attractors: [2]"//new_line("a")//"        * returns A_versus"//new_line("a")//"        * when prompted by the algorithm, saving A_versus is necessary for the"//new_line("a")//"          next steps"//new_line("a")//"    4) compute the therapeutic bullets: [3]"//new_line("a")//"        * returns B_therap"//new_line("a")//"        * in case of multivalued logic, therapeutic bullets are reported as"//new_line("a")//"          follow: ... X[y] ... where the variable X has to be set to the value y"//new_line("a")//new_line("a")//"If you rename/move/delete the csv files generated by the algorithm, it will not"//new_line("a")//"recognize them when requiered, if any."//new_line("a")//new_line("a")//"Do not forget to recompile the sources following any modification."
                 case (5)
-                    write (unit=*,fmt="(a)") new_line("a")//"kali-targ: a tool for in silico target identification."//new_line("a")//"Copyright (C) 2013-2014 Arnaud Poret"//new_line("a")//new_line("a")//"This program is free software: you can redistribute it and/or modify it under"//new_line("a")//"the terms of the GNU General Public License as published by the Free Software"//new_line("a")//"Foundation, either version 3 of the License, or (at your option) any later"//new_line("a")//"version."//new_line("a")//new_line("a")//"This program is distributed in the hope that it will be useful, but WITHOUT ANY"//new_line("a")//"WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A"//new_line("a")//"PARTICULAR PURPOSE. See the GNU General Public License for more details."//new_line("a")//new_line("a")//"You should have received a copy of the GNU General Public License along with"//new_line("a")//"this program. If not, see https://www.gnu.org/licenses/gpl.html."
+                    write (unit=*,fmt="(a)") new_line("a")//"kali-targ: a tool for in silico target identification."//new_line("a")//"Copyright (C) 2013-2015 Arnaud Poret"//new_line("a")//new_line("a")//"This program is free software: you can redistribute it and/or modify it under"//new_line("a")//"the terms of the GNU General Public License as published by the Free Software"//new_line("a")//"Foundation, either version 3 of the License, or (at your option) any later"//new_line("a")//"version."//new_line("a")//new_line("a")//"This program is distributed in the hope that it will be useful, but WITHOUT ANY"//new_line("a")//"WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A"//new_line("a")//"PARTICULAR PURPOSE. See the GNU General Public License for more details."//new_line("a")//new_line("a")//"You should have received a copy of the GNU General Public License along with"//new_line("a")//"this program. If not, see https://www.gnu.org/licenses/gpl.html."
                 case (6)
                     write (unit=*,fmt="(a)") new_line("a")//"Goodbye."//new_line("a")
                     exit
