@@ -2,7 +2,7 @@
 ! This program is licensed under the GNU General Public License.
 ! To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
 
-!################################    HOW TO    ################################!
+!################################    HOWTO    #################################!
 
 ! 1) read the comments
 ! 2) fill the template
@@ -84,17 +84,17 @@ program example_network
     function f_physio(x,k) result(y)
         integer::k
         real,dimension(:,:)::x
-        real,dimension(size(x,1))::y
-        y(1)=x(1,k)!CycD
-        y(2)=max(min(1.0-x(1,k),1.0-x(4,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-x(1,k),1.0-x(10,k)))!Rb
-        y(3)=max(min(1.0-x(2,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-x(2,k),1.0-x(10,k)))!E2F
-        y(4)=min(x(3,k),1.0-x(2,k))!CycE
-        y(5)=max(min(x(3,k),1.0-x(2,k),1.0-x(7,k),1.0-min(x(8,k),x(9,k))),min(x(5,k),1.0-x(2,k),1.0-x(7,k),1.0-min(x(8,k),x(9,k))))!CycA
-        y(6)=max(min(1.0-x(1,k),1.0-x(4,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-min(x(4,k),x(5,k)),1.0-x(10,k),1.0-x(1,k)))!p27
-        y(7)=x(10,k)!Cdc20
-        y(8)=max(min(1.0-x(5,k),1.0-x(10,k)),x(7,k),min(x(6,k),1.0-x(10,k)))!Cdh1
-        y(9)=max(1.0-x(8,k),min(x(8,k),x(9,k),max(x(7,k),x(5,k),x(10,k))))!UbcH10
-        y(10)=min(1.0-x(7,k),1.0-x(8,k))!CycB
+        real,dimension(size(x,1),1)::y
+        y(1,1)=x(1,k)!CycD
+        y(2,1)=max(min(1.0-x(1,k),1.0-x(4,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-x(1,k),1.0-x(10,k)))!Rb
+        y(3,1)=max(min(1.0-x(2,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-x(2,k),1.0-x(10,k)))!E2F
+        y(4,1)=min(x(3,k),1.0-x(2,k))!CycE
+        y(5,1)=max(min(x(3,k),1.0-x(2,k),1.0-x(7,k),1.0-min(x(8,k),x(9,k))),min(x(5,k),1.0-x(2,k),1.0-x(7,k),1.0-min(x(8,k),x(9,k))))!CycA
+        y(6,1)=max(min(1.0-x(1,k),1.0-x(4,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-min(x(4,k),x(5,k)),1.0-x(10,k),1.0-x(1,k)))!p27
+        y(7,1)=x(10,k)!Cdc20
+        y(8,1)=max(min(1.0-x(5,k),1.0-x(10,k)),x(7,k),min(x(6,k),1.0-x(10,k)))!Cdh1
+        y(9,1)=max(1.0-x(8,k),min(x(8,k),x(9,k),max(x(7,k),x(5,k),x(10,k))))!UbcH10
+        y(10,1)=min(1.0-x(7,k),1.0-x(8,k))!CycB
     end function f_physio
     !##########################################################################!
     !#############################    f_patho    ##############################!
@@ -105,16 +105,16 @@ program example_network
     function f_patho(x,k) result(y)
         integer::k
         real,dimension(:,:)::x
-        real,dimension(size(x,1))::y
-        y(1)=x(1,k)!CycD
-        y(2)=0.0!Rb
-        y(3)=max(min(1.0-x(2,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-x(2,k),1.0-x(10,k)))!E2F
-        y(4)=min(x(3,k),1.0-x(2,k))!CycE
-        y(5)=max(min(x(3,k),1.0-x(2,k),1.0-x(7,k),1.0-min(x(8,k),x(9,k))),min(x(5,k),1.0-x(2,k),1.0-x(7,k),1.0-min(x(8,k),x(9,k))))!CycA
-        y(6)=max(min(1.0-x(1,k),1.0-x(4,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-min(x(4,k),x(5,k)),1.0-x(10,k),1.0-x(1,k)))!p27
-        y(7)=x(10,k)!Cdc20
-        y(8)=max(min(1.0-x(5,k),1.0-x(10,k)),x(7,k),min(x(6,k),1.0-x(10,k)))!Cdh1
-        y(9)=max(1.0-x(8,k),min(x(8,k),x(9,k),max(x(7,k),x(5,k),x(10,k))))!UbcH10
-        y(10)=min(1.0-x(7,k),1.0-x(8,k))!CycB
+        real,dimension(size(x,1),1)::y
+        y(1,1)=x(1,k)!CycD
+        y(2,1)=0.0!Rb
+        y(3,1)=max(min(1.0-x(2,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-x(2,k),1.0-x(10,k)))!E2F
+        y(4,1)=min(x(3,k),1.0-x(2,k))!CycE
+        y(5,1)=max(min(x(3,k),1.0-x(2,k),1.0-x(7,k),1.0-min(x(8,k),x(9,k))),min(x(5,k),1.0-x(2,k),1.0-x(7,k),1.0-min(x(8,k),x(9,k))))!CycA
+        y(6,1)=max(min(1.0-x(1,k),1.0-x(4,k),1.0-x(5,k),1.0-x(10,k)),min(x(6,k),1.0-min(x(4,k),x(5,k)),1.0-x(10,k),1.0-x(1,k)))!p27
+        y(7,1)=x(10,k)!Cdc20
+        y(8,1)=max(min(1.0-x(5,k),1.0-x(10,k)),x(7,k),min(x(6,k),1.0-x(10,k)))!Cdh1
+        y(9,1)=max(1.0-x(8,k),min(x(8,k),x(9,k),max(x(7,k),x(5,k),x(10,k))))!UbcH10
+        y(10,1)=min(1.0-x(7,k),1.0-x(8,k))!CycB
     end function f_patho
 end program example_network
