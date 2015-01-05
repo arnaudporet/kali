@@ -42,8 +42,11 @@ Distributed version control system: Git (http://git-scm.com/)
    version) at http://arxiv.org/abs/1407.4374 or
    https://hal.archives-ouvertes.fr/hal-01024788
 
-2) clone kali-targ: git clone https://github.com/arnaudporet/kali-targ.git (or
-   download it if you do not use Git, but I strongly encourage you to use Git)
+2) clone kali-targ:
+       git clone https://github.com/arnaudporet/kali-targ.git
+   or download it if you do not use Git:
+       https://github.com/arnaudporet/kali-targ/archive/master.zip
+   but I strongly encourage you to use Git
 
 3) go to the folder corresponding to the version of your choice
 
