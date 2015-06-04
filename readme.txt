@@ -1,6 +1,6 @@
 ################################################################################
-########    An in silico target identification using boolean network    ########
-########          attractors: avoiding pathological phenotypes          ########
+#####    Therapeutic target discovery using Boolean network attractors:    #####
+#####                   avoiding pathological phenotypes                   #####
 ################################################################################
 
 ################################    LICENSE    #################################
