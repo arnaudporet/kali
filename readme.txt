@@ -3,6 +3,11 @@
 #####                   avoiding pathological phenotypes                   #####
 ################################################################################
 
+################################    WARNING    #################################
+
+Seems to be not fully operational when compiled with newer versions of gfortran
+(namely gfortran 5). The new version of kali-targ will be soon released.
+
 ################################    LICENSE    #################################
 
 Copyright (C) 2013-2015 Arnaud Poret
