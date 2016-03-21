@@ -17,6 +17,9 @@
 //    "golang run yourfile.go" instead of "go run yourfile.go"
 // 5) check the help proposed by the algorithm
 
+// This example is a generic Boolean model of the mammalian cell cycle by Adrien
+// Faure and coworkers [1].
+
 //############################################################################//
 
 package main
@@ -63,8 +66,8 @@ func main() {
 
 // The network must be deterministic.
 
-// To cope with both Boolean and multivalued logic, the Zadeh fuzzy logic operators
-// are used:
+// To cope with both Boolean and multivalued logic, the Zadeh fuzzy logic
+// operators are used:
 //     x AND y = min(x,y)
 //     x OR y = max(x,y)
 //     NOT x = 1-x
@@ -112,3 +115,7 @@ func fpatho(x kali.Matrix,k int) kali.Vector {
     y[9]=min(1.0-x[6][k],1.0-x[7][k])// CycB
     return y
 }
+
+// [1] Adrien Faure, Aurelien Naldi, Claudine Chaouiya, Denis Thieffry.
+// Dynamical analysis of a generic Boolean model for the control of the
+// mammalian cell cycle. Bioinformatics 22(14):e124-e131. Oxford Univ Press.
