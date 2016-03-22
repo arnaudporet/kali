@@ -209,7 +209,7 @@ func (A Aset) Report(setting int,nodes []string) {
         file,_=os.Create(reportname)
         file.WriteString(report)
         file.Close()
-        fmt.Println("Report saved as "+reportname+"\n")
+        fmt.Println("Report saved as "+reportname)
     }
 }
 //#### Save ##################################################################//

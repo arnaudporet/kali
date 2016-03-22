@@ -100,7 +100,7 @@ func (B Bset) Report(nodes []string,Aphysio,Aversus Aset,rmin,rmax int) {
         file,_=os.Create("B_therap.txt")
         file.WriteString(report)
         file.Close()
-        fmt.Println("\nReport saved as B_therap.txt\n")
+        fmt.Println("\nReport saved as B_therap.txt")
     }
 }
 //#### Sort ##################################################################//

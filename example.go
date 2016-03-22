@@ -14,7 +14,7 @@
 //    it is possible that the Go package has a different name depending on your
 //    OS/Linux distribution
 //    for example, with Ubuntu, it is named "golang", so it may be
-//    "golang run yourfile.go" instead of "go run yourfile.go"
+//    "golang-go run yourfile.go" instead of "go run yourfile.go"
 // 5) check the help proposed by the algorithm
 
 // This example is a generic Boolean model of the mammalian cell cycle by Adrien
