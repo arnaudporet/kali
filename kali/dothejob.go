@@ -4,8 +4,10 @@
 package kali
 import "fmt"
 import "math"
+import "math/rand"
 import "strconv"
 import "strings"
+import "time"
 //#### DoTheJob ##############################################################//
 func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,maxtarg,maxmoda,maxD int,nodes []string,vals Vector) {
     var todo,wholeS,setting,rmin,rmax,tochange int
@@ -13,6 +15,7 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,maxtarg,maxmoda,maxD int,no
     var nullb Bullet
     var Aphysio,Apatho,Aversus,nullset Aset
     var Btherap Bset
+    rand.Seed(int64(time.Now().Nanosecond()))
     todo=-1
     for todo!=0 {// TODO case 0 does not break it...
         todo=int(Prompt("\nWhat to do:\n    [1] (re)generate the state space (or a subset of it)\n    [2] compute an attractor set\n    [3] compute the pathological attractors\n    [4] compute therapeutic bullets\n    [5] change parameter values\n    [6] check what is already saved\n    [7] help\n    [8] license\n    [0] quit\n\nTo do: ",ToV(Range(0,9))))
