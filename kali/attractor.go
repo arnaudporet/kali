@@ -128,8 +128,10 @@ func (A *Aset) Load(setting int) {
     reader.TrimLeadingSpace=true
     s,_=reader.Read()
     n,_=strconv.ParseInt(s[0],10,0)
-    s,_=reader.Read()
-    m,_=strconv.ParseInt(s[0],10,0)
+    if int(n)>0 {
+        s,_=reader.Read()
+        m,_=strconv.ParseInt(s[0],10,0)
+    }
     for i1=0;i1<int(n);i1++ {
         a=Attractor{}
         s,_=reader.Read()
@@ -220,7 +222,9 @@ func (A Aset) Save(setting int) {
     var file *os.File
     var writer *csv.Writer
     s=append(s,[]string{strconv.FormatInt(int64(len(A)),10)})
-    s=append(s,[]string{strconv.FormatInt(int64(A[0].Mat.Size(1)),10)})
+    if len(A)>0 {
+        s=append(s,[]string{strconv.FormatInt(int64(A[0].Mat.Size(1)),10)})
+    }
     for i1=range A {
         s=append(s,[]string{A[i1].Name})
         s=append(s,[]string{strconv.FormatFloat(A[i1].Basin,'f',-1,64)})
