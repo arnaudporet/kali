@@ -14,17 +14,19 @@ func Exist(file string) bool {
 func FillToMaxLen(s []string) []string {
     var wmax,i int
     var z []string
-    z=make([]string,len(s))
-    copy(z,s)
-    wmax=len(z[0])
-    for i=1;i<len(z);i++ {
-        if wmax<len(z[i]) {
-            wmax=len(z[i])
+    if len(s)>0 {
+        z=make([]string,len(s))
+        copy(z,s)
+        wmax=len(z[0])
+        for i=1;i<len(z);i++ {
+            if wmax<len(z[i]) {
+                wmax=len(z[i])
+            }
         }
-    }
-    for i=range z {
-        for len(z[i])<wmax {
-            z[i]+=" "
+        for i=range z {
+            for len(z[i])<wmax {
+                z[i]+=" "
+            }
         }
     }
     return z
@@ -57,10 +59,12 @@ func Max(x ...float64) float64 {
 func Prompt(message string,deck Vector) float64 {
     var x float64
     for {
-        fmt.Printf(message)
-        fmt.Scanf("%f",&x)
+        fmt.Print(message)
+        fmt.Scan(&x)
         if len(deck)==0 || deck.Find(x)>-1 {
             return x
+        } else {
+            fmt.Println("bad input")
         }
     }
 }

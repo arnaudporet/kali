@@ -145,7 +145,9 @@ func (B *Bset) Sort() {
 //#### Swap ##################################################################//
 func (B *Bset) Swap(i1,i2 int) {
     var b Bullet
-    b=(*B)[i1].Copy()
-    (*B)[i1]=(*B)[i2].Copy()
-    (*B)[i2]=b
+    if len(*B)>0 {
+        b=(*B)[i1].Copy()
+        (*B)[i1]=(*B)[i2].Copy()
+        (*B)[i2]=b
+    }
 }

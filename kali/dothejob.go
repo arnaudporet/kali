@@ -57,15 +57,17 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,maxtarg,maxmoda,maxD int,no
             case 4:
                 if len(D)==0 {
                     fmt.Println("\nThe state space (or a subset of it) must be generated to compute therapeutic bullets. Ensure that the state space (or a subset of it) is already generated.")
+                } else if !Exist("A_physio.csv") || !Exist("A_patho.csv") || !Exist("A_versus.csv") {
+                    fmt.Println("\nThe files A_physio.csv, A_patho.csv and A_versus.csv are required to compute therapeutic bullets. Ensure that the physiological attractor set, the pathological attractor set and the pathological attractors are already computed.")
                 } else {
-                    if !Exist("A_physio.csv") || !Exist("A_patho.csv") || !Exist("A_versus.csv") {
-                        fmt.Println("\nThe files A_physio.csv, A_patho.csv and A_versus.csv are required to compute therapeutic bullets. Ensure that the physiological attractor set, the pathological attractor set and the pathological attractors are already computed.")
+                    Aversus.Load(3)
+                    if len(Aversus)==0 {
+                        fmt.Println("\nA_versus is empty: there are no pathological attractors to remove.")
                     } else {
                         Aphysio.Load(1)
                         Apatho.Load(2)
-                        Aversus.Load(3)
-                        rmin=int(Prompt("\nNumber of targets per bullet (lower bound): ",Vector{}))
-                        rmax=int(Prompt("Number of targets per bullet (upper bound): ",Vector{}))
+                        rmin=int(Prompt("\nNumber of targets per bullet (lower bound): ",ToV(Range(1,len(nodes)+1))))
+                        rmax=int(Prompt("\nNumber of targets per bullet (upper bound): ",ToV(Range(rmin,len(nodes)+1))))
                         Btherap.Compute(fpatho,D,rmin,rmax,maxtarg,maxmoda,Aphysio,Apatho,Aversus,vals)
                         Btherap.Report(nodes,Aphysio,Aversus,rmin,rmax)
                     }

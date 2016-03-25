@@ -57,16 +57,18 @@ func (v Vector) Find(x float64) int {
 func (v Vector) MinPos() []int {
     var i,imin int
     var y []int
-    imin=0
-    for i=1;i<len(v);i++ {
-        if v[i]<v[imin] {
-            imin=i
+    if len(v)>0 {
+        imin=0
+        for i=1;i<len(v);i++ {
+            if v[i]<v[imin] {
+                imin=i
+            }
         }
-    }
-    y=append(y,imin)
-    for i=imin+1;i<len(v);i++ {
-        if v[i]==v[imin] {
-            y=append(y,i)
+        y=append(y,imin)
+        for i=imin+1;i<len(v);i++ {
+            if v[i]==v[imin] {
+                y=append(y,i)
+            }
         }
     }
     return y
@@ -75,8 +77,10 @@ func (v Vector) MinPos() []int {
 func (v Vector) Pos(x []int) Vector {
     var i int
     var y Vector
-    for i=range x {
-        y=append(y,v[x[i]])
+    if len(v)>0 {
+        for i=range x {
+            y=append(y,v[x[i]])
+        }
     }
     return y
 }
@@ -103,13 +107,15 @@ func (v Vector) ToI() []int {
 func (v Vector) ToM(d int) Matrix {
     var i int
     var y Matrix
-    switch d {
-        case 1:
-            y=Matrix{v.Copy()}
-        case 2:
-            for i=range v {
-                y=append(y,Vector{v[i]})
-            }
+    if len(v)>0 {
+        switch d {
+            case 1:
+                y=Matrix{v.Copy()}
+            case 2:
+                for i=range v {
+                    y=append(y,Vector{v[i]})
+                }
+        }
     }
     return y
 }

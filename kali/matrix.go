@@ -13,8 +13,12 @@ func (m1 *Matrix) Cat(m2 Matrix,d int) {
                 (*m1)=append((*m1),m2[i].Copy())
             }
         case 2:
-            for i=range m2 {
-                (*m1)[i].Cat(m2[i])
+            if len(*m1)>0 {
+                for i=range m2 {
+                    (*m1)[i].Cat(m2[i])
+                }
+            } else {
+                (*m1)=m2.Copy()
             }
     }
 }
@@ -68,9 +72,11 @@ func (m Matrix) Find(v Vector,d int) int {
                 }
             }
         case 2:
-            for i=range m[0] {
-                if m.Col(i).Equal(v) {
-                    return i
+            if len(m)>0 {
+                for i=range m[0] {
+                    if m.Col(i).Equal(v) {
+                        return i
+                    }
                 }
             }
     }
@@ -79,8 +85,14 @@ func (m Matrix) Find(v Vector,d int) int {
 //#### Size ##################################################################//
 func (m Matrix) Size(d int) int {
     switch d {
-        case 1: return len(m)
-        case 2: return len(m[0])
+        case 1:
+            return len(m)
+        case 2:
+            if len(m)>0 {
+                return len(m[0])
+            } else {
+                return 0
+            }
     }
     return -1
 }
@@ -89,12 +101,14 @@ func (m Matrix) Sub(rows,cols []int) Matrix {
     var i,j int
     var z Vector
     var y Matrix
-    for i=range rows {
-        z=Vector{}
-        for j=range cols {
-            z=append(z,m[rows[i]][cols[j]])
+    if len(m)>0 && len(cols)>0 {
+        for i=range rows {
+            z=Vector{}
+            for j=range cols {
+                z=append(z,m[rows[i]][cols[j]])
+            }
+            y=append(y,z.Copy())
         }
-        y=append(y,z.Copy())
     }
     return y
 }
@@ -102,8 +116,10 @@ func (m Matrix) Sub(rows,cols []int) Matrix {
 func (m Matrix) T() Matrix {
     var j int
     var y Matrix
-    for j=range m[0] {
-        y=append(y,m.Col(j))
+    if len(m)>0 {
+        for j=range m[0] {
+            y=append(y,m.Col(j))
+        }
     }
     return y
 }
