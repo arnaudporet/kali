@@ -18,7 +18,19 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,maxtarg,maxmoda,maxD int,no
     rand.Seed(int64(time.Now().Nanosecond()))
     todo=-1
     for todo!=0 {// TODO case 0 does not break it...
-        todo=int(Prompt("\nWhat to do:\n    [1] (re)generate the state space (or a subset of it)\n    [2] compute an attractor set\n    [3] compute the pathological attractors\n    [4] compute therapeutic bullets\n    [5] change parameter values\n    [6] check what is already saved\n    [7] help\n    [8] license\n    [0] quit\n\nTo do: ",ToV(Range(0,9))))
+        todo=int(Prompt(strings.Join([]string{
+            "\nWhat to do:",
+            "    [1] (re)generate the state space (or a subset of it)",
+            "    [2] compute an attractor set",
+            "    [3] compute the pathological attractors",
+            "    [4] compute therapeutic bullets",
+            "    [5] change parameter values",
+            "    [6] check what is already saved",
+            "    [7] help",
+            "    [8] license",
+            "    [0] quit",
+            "\nTo do: ",
+        },"\n"),ToV(Range(0,9))))
         switch todo {
             case 1:
                 wholeS=int(Prompt("\nState space cardinality: "+strconv.FormatFloat(math.Pow(float64(len(vals)),float64(len(nodes))),'f',-1,64)+"\n\nCompute the whole state space? [0/1] ",Vector{0.0,1.0}))
@@ -75,7 +87,14 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,maxtarg,maxmoda,maxD int,no
             case 5:
                 tochange=-1
                 for tochange!=0 {// TODO case 0 does not break it...
-                    tochange=int(Prompt("\nChange:\n    [1] maxtarg ("+strconv.FormatInt(int64(maxtarg),10)+")\n    [2] maxmoda ("+strconv.FormatInt(int64(maxmoda),10)+")\n    [3] maxD ("+strconv.FormatInt(int64(maxD),10)+")\n    [0] done\n\nTo change: ",ToV(Range(0,4))))
+                    tochange=int(Prompt(strings.Join([]string{
+                        "\nChange:",
+                        "    [1] maxtarg ("+strconv.FormatInt(int64(maxtarg),10)+")",
+                        "    [2] maxmoda ("+strconv.FormatInt(int64(maxmoda),10)+")",
+                        "    [3] maxD ("+strconv.FormatInt(int64(maxD),10)+")",
+                        "    [0] done",
+                        "\nTo change: ",
+                    },"\n"),ToV(Range(0,4))))
                     switch tochange {
                         case 1:
                             maxtarg=int(Prompt("\nmaxtarg=",Vector{}))
@@ -91,55 +110,62 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,maxtarg,maxmoda,maxD int,no
                             // break
                     }
                 }
-            case 6: fmt.Println("\nAlready saved:\n    A_physio: "+strconv.FormatBool(Exist("A_physio.csv"))+"\n    A_patho: "+strconv.FormatBool(Exist("A_patho.csv"))+"\n    A_versus: "+strconv.FormatBool(Exist("A_versus.csv"))+"\n    B_therap: "+strconv.FormatBool(Exist("B_therap.txt")))
+            case 6:
+                fmt.Println(strings.Join([]string{
+                    "\nAlready saved:",
+                    "    A_physio: "+strconv.FormatBool(Exist("A_physio.csv")),
+                    "    A_patho:  "+strconv.FormatBool(Exist("A_patho.csv")),
+                    "    A_versus: "+strconv.FormatBool(Exist("A_versus.csv")),
+                    "    B_therap: "+strconv.FormatBool(Exist("B_therap.txt")),
+                },"\n"))
             case 7:
                 fmt.Println(strings.Join([]string{
-                "\nHow to use the algorithm:",
-                "    1) read my article, it explains:",
-                "        * the algorithm",
-                "        * its purpose",
-                "        * how it works (illustrated with the example)",
-                "        * its applications (illustrated with a Boolean model of Fanconi anemia)",
-                "        * its strengths and weaknesses",
-                "        * its possible further improvements/contributions",
-                "       freely available on arXiv and HAL:",
-                "        * http://arxiv.org/abs/1407.4374",
-                "        * https://hal.archives-ouvertes.fr/hal-01024788",
-                "    2) generate the state space (or a subset of it): [1]",
-                "        * you can regenerate it whenever you want",
-                "    3) compute the physiological attractor set: [2]",
-                "        * when prompted, set the setting to physiological",
-                "        * will return A_physio",
-                "        * when prompted, save A_physio (required for the next steps)",
-                "        * will create the files A_physio.csv (for the algorithm) and A_physio.txt (for you)",
-                "    4) compute the pathological attractor set: [2]",
-                "        * when prompted, set the setting to pathological",
-                "        * will return A_patho",
-                "        * when prompted, save A_patho (required for the next steps)",
-                "        * will create the files A_patho.csv (for the algorithm) and A_patho.txt (for you)",
-                "    5) compute the pathological attractors: [3]",
-                "        * will return A_versus",
-                "        * when prompted, save A_versus (required for the next steps)",
-                "        * will create the files A_versus.csv (for the algorithm) and A_versus.txt (for you)",
-                "    6) compute therapeutic bullets: [4]",
-                "        * will return B_therap",
-                "        * when prompted, you can save B_therap (optional)",
-                "        * will create the file B_therap.txt (for you)",
-                "        * therapeutic bullets are reported as follow:",
-                "              x1[y1] x2[y2] x3[y3] ...",
-                "          meaning that the variable x has to be set to the value y",
-                "    * you can change the parameter values (namely maxtarg, maxmoda and maxD): [5]",
-                "    * you can check what is already saved: [6]",
-                "\nIf you rename, move or delete the csv files created by the algorithm then it will not recognize them when required, if any.",
-                "\nThe algorithm is tested with Go version go1.6 linux/amd64 (Arch Linux).",
+                    "\nHow to use the algorithm:",
+                    "    1) read my article, it explains:",
+                    "        * the algorithm",
+                    "        * its purpose",
+                    "        * how it works (illustrated with the example)",
+                    "        * its applications (illustrated with a Boolean model of Fanconi anemia)",
+                    "        * its strengths and weaknesses",
+                    "        * its possible further improvements/contributions",
+                    "       freely available on arXiv and HAL:",
+                    "        * http://arxiv.org/abs/1407.4374",
+                    "        * https://hal.archives-ouvertes.fr/hal-01024788",
+                    "    2) generate the state space (or a subset of it): [1]",
+                    "        * you can regenerate it whenever you want",
+                    "    3) compute the physiological attractor set: [2]",
+                    "        * when prompted, set the setting to physiological",
+                    "        * will return A_physio",
+                    "        * when prompted, save A_physio (required for the next steps)",
+                    "        * will create the files A_physio.csv (for the algorithm) and A_physio.txt (for you)",
+                    "    4) compute the pathological attractor set: [2]",
+                    "        * when prompted, set the setting to pathological",
+                    "        * will return A_patho",
+                    "        * when prompted, save A_patho (required for the next steps)",
+                    "        * will create the files A_patho.csv (for the algorithm) and A_patho.txt (for you)",
+                    "    5) compute the pathological attractors: [3]",
+                    "        * will return A_versus",
+                    "        * when prompted, save A_versus (required for the next steps)",
+                    "        * will create the files A_versus.csv (for the algorithm) and A_versus.txt (for you)",
+                    "    6) compute therapeutic bullets: [4]",
+                    "        * will return B_therap",
+                    "        * when prompted, you can save B_therap (optional)",
+                    "        * will create the file B_therap.txt (for you)",
+                    "        * therapeutic bullets are reported as follow:",
+                    "              x1[y1] x2[y2] x3[y3] ...",
+                    "          meaning that the variable x has to be set to the value y",
+                    "    * you can change the parameter values (namely maxtarg, maxmoda and maxD): [5]",
+                    "    * you can check what is already saved: [6]",
+                    "\nIf you rename, move or delete the csv files created by the algorithm then it will not recognize them when required, if any.",
+                    "\nThe algorithm is tested with Go version go1.6 linux/amd64 (Arch Linux).",
                 },"\n"))
             case 8:
                 fmt.Println(strings.Join([]string{
-                "\nkali: a tool for in silico therapeutic target discovery",
-                "Copyright (C) 2013-2016 Arnaud Poret",
-                "\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.",
-                "\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.",
-                "\nYou should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/gpl.html",
+                    "\nkali: a tool for in silico therapeutic target discovery",
+                    "Copyright (C) 2013-2016 Arnaud Poret",
+                    "\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.",
+                    "\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.",
+                    "\nYou should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/gpl.html",
                 },"\n"))
             case 0:
                 fmt.Println("\nGoodbye!\n")
