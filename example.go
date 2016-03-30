@@ -81,6 +81,9 @@ func fphysio(x kali.Matrix,k int) kali.Vector {
     min=kali.Min
     max=kali.Max
     y=make(kali.Vector,x.Size(1))
+    // replace the following equations with your own stuff
+    // your equations coded in the same way: y[i]=f(x[0][k],x[1][k],x[2][k],...)
+    // note that the numbering starts at 0
     y[0]=x[0][k]// CycD
     y[1]=max(min(1.0-x[0][k],1.0-x[3][k],1.0-x[4][k],1.0-x[9][k]),min(x[5][k],1.0-x[0][k],1.0-x[9][k]))// Rb
     y[2]=max(min(1.0-x[1][k],1.0-x[4][k],1.0-x[9][k]),min(x[5][k],1.0-x[1][k],1.0-x[9][k]))// E2F
@@ -103,6 +106,9 @@ func fpatho(x kali.Matrix,k int) kali.Vector {
     min=kali.Min
     max=kali.Max
     y=make(kali.Vector,x.Size(1))
+    // replace the following equations with your own stuff
+    // your equations coded in the same way: y[i]=f(x[0][k],x[1][k],x[2][k],...)
+    // note that the numbering starts at 0
     y[0]=x[0][k]// CycD
     y[1]=0.0// Rb
     y[2]=max(min(1.0-x[1][k],1.0-x[4][k],1.0-x[9][k]),min(x[5][k],1.0-x[1][k],1.0-x[9][k]))// E2F
