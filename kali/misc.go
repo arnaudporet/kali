@@ -4,6 +4,7 @@
 package kali
 import "fmt"
 import "os"
+import "strings"
 //#### Exist #################################################################//
 func Exist(file string) bool {
     var err error
@@ -64,7 +65,7 @@ func Prompt(message string,deck Vector) float64 {
         if len(deck)==0 || deck.Find(x)>-1 {
             return x
         } else {
-            fmt.Println("bad input")
+            fmt.Println("\nERROR: must be in ["+strings.Join(deck.ToS(),",")+"]")
         }
     }
 }

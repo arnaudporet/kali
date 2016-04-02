@@ -2,6 +2,9 @@
 // This work is licensed under the GNU General Public License.
 // To view a copy of this license, visit http://www.gnu.org/licenses/gpl.html
 package kali
+import "encoding/csv"
+import "os"
+import "strconv"
 //#### Types #################################################################//
 type Matrix []Vector
 //#### Cat ###################################################################//
@@ -82,6 +85,44 @@ func (m Matrix) Find(v Vector,d int) int {
     }
     return -1
 }
+//#### Load ##################################################################//
+func (m *Matrix) Load(filename string) {
+    var i,j int
+    var x float64
+    var s [][]string
+    var z Vector
+    var file *os.File
+    var reader *csv.Reader
+    (*m)=Matrix{}
+    file,_=os.Open(filename)
+    reader=csv.NewReader(file)
+    reader.Comma=','
+    reader.Comment=0
+    reader.FieldsPerRecord=-1
+    reader.LazyQuotes=false
+    reader.TrimLeadingSpace=true
+    s,_=reader.ReadAll()
+    file.Close()
+    for i=range s {
+        z=Vector{}
+        for j=range s[i] {
+            x,_=strconv.ParseFloat(s[i][j],64)
+            z=append(z,x)
+        }
+        (*m)=append((*m),z.Copy())
+    }
+}
+//#### Save ##################################################################//
+func (m Matrix) Save(filename string) {
+    var file *os.File
+    var writer *csv.Writer
+    file,_=os.Create(filename)
+    writer=csv.NewWriter(file)
+    writer.Comma=','
+    writer.UseCRLF=false
+    writer.WriteAll(m.ToS())
+    file.Close()
+}
 //#### Size ##################################################################//
 func (m Matrix) Size(d int) int {
     switch d {
@@ -120,6 +161,15 @@ func (m Matrix) T() Matrix {
         for j=range m[0] {
             y=append(y,m.Col(j))
         }
+    }
+    return y
+}
+//#### ToS ###################################################################//
+func (m Matrix) ToS() [][]string {
+    var i int
+    var y [][]string
+    for i=range m {
+        y=append(y,m[i].ToS())
     }
     return y
 }

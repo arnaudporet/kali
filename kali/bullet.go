@@ -95,12 +95,12 @@ func (B Bset) Report(nodes []string,Aphysio,Aversus Aset,rmin,rmax int) {
         report+="    "+strconv.FormatInt(int64(i1+rmin),10)+"-bullets: "+strconv.FormatInt(int64(barrel[i1]),10)+"\n"
     }
     fmt.Println("\n"+report)
-    save=int(Prompt("Save? [0/1] ",Vector{0.0,1.0}))
+    save=int(Prompt("Save? (optional) [0/1] ",Vector{0.0,1.0}))
     if save==1 {
         file,_=os.Create("B_therap.txt")
         file.WriteString(report)
         file.Close()
-        fmt.Println("\nReport saved as B_therap.txt")
+        fmt.Println("\nINFO: report saved as B_therap.txt")
     }
 }
 //#### Sort ##################################################################//

@@ -116,9 +116,9 @@ func (A *Aset) Load(setting int) {
     var reader *csv.Reader
     (*A)=Aset{}
     switch setting {
-        case 1: file,_=os.Open("A_physio.csv")
-        case 2: file,_=os.Open("A_patho.csv")
-        case 3: file,_=os.Open("A_versus.csv")
+        case 0: file,_=os.Open("A_physio.csv")
+        case 1: file,_=os.Open("A_patho.csv")
+        case 2: file,_=os.Open("A_versus.csv")
     }
     reader=csv.NewReader(file)
     reader.Comma=','
@@ -156,8 +156,8 @@ func (A *Aset) Name(Ref Aset,setting int) {
     var i,k,inRef int
     var name string
     switch setting {
-        case 1: name="a_physio"
-        case 2: name="a_patho"
+        case 0: name="a_physio"
+        case 1: name="a_patho"
     }
     k=1
     for i=range (*A) {
@@ -180,13 +180,13 @@ func (A Aset) Report(setting int,nodes []string) {
     npoint=0
     ncycle=0
     switch setting {
-        case 1:
+        case 0:
             reportname="A_physio.txt"
             report="A_physio={"
-        case 2:
+        case 1:
             reportname="A_patho.txt"
             report="A_patho={"
-        case 3:
+        case 2:
             reportname="A_versus.txt"
             report="A_versus={"
     }
@@ -205,19 +205,19 @@ func (A Aset) Report(setting int,nodes []string) {
     }
     report+="Found attractors: "+strconv.FormatInt(int64(len(A)),10)+"\n    points: "+strconv.FormatInt(int64(npoint),10)+"\n    cycles: "+strconv.FormatInt(int64(ncycle),10)+"\n"
     fmt.Println("\n"+report)
-    save=int(Prompt("Save? [0/1] ",Vector{0.0,1.0}))
+    save=int(Prompt("Save? (required for the next steps) [0/1] ",Vector{0.0,1.0}))
     if save==1 {
         A.Save(setting)
         file,_=os.Create(reportname)
         file.WriteString(report)
         file.Close()
-        fmt.Println("Report saved as "+reportname)
+        fmt.Println("\nINFO: report saved as "+reportname)
     }
 }
 //#### Save ##################################################################//
 func (A Aset) Save(setting int) {
     var i1,i2 int
-    var name string
+    var filename string
     var s [][]string
     var file *os.File
     var writer *csv.Writer
@@ -233,17 +233,17 @@ func (A Aset) Save(setting int) {
         }
     }
     switch setting {
-        case 1: name="A_physio.csv"
-        case 2: name="A_patho.csv"
-        case 3: name="A_versus.csv"
+        case 0: filename="A_physio.csv"
+        case 1: filename="A_patho.csv"
+        case 2: filename="A_versus.csv"
     }
-    file,_=os.Create(name)
+    file,_=os.Create(filename)
     writer=csv.NewWriter(file)
     writer.Comma=','
     writer.UseCRLF=false
     writer.WriteAll(s)
     file.Close()
-    fmt.Println("\nSet saved as "+name)
+    fmt.Println("\nINFO: set saved as "+filename)
 }
 //#### Sort ##################################################################//
 func (a *Attractor) Sort() {
