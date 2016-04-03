@@ -25,7 +25,7 @@
 package main
 import "./kali"//import the algorithm, change the path if you move it
 func main() {
-    var maxtarg,maxmoda,maxD int
+    var maxtarg,maxmoda,maxS int
     var nodes []string
     var vals kali.Vector
     // The node names.
@@ -60,8 +60,8 @@ func main() {
     // If it exceeds its maximal possible value then the algorithm will
     // automatically decrease it to its maximal possible value.
     // Can be changed at run-time.
-    maxD=int(1e4)
-    kali.DoTheJob(fphysio,fpatho,maxtarg,maxmoda,maxD,nodes,vals)
+    maxS=int(1e4)
+    kali.DoTheJob(fphysio,fpatho,maxtarg,maxmoda,maxS,nodes,vals)
 }
 
 // The network must be deterministic.

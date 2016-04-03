@@ -20,7 +20,7 @@ func (a *Attractor) Compute(f func(Matrix,int) Vector,x0 Vector,b Bullet) {
     var y Vector
     var x Matrix
     (*a)=Attractor{}
-    x=x0.ToM(2)
+    x=x0.VtoM(2)
     k=0
     for {
         y=f(x,k)
@@ -33,18 +33,18 @@ func (a *Attractor) Compute(f func(Matrix,int) Vector,x0 Vector,b Bullet) {
             (*a).Sort()
             break
         } else {
-            x.Cat(y.ToM(2),2)
+            x.Cat(y.VtoM(2),2)
             k+=1
         }
     }
 }
 //#### Compute ###############################################################//
-func (A *Aset) Compute(f func(Matrix,int) Vector,D Matrix,b Bullet,Ref Aset,setting int) {
+func (A *Aset) Compute(f func(Matrix,int) Vector,S Matrix,b Bullet,Ref Aset,setting int) {
     var i,inA int
     var a Attractor
     (*A)=Aset{}
-    for i=range D[0] {
-        a.Compute(f,D.Col(i),b)
+    for i=range S[0] {
+        a.Compute(f,S.Col(i),b)
         inA=(*A).Find(a)
         if inA>-1 {
             (*A)[inA].Basin+=1.0
@@ -54,7 +54,7 @@ func (A *Aset) Compute(f func(Matrix,int) Vector,D Matrix,b Bullet,Ref Aset,sett
         }
     }
     for i=range (*A) {
-        (*A)[i].Basin=100.0*(*A)[i].Basin/float64(D.Size(2))
+        (*A)[i].Basin=100.0*(*A)[i].Basin/float64(S.Size(2))
     }
     (*A).Sort()
     (*A).Name(Ref,setting)
@@ -106,11 +106,9 @@ func (a Attractor) IsPatho() bool {
 }
 //#### Load ##################################################################//
 func (A *Aset) Load(setting int) {
-    var i1,i2,i3 int
+    var i1,i2 int
     var n,m int64
-    var x float64
     var s []string
-    var z Vector
     var a Attractor
     var file *os.File
     var reader *csv.Reader
@@ -133,19 +131,14 @@ func (A *Aset) Load(setting int) {
         m,_=strconv.ParseInt(s[0],10,0)
     }
     for i1=0;i1<int(n);i1++ {
-        a=Attractor{}
         s,_=reader.Read()
         a.Name=s[0]
         s,_=reader.Read()
         a.Basin,_=strconv.ParseFloat(s[0],64)
+        a.Mat=Matrix{}
         for i2=0;i2<int(m);i2++ {
-            z=Vector{}
             s,_=reader.Read()
-            for i3=range s {
-                x,_=strconv.ParseFloat(s[i3],64)
-                z=append(z,x)
-            }
-            a.Mat=append(a.Mat,z.Copy())
+            a.Mat=append(a.Mat,StoV(s))
         }
         (*A)=append((*A),a.Copy())
     }
@@ -199,7 +192,7 @@ func (A Aset) Report(setting int,nodes []string) {
         }
         report+="Name: "+A[i1].Name+"\nBasin: "+strconv.FormatFloat(A[i1].Basin,'f',-1,64)+"%\nMatrix:\n"
         for i2=range A[i1].Mat {
-            report+="    "+nodesfilled[i2]+" "+strings.Join(A[i1].Mat[i2].ToS()," ")+"\n"
+            report+="    "+nodesfilled[i2]+" "+strings.Join(A[i1].Mat[i2].VtoS()," ")+"\n"
         }
         report+=strings.Repeat("-",80)+"\n"
     }
@@ -229,7 +222,7 @@ func (A Aset) Save(setting int) {
         s=append(s,[]string{A[i1].Name})
         s=append(s,[]string{strconv.FormatFloat(A[i1].Basin,'f',-1,64)})
         for i2=range A[i1].Mat {
-            s=append(s,A[i1].Mat[i2].ToS())
+            s=append(s,A[i1].Mat[i2].VtoS())
         }
     }
     switch setting {
@@ -249,9 +242,9 @@ func (A Aset) Save(setting int) {
 func (a *Attractor) Sort() {
     var i int
     var jmin Vector
-    jmin=ToV(Range(0,(*a).Mat.Size(2)))
+    jmin=ItoV(Range(0,(*a).Mat.Size(2)))
     for i=range (*a).Mat {
-        jmin=jmin.Pos((*a).Mat[i].Pos(jmin.ToI()).MinPos())
+        jmin=jmin.Pos((*a).Mat[i].Pos(jmin.VtoI()).MinPos())
         if len(jmin)==1 {
             (*a).Mat.CircShift(int(jmin[0]))
             break

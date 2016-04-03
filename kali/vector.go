@@ -53,6 +53,15 @@ func (v Vector) Find(x float64) int {
     }
     return -1
 }
+//#### ItoV ###################################################################//
+func ItoV(x []int) Vector {
+    var i int
+    var y Vector
+    for i=range x {
+        y=append(y,float64(x[i]))
+    }
+    return y
+}
 //#### MinPos ################################################################//
 func (v Vector) MinPos() []int {
     var i,imin int
@@ -84,6 +93,17 @@ func (v Vector) Pos(x []int) Vector {
     }
     return y
 }
+//#### StoV ##################################################################//
+func StoV(s []string) Vector {
+    var i int
+    var x float64
+    var y Vector
+    for i=range s {
+        x,_=strconv.ParseFloat(s[i],64)
+        y=append(y,x)
+    }
+    return y
+}
 //#### Sum ###################################################################//
 func (v Vector) Sum() float64 {
     var i int
@@ -94,8 +114,8 @@ func (v Vector) Sum() float64 {
     }
     return y
 }
-//#### ToI ###################################################################//
-func (v Vector) ToI() []int {
+//#### VtoI ##################################################################//
+func (v Vector) VtoI() []int {
     var i int
     var y []int
     for i=range v {
@@ -103,8 +123,8 @@ func (v Vector) ToI() []int {
     }
     return y
 }
-//#### ToM ###################################################################//
-func (v Vector) ToM(d int) Matrix {
+//#### VtoM ##################################################################//
+func (v Vector) VtoM(d int) Matrix {
     var i int
     var y Matrix
     if len(v)>0 {
@@ -119,21 +139,12 @@ func (v Vector) ToM(d int) Matrix {
     }
     return y
 }
-//#### ToS ###################################################################//
-func (v Vector) ToS() []string {
+//#### VtoS ##################################################################//
+func (v Vector) VtoS() []string {
     var i int
     var y []string
     for i=range v {
         y=append(y,strconv.FormatFloat(v[i],'f',-1,64))
-    }
-    return y
-}
-//#### ToV ###################################################################//
-func ToV(x []int) Vector {
-    var i int
-    var y Vector
-    for i=range x {
-        y=append(y,float64(x[i]))
     }
     return y
 }

@@ -29,7 +29,7 @@ func (b Bullet) Assess(Atest,Aversus Aset) bool {
     }
 }
 //#### Compute ###############################################################//
-func (B *Bset) Compute(fpatho func(Matrix,int) Vector,D Matrix,rmin,rmax,maxtarg,maxmoda int,Aphysio,Apatho,Aversus Aset,vals Vector) {
+func (B *Bset) Compute(fpatho func(Matrix,int) Vector,S Matrix,rmin,rmax,maxtarg,maxmoda int,Aphysio,Apatho,Aversus Aset,vals Vector) {
     var r,i1,i2 int
     var Targ,Moda Matrix
     var b Bullet
@@ -38,13 +38,13 @@ func (B *Bset) Compute(fpatho func(Matrix,int) Vector,D Matrix,rmin,rmax,maxtarg
     b.Gain=make(Vector,2)
     b.Gain[0]=Aphysio.Covers(Apatho).Sum()
     for r=rmin;r<rmax+1;r++ {
-        Targ=GenCombiMat(ToV(Range(0,len(D))),r,maxtarg)
+        Targ=GenCombiMat(ItoV(Range(0,len(S))),r,maxtarg)
         Moda=GenArrangMat(vals,r,maxmoda)
         for i1=range Targ {
             for i2=range Moda {
                 b.Targ=Targ[i1].Copy()
                 b.Moda=Moda[i2].Copy()
-                Atest.Compute(fpatho,D,b,Aphysio,2)
+                Atest.Compute(fpatho,S,b,Aphysio,1)
                 b.Gain[1]=Aphysio.Covers(Atest).Sum()
                 if b.Assess(Atest,Aversus) {
                     b.Cover=Union(Aphysio,Aversus).Covers(Atest)

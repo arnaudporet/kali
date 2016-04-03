@@ -9,9 +9,9 @@ import "strconv"
 import "strings"
 import "time"
 //#### DoTheJob ##############################################################//
-func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,maxtarg,maxmoda,maxD int,nodes []string,vals Vector) {
-    var todo,wholeS,setting,rmin,rmax,tochange,gen,save int
-    var D Matrix
+func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,maxtarg,maxmoda,maxS int,nodes []string,vals Vector) {
+    var todo,whole,setting,rmin,rmax,tochange,gen,save int
+    var S Matrix
     var nullb Bullet
     var Aphysio,Apatho,Aversus,nullset Aset
     var Btherap Bset
@@ -20,73 +20,73 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,maxtarg,maxmoda,maxD int,no
     for todo!=0 {// TODO case 0 does not break it...
         todo=int(Prompt(strings.Join([]string{
             "\nWhat to do:",
-            "    [1] generate or load the state space",
+            "    [1] generate or load the state space (S)",
             "    [2] compute an attractor set (A_physio or A_patho)",
             "    [3] compute the pathological attractors (A_versus)",
             "    [4] compute therapeutic bullets (B_therap)",
-            "    [5] change parameter values (maxtarg, maxmoda, maxD)",
-            "    [6] check what is already saved (state space, A_physio, A_patho, A_versus, B_therap)",
+            "    [5] change parameter values (maxtarg, maxmoda, maxS)",
+            "    [6] check what is already saved (S, A_physio, A_patho, A_versus, B_therap)",
             "    [7] help",
             "    [8] license",
             "    [0] quit",
             "\nTo do [0-8] ",
-        },"\n"),ToV(Range(0,9))))
+        },"\n"),ItoV(Range(0,9))))
         switch todo {
             case 1:
-                gen=int(Prompt("\nState space: load [0] or generate [1]? [0/1] ",Vector{0.0,1.0}))
+                gen=int(Prompt("\nS: load [0] or generate [1]? [0/1] ",Vector{0.0,1.0}))
                 switch gen {
                     case 0:
-                        if !Exist("state_space.csv") {
-                            fmt.Println("\nERROR: nothing to load")
+                        if !Exist("S.csv") {
+                            fmt.Println("\nERROR: unable to load S.csv")
                         } else {
-                            D.Load("state_space.csv")
-                            fmt.Println("\nINFO: state space loaded")
+                            S.Load("S.csv")
+                            fmt.Println("\nINFO: S loaded")
                         }
                     case 1:
-                        wholeS=int(Prompt("\nState space cardinality: "+strconv.FormatFloat(math.Pow(float64(len(vals)),float64(len(nodes))),'f',-1,64)+"\n\nCompute the whole state space? [0/1] ",Vector{0.0,1.0}))
-                        switch wholeS {
-                            case 0: D=GenArrangMat(vals,len(nodes),maxD).T()
-                            case 1: D=GenS(vals,len(nodes))
+                        whole=int(Prompt("\nS cardinality: "+strconv.FormatFloat(math.Pow(float64(len(vals)),float64(len(nodes))),'f',-1,64)+"\n\nCompute whole S or limit to maxS ("+strconv.FormatInt(int64(maxS),10)+")? [0/1] ",Vector{0.0,1.0}))
+                        switch whole {
+                            case 0: S=GenArrangMat(vals,len(nodes),maxS).T()
+                            case 1: S=GenS(vals,len(nodes))
                         }
-                        fmt.Println("\nINFO: state space generated")
+                        fmt.Println("\nINFO: S generated")
                         save=int(Prompt("\nSave? (optional) [0/1] ",Vector{0.0,1.0}))
                         if save==1 {
-                            D.Save("state_space.csv")
-                            fmt.Println("\nINFO: state space saved as state_space.csv")
+                            S.Save("S.csv")
+                            fmt.Println("\nINFO: set saved as S.csv")
                         }
                 }
             case 2:
-                if len(D)==0 {
-                    fmt.Println("\nERROR: the state space must be generated or loaded")
+                if len(S)==0 {
+                    fmt.Println("\nERROR: S must be generated or loaded")
                 } else {
                     setting=int(Prompt("\nSetting: physiological [0] or pathological [1]? [0/1] ",Vector{0.0,1.0}))
                     switch setting {
                         case 0:
-                            Aphysio.Compute(fphysio,D,nullb,nullset,0)
+                            Aphysio.Compute(fphysio,S,nullb,nullset,0)
                             Aphysio.Report(0,nodes)
                         case 1:
                             if !Exist("A_physio.csv") {
-                                fmt.Println("\nERROR: the physiological attractor set (A_physio) must be computed and saved")
+                                fmt.Println("\nERROR: unable to load A_physio.csv")
                             } else {
                                 Aphysio.Load(0)
-                                Apatho.Compute(fpatho,D,nullb,Aphysio,1)
+                                Apatho.Compute(fpatho,S,nullb,Aphysio,1)
                                 Apatho.Report(1,nodes)
                             }
                     }
                 }
             case 3:
                 if !Exist("A_patho.csv") {
-                    fmt.Println("\nERROR: the pathological attractor set (A_patho) must be computed ans saved")
+                    fmt.Println("\nERROR: unable to load A_patho.csv")
                 } else {
                     Apatho.Load(1)
                     Aversus.Versus(Apatho)
                     Aversus.Report(2,nodes)
                 }
             case 4:
-                if len(D)==0 {
-                    fmt.Println("\nERROR: the state space must be generated or loaded")
+                if len(S)==0 {
+                    fmt.Println("\nERROR: S must be generated or loaded")
                 } else if !Exist("A_physio.csv") || !Exist("A_patho.csv") || !Exist("A_versus.csv") {
-                    fmt.Println("\nERROR: the physiological attractor set (A_physio), the pathological attractor set (A_patho) and the pathological attractors (A_versus) must be computed and saved")
+                    fmt.Println("\nERROR: unable to load A_physio.csv, A_patho.csv, A_versus.csv")
                 } else {
                     Aversus.Load(2)
                     if len(Aversus)==0 {
@@ -94,9 +94,9 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,maxtarg,maxmoda,maxD int,no
                     } else {
                         Aphysio.Load(0)
                         Apatho.Load(1)
-                        rmin=int(Prompt("\nNumber of targets per bullet (lower bound): ",ToV(Range(1,len(nodes)+1))))
-                        rmax=int(Prompt("\nNumber of targets per bullet (upper bound): ",ToV(Range(rmin,len(nodes)+1))))
-                        Btherap.Compute(fpatho,D,rmin,rmax,maxtarg,maxmoda,Aphysio,Apatho,Aversus,vals)
+                        rmin=int(Prompt("\nNumber of targets per bullet (lower bound): ",ItoV(Range(1,len(nodes)+1))))
+                        rmax=int(Prompt("\nNumber of targets per bullet (upper bound): ",ItoV(Range(rmin,len(nodes)+1))))
+                        Btherap.Compute(fpatho,S,rmin,rmax,maxtarg,maxmoda,Aphysio,Apatho,Aversus,vals)
                         Btherap.Report(nodes,Aphysio,Aversus,rmin,rmax)
                     }
                 }
@@ -107,20 +107,20 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,maxtarg,maxmoda,maxD int,no
                         "\nChange:",
                         "    [1] maxtarg ("+strconv.FormatInt(int64(maxtarg),10)+")",
                         "    [2] maxmoda ("+strconv.FormatInt(int64(maxmoda),10)+")",
-                        "    [3] maxD    ("+strconv.FormatInt(int64(maxD),10)+")",
+                        "    [3] maxS    ("+strconv.FormatInt(int64(maxS),10)+")",
                         "    [0] done",
-                        "\nTo change: ",
-                    },"\n"),ToV(Range(0,4))))
+                        "\nTo change [0-3] ",
+                    },"\n"),ItoV(Range(0,4))))
                     switch tochange {
                         case 1:
                             maxtarg=int(Prompt("\nmaxtarg=",Vector{}))
-                            fmt.Println("\nWARNING: you should recompute therapeutic bullets, if any")
+                            fmt.Println("\nWARNING: you should recompute B_therap, if any")
                         case 2:
                             maxmoda=int(Prompt("\nmaxmoda=",Vector{}))
-                            fmt.Println("\nWARNING: you should recompute therapeutic bullets, if any")
+                            fmt.Println("\nWARNING: you should recompute B_therap, if any")
                         case 3:
-                            maxD=int(Prompt("\nmaxD=",Vector{}))
-                            fmt.Println("\nWARNING: you should regenerate the state space, if any")
+                            maxS=int(Prompt("\nmaxS=",Vector{}))
+                            fmt.Println("\nWARNING: you should regenerate S, if any")
                         case 0:
                             fmt.Println("\nINFO: OK!")
                             // break
@@ -129,7 +129,7 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,maxtarg,maxmoda,maxD int,no
             case 6:
                 fmt.Println(strings.Join([]string{
                     "\nAlready saved:",
-                    "    state space: "+strconv.FormatBool(Exist("state_space.csv")),
+                    "    S:           "+strconv.FormatBool(Exist("S.csv")),
                     "    A_physio:    "+strconv.FormatBool(Exist("A_physio.csv")),
                     "    A_patho:     "+strconv.FormatBool(Exist("A_patho.csv")),
                     "    A_versus:    "+strconv.FormatBool(Exist("A_versus.csv")),
@@ -148,32 +148,24 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,maxtarg,maxmoda,maxD int,no
                     "       freely available on arXiv and HAL:",
                     "        * http://arxiv.org/abs/1407.4374",
                     "        * https://hal.archives-ouvertes.fr/hal-01024788",
-                    "    2) generate or load the state space: [1]",
-                    "        * you can regenerate or reload the state space whenever you want",
-                    "        * when prompted, you can save the state space (optional)",
-                    "    3) compute the physiological attractor set: [2]",
+                    "    2) generate or load the state space (S): [1]",
+                    "        * you can regenerate or reload S whenever you want",
+                    "        * when prompted, you can save S (optional)",
+                    "    3) compute the physiological attractor set (A_physio): [2]",
                     "        * when prompted, set the setting to physiological",
-                    "        * will return A_physio",
                     "        * when prompted, save A_physio (required for the next steps)",
-                    "        * will create the files A_physio.csv (for the algorithm) and A_physio.txt (for you)",
-                    "    4) compute the pathological attractor set: [2]",
+                    "    4) compute the pathological attractor set (A_patho): [2]",
                     "        * when prompted, set the setting to pathological",
-                    "        * will return A_patho",
                     "        * when prompted, save A_patho (required for the next steps)",
-                    "        * will create the files A_patho.csv (for the algorithm) and A_patho.txt (for you)",
-                    "    5) compute the pathological attractors: [3]",
-                    "        * will return A_versus",
+                    "    5) compute the pathological attractors (A_versus): [3]",
                     "        * when prompted, save A_versus (required for the next steps)",
-                    "        * will create the files A_versus.csv (for the algorithm) and A_versus.txt (for you)",
-                    "    6) compute therapeutic bullets: [4]",
-                    "        * will return B_therap",
+                    "    6) compute therapeutic bullets (B_therap): [4]",
                     "        * when prompted, you can save B_therap (optional)",
-                    "        * will create the file B_therap.txt (for you)",
                     "        * therapeutic bullets are reported as follow:",
                     "              x1[y1] x2[y2] x3[y3] ...",
                     "          meaning that the variable x has to be set to the value y",
-                    "    * you can change parameter values (maxtarg, maxmoda and maxD): [5]",
-                    "    * you can check what is already saved (state space, A_physio, A_patho, A_versus and B_therap): [6]",
+                    "    * you can change parameter values (maxtarg, maxmoda, maxS): [5]",
+                    "    * you can check what is already saved (S, A_physio, A_patho, A_versus, B_therap): [6]",
                     "\nIf you rename, move or delete the csv files created by the algorithm then it will not recognize them when required, if any.",
                     "\nThe algorithm is tested with Go version go1.6 linux/amd64 (Arch Linux).",
                 },"\n"))

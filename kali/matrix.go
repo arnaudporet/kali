@@ -4,7 +4,6 @@
 package kali
 import "encoding/csv"
 import "os"
-import "strconv"
 //#### Types #################################################################//
 type Matrix []Vector
 //#### Cat ###################################################################//
@@ -87,13 +86,9 @@ func (m Matrix) Find(v Vector,d int) int {
 }
 //#### Load ##################################################################//
 func (m *Matrix) Load(filename string) {
-    var i,j int
-    var x float64
     var s [][]string
-    var z Vector
     var file *os.File
     var reader *csv.Reader
-    (*m)=Matrix{}
     file,_=os.Open(filename)
     reader=csv.NewReader(file)
     reader.Comma=','
@@ -103,14 +98,16 @@ func (m *Matrix) Load(filename string) {
     reader.TrimLeadingSpace=true
     s,_=reader.ReadAll()
     file.Close()
-    for i=range s {
-        z=Vector{}
-        for j=range s[i] {
-            x,_=strconv.ParseFloat(s[i][j],64)
-            z=append(z,x)
-        }
-        (*m)=append((*m),z.Copy())
+    (*m)=StoM(s)
+}
+//#### MtoS ##################################################################//
+func (m Matrix) MtoS() [][]string {
+    var i int
+    var y [][]string
+    for i=range m {
+        y=append(y,m[i].VtoS())
     }
+    return y
 }
 //#### Save ##################################################################//
 func (m Matrix) Save(filename string) {
@@ -120,7 +117,7 @@ func (m Matrix) Save(filename string) {
     writer=csv.NewWriter(file)
     writer.Comma=','
     writer.UseCRLF=false
-    writer.WriteAll(m.ToS())
+    writer.WriteAll(m.MtoS())
     file.Close()
 }
 //#### Size ##################################################################//
@@ -136,6 +133,15 @@ func (m Matrix) Size(d int) int {
             }
     }
     return -1
+}
+//#### StoM ##################################################################//
+func StoM(s [][]string) Matrix {
+    var i int
+    var y Matrix
+    for i=range s {
+        y=append(y,StoV(s[i]))
+    }
+    return y
 }
 //#### Sub ###################################################################//
 func (m Matrix) Sub(rows,cols []int) Matrix {
@@ -161,15 +167,6 @@ func (m Matrix) T() Matrix {
         for j=range m[0] {
             y=append(y,m.Col(j))
         }
-    }
-    return y
-}
-//#### ToS ###################################################################//
-func (m Matrix) ToS() [][]string {
-    var i int
-    var y [][]string
-    for i=range m {
-        y=append(y,m[i].ToS())
     }
     return y
 }

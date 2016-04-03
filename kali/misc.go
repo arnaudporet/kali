@@ -65,7 +65,7 @@ func Prompt(message string,deck Vector) float64 {
         if len(deck)==0 || deck.Find(x)>-1 {
             return x
         } else {
-            fmt.Println("\nERROR: must be in ["+strings.Join(deck.ToS(),",")+"]")
+            fmt.Println("\nERROR: must be in ["+strings.Join(deck.VtoS(),",")+"]")
         }
     }
 }
