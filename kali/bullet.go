@@ -29,27 +29,22 @@ func (b Bullet) Assess(Atest,Aversus Aset) bool {
     }
 }
 //#### Compute ###############################################################//
-func (B *Bset) Compute(fpatho func(Matrix,int) Vector,S Matrix,rmin,rmax,maxtarg,maxmoda int,Aphysio,Apatho,Aversus Aset,vals Vector) {
-    var r,i1,i2 int
-    var Targ,Moda Matrix
+func (B *Bset) Compute(fpatho func(Matrix,int) Vector,S,Targ,Moda Matrix,Aphysio,Apatho,Aversus Aset) {
+    var i1,i2 int
     var b Bullet
     var Atest Aset
     (*B)=Bset{}
     b.Gain=make(Vector,2)
     b.Gain[0]=Aphysio.Covers(Apatho).Sum()
-    for r=rmin;r<rmax+1;r++ {
-        Targ=GenCombiMat(ItoV(Range(0,len(S))),r,maxtarg)
-        Moda=GenArrangMat(vals,r,maxmoda)
-        for i1=range Targ {
-            for i2=range Moda {
-                b.Targ=Targ[i1].Copy()
-                b.Moda=Moda[i2].Copy()
-                Atest.Compute(fpatho,S,b,Aphysio,1)
-                b.Gain[1]=Aphysio.Covers(Atest).Sum()
-                if b.Assess(Atest,Aversus) {
-                    b.Cover=Union(Aphysio,Aversus).Covers(Atest)
-                    (*B)=append((*B),b.Copy())
-                }
+    for i1=range Targ {
+        for i2=range Moda {
+            b.Targ=Targ[i1].Copy()
+            b.Moda=Moda[i2].Copy()
+            Atest.Compute(fpatho,S,b,Aphysio,1)
+            b.Gain[1]=Aphysio.Covers(Atest).Sum()
+            if b.Assess(Atest,Aversus) {
+                b.Cover=Union(Aphysio,Aversus).Covers(Atest)
+                (*B)=append((*B),b.Copy())
             }
         }
     }
@@ -65,16 +60,13 @@ func (b Bullet) Copy() Bullet {
     return y
 }
 //#### Report ################################################################//
-func (B Bset) Report(nodes []string,Aphysio,Aversus Aset,rmin,rmax int) {
+func (B Bset) Report(nodes []string,Aphysio,Aversus Aset) {
     var i1,i2,save int
-    var barrel []int
     var report string
     var z []string
     var file *os.File
-    barrel=make([]int,rmax-rmin+1)
-    report="Number of targets per bullet: "+strconv.FormatInt(int64(rmin),10)+"-"+strconv.FormatInt(int64(rmax),10)+"\n"+strings.Repeat("-",80)+"\n"
+    report=""
     for i1=range B {
-        barrel[len(B[i1].Targ)-rmin]+=1
         report+="Bullet: "
         z=[]string{}
         for i2=range B[i1].Targ {
@@ -91,9 +83,6 @@ func (B Bset) Report(nodes []string,Aphysio,Aversus Aset,rmin,rmax int) {
         report+=strings.Repeat("-",80)+"\n"
     }
     report+="Found therapeutic bullets: "+strconv.FormatInt(int64(len(B)),10)+"\n"
-    for i1=range barrel {
-        report+="    "+strconv.FormatInt(int64(i1+rmin),10)+"-bullets: "+strconv.FormatInt(int64(barrel[i1]),10)+"\n"
-    }
     fmt.Println("\n"+report)
     save=int(Prompt("Save? (optional) [0/1] ",Vector{0.0,1.0}))
     if save==1 {
@@ -110,29 +99,24 @@ func (B *Bset) Sort() {
     for {
         repass=false
         for i1=0;i1<len(*B)-1;i1++ {
-            if len((*B)[i1].Targ)>len((*B)[i1+1].Targ) {
-                (*B).Swap(i1,i1+1)
-                repass=true
-            } else if len((*B)[i1].Targ)==len((*B)[i1+1].Targ) {
-                if (*B)[i1].Targ.Equal((*B)[i1+1].Targ) {
-                    for i2=range (*B)[i1].Moda {
-                        if (*B)[i1].Moda[i2]>(*B)[i1+1].Moda[i2] {
-                            (*B).Swap(i1,i1+1)
-                            repass=true
-                            break
-                        } else if (*B)[i1].Moda[i2]<(*B)[i1+1].Moda[i2] {
-                            break
-                        }
+            if (*B)[i1].Targ.Equal((*B)[i1+1].Targ) {
+                for i2=range (*B)[i1].Moda {
+                    if (*B)[i1].Moda[i2]>(*B)[i1+1].Moda[i2] {
+                        (*B).Swap(i1,i1+1)
+                        repass=true
+                        break
+                    } else if (*B)[i1].Moda[i2]<(*B)[i1+1].Moda[i2] {
+                        break
                     }
-                } else {
-                    for i2=range (*B)[i1].Targ {
-                        if (*B)[i1].Targ[i2]>(*B)[i1+1].Targ[i2] {
-                            (*B).Swap(i1,i1+1)
-                            repass=true
-                            break
-                        } else if (*B)[i1].Targ[i2]<(*B)[i1+1].Targ[i2] {
-                            break
-                        }
+                }
+            } else {
+                for i2=range (*B)[i1].Targ {
+                    if (*B)[i1].Targ[i2]>(*B)[i1+1].Targ[i2] {
+                        (*B).Swap(i1,i1+1)
+                        repass=true
+                        break
+                    } else if (*B)[i1].Targ[i2]<(*B)[i1+1].Targ[i2] {
+                        break
                     }
                 }
             }

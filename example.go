@@ -25,7 +25,7 @@
 package main
 import "./kali"//import the algorithm, change the path if you move it
 func main() {
-    var maxtarg,maxmoda,maxS int
+    var ntarg,maxtarg,maxmoda,maxS int
     var nodes []string
     var vals kali.Vector
     // The node names.
@@ -45,6 +45,10 @@ func main() {
     // {0,1} for Boolean logic or, for example, {0,0.5,1} for three-valued
     // logic.
     vals=kali.Vector{0.0,1.0}
+    // The number of targets per bullet.
+    // ntarg in [1;number of nodes]
+    // Can be changed at run-time.
+    ntarg=2
     // The maximum number of target combinations to test.
     // If it exceeds its maximal possible value then the algorithm will
     // automatically decrease it to its maximal possible value.
@@ -61,7 +65,7 @@ func main() {
     // automatically decrease it to its maximal possible value.
     // Can be changed at run-time.
     maxS=int(1e4)
-    kali.DoTheJob(fphysio,fpatho,maxtarg,maxmoda,maxS,nodes,vals)
+    kali.DoTheJob(fphysio,fpatho,ntarg,maxtarg,maxmoda,maxS,nodes,vals)
 }
 
 // The network must be deterministic.
