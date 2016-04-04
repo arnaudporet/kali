@@ -3,6 +3,7 @@
 // To view a copy of this license, visit http://www.gnu.org/licenses/gpl.html
 package kali
 import "encoding/csv"
+import "fmt"
 import "os"
 //#### Types #################################################################//
 type Matrix []Vector
@@ -89,16 +90,21 @@ func (m *Matrix) Load(filename string) {
     var s [][]string
     var file *os.File
     var reader *csv.Reader
-    file,_=os.Open(filename)
-    reader=csv.NewReader(file)
-    reader.Comma=','
-    reader.Comment=0
-    reader.FieldsPerRecord=-1
-    reader.LazyQuotes=false
-    reader.TrimLeadingSpace=true
-    s,_=reader.ReadAll()
-    file.Close()
-    (*m)=StoM(s)
+    if !Exist(filename) {
+        fmt.Println("\nERROR: unable to load "+filename)
+    } else {
+        file,_=os.Open(filename)
+        reader=csv.NewReader(file)
+        reader.Comma=','
+        reader.Comment=0
+        reader.FieldsPerRecord=-1
+        reader.LazyQuotes=false
+        reader.TrimLeadingSpace=true
+        s,_=reader.ReadAll()
+        file.Close()
+        (*m)=StoM(s)
+        fmt.Println("\nINFO: "+filename+" loaded")
+    }
 }
 //#### MtoS ##################################################################//
 func (m Matrix) MtoS() [][]string {
@@ -113,12 +119,16 @@ func (m Matrix) MtoS() [][]string {
 func (m Matrix) Save(filename string) {
     var file *os.File
     var writer *csv.Writer
+    if Exist(filename) {
+        fmt.Println("\nWARNING: "+filename+" will be overwritten")
+    }
     file,_=os.Create(filename)
     writer=csv.NewWriter(file)
     writer.Comma=','
     writer.UseCRLF=false
     writer.WriteAll(m.MtoS())
     file.Close()
+    fmt.Println("\nINFO: saved as "+filename)
 }
 //#### Size ##################################################################//
 func (m Matrix) Size(d int) int {

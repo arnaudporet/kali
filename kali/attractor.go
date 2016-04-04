@@ -108,41 +108,48 @@ func (a Attractor) IsPatho() bool {
 func (A *Aset) Load(setting int) {
     var i1,i2 int
     var n,m int64
+    var filename string
     var s []string
     var a Attractor
     var file *os.File
     var reader *csv.Reader
-    (*A)=Aset{}
     switch setting {
-        case 0: file,_=os.Open("A_physio.csv")
-        case 1: file,_=os.Open("A_patho.csv")
-        case 2: file,_=os.Open("A_versus.csv")
+        case 0: filename="A_physio.csv"
+        case 1: filename="A_patho.csv"
+        case 2: filename="A_versus.csv"
     }
-    reader=csv.NewReader(file)
-    reader.Comma=','
-    reader.Comment=0
-    reader.FieldsPerRecord=-1
-    reader.LazyQuotes=false
-    reader.TrimLeadingSpace=true
-    s,_=reader.Read()
-    n,_=strconv.ParseInt(s[0],10,0)
-    if int(n)>0 {
+    if !Exist(filename) {
+        fmt.Println("\nERROR: unable to load "+filename)
+    } else {
+        (*A)=Aset{}
+        file,_=os.Open(filename)
+        reader=csv.NewReader(file)
+        reader.Comma=','
+        reader.Comment=0
+        reader.FieldsPerRecord=-1
+        reader.LazyQuotes=false
+        reader.TrimLeadingSpace=true
         s,_=reader.Read()
-        m,_=strconv.ParseInt(s[0],10,0)
-    }
-    for i1=0;i1<int(n);i1++ {
-        s,_=reader.Read()
-        a.Name=s[0]
-        s,_=reader.Read()
-        a.Basin,_=strconv.ParseFloat(s[0],64)
-        a.Mat=Matrix{}
-        for i2=0;i2<int(m);i2++ {
+        n,_=strconv.ParseInt(s[0],10,0)
+        if int(n)>0 {
             s,_=reader.Read()
-            a.Mat=append(a.Mat,StoV(s))
+            m,_=strconv.ParseInt(s[0],10,0)
         }
-        (*A)=append((*A),a.Copy())
+        for i1=0;i1<int(n);i1++ {
+            s,_=reader.Read()
+            a.Name=s[0]
+            s,_=reader.Read()
+            a.Basin,_=strconv.ParseFloat(s[0],64)
+            a.Mat=Matrix{}
+            for i2=0;i2<int(m);i2++ {
+                s,_=reader.Read()
+                a.Mat=append(a.Mat,StoV(s))
+            }
+            (*A)=append((*A),a.Copy())
+        }
+        file.Close()
+        fmt.Println("\nINFO: "+filename+" loaded")
     }
-    file.Close()
 }
 //#### Name ##################################################################//
 func (A *Aset) Name(Ref Aset,setting int) {
@@ -165,8 +172,8 @@ func (A *Aset) Name(Ref Aset,setting int) {
 }
 //#### Report ################################################################//
 func (A Aset) Report(setting int,nodes []string) {
-    var npoint,ncycle,i1,i2,save int
-    var reportname,report string
+    var npoint,ncycle,i1,i2 int
+    var filename,report string
     var nodesfilled []string
     var file *os.File
     nodesfilled=FillToMaxLen(nodes)
@@ -174,13 +181,13 @@ func (A Aset) Report(setting int,nodes []string) {
     ncycle=0
     switch setting {
         case 0:
-            reportname="A_physio.txt"
+            filename="A_physio.txt"
             report="A_physio={"
         case 1:
-            reportname="A_patho.txt"
+            filename="A_patho.txt"
             report="A_patho={"
         case 2:
-            reportname="A_versus.txt"
+            filename="A_versus.txt"
             report="A_versus={"
     }
     report+=strings.Join(A.GetNames(),",")+"}\n"+strings.Repeat("-",80)+"\n"
@@ -196,16 +203,16 @@ func (A Aset) Report(setting int,nodes []string) {
         }
         report+=strings.Repeat("-",80)+"\n"
     }
-    report+="Found attractors: "+strconv.FormatInt(int64(len(A)),10)+"\n    points: "+strconv.FormatInt(int64(npoint),10)+"\n    cycles: "+strconv.FormatInt(int64(ncycle),10)+"\n"
+    report+="Found attractors: "+strconv.FormatInt(int64(len(A)),10)+"\n    points: "+strconv.FormatInt(int64(npoint),10)+"\n    cycles: "+strconv.FormatInt(int64(ncycle),10)
     fmt.Println("\n"+report)
-    save=int(Prompt("Save? (required for the next steps) [0/1] ",Vector{0.0,1.0}))
-    if save==1 {
-        A.Save(setting)
-        file,_=os.Create(reportname)
-        file.WriteString(report)
-        file.Close()
-        fmt.Println("\nINFO: report saved as "+reportname)
+    if Exist(filename) {
+        fmt.Println("\nWARNING: "+filename+" will be overwritten")
     }
+    file,_=os.Create(filename)
+    file.WriteString(report+"\n")
+    file.Close()
+    fmt.Println("\nINFO: saved as "+filename)
+    A.Save(setting)
 }
 //#### Save ##################################################################//
 func (A Aset) Save(setting int) {
@@ -230,13 +237,16 @@ func (A Aset) Save(setting int) {
         case 1: filename="A_patho.csv"
         case 2: filename="A_versus.csv"
     }
+    if Exist(filename) {
+        fmt.Println("\nWARNING: "+filename+" will be overwritten")
+    }
     file,_=os.Create(filename)
     writer=csv.NewWriter(file)
     writer.Comma=','
     writer.UseCRLF=false
     writer.WriteAll(s)
     file.Close()
-    fmt.Println("\nINFO: set saved as "+filename)
+    fmt.Println("\nINFO: saved as "+filename)
 }
 //#### Sort ##################################################################//
 func (a *Attractor) Sort() {

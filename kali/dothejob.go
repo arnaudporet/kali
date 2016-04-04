@@ -10,7 +10,7 @@ import "strings"
 import "time"
 //#### DoTheJob ##############################################################//
 func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,ntarg,maxtarg,maxmoda,maxS int,nodes []string,vals Vector) {
-    var todo,whole,setting,tochange,gen,save int
+    var todo,whole,setting,tochange int
     var S,Targ,Moda Matrix
     var nullb Bullet
     var Aphysio,Apatho,Aversus,nullset Aset
@@ -20,13 +20,13 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,ntarg,maxtarg,maxmoda,maxS 
     for todo!=0 {// TODO case 0 does not break it...
         todo=int(Prompt(strings.Join([]string{
             "\nWhat to do:",
-            "    [1] generate/load the state space (S)",
-            "    [2] compute an attractor set (A_physio, A_patho)",
+            "    [1] generate the state space (S)",
+            "    [2] compute an attractor set (A_physio or A_patho)",
             "    [3] compute the pathological attractors (A_versus)",
-            "    [4] generate/load the bullets to test ({Targ,Moda})",
+            "    [4] generate the bullets to test (Targ and Moda)",
             "    [5] compute therapeutic bullets (B_therap)",
-            "    [6] change parameter values (ntarg, maxtarg, maxmoda, maxS)",
-            "    [7] check what is already saved (S, A_physio, A_patho, A_versus, Targ, Moda, B_therap)",
+            "    [6] change parameter values (ntarg, maxtarg, maxmoda or maxS)",
+            "    [7] check what is already saved (S, A_physio, A_patho, A_versus, Targ, Moda and B_therap)",
             "    [8] help",
             "    [9] license",
             "    [0] quit",
@@ -34,41 +34,30 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,ntarg,maxtarg,maxmoda,maxS 
         },"\n"),ItoV(Range(0,10))))
         switch todo {
             case 1:
-                gen=int(Prompt("\nS: load [0], generate [1]? [0/1] ",Vector{0.0,1.0}))
-                switch gen {
+                whole=int(Prompt("\nS cardinality: "+strconv.FormatFloat(math.Pow(float64(len(vals)),float64(len(nodes))),'f',-1,64)+"\n\nCompute whole S [1], limit to maxS [0] ("+strconv.FormatInt(int64(maxS),10)+")? [0/1] ",Vector{0.0,1.0}))
+                switch whole {
                     case 0:
-                        if !Exist("S.csv") {
-                            fmt.Println("\nERROR: unable to load S.csv")
-                        } else {
-                            S.Load("S.csv")
-                            fmt.Println("\nINFO: S loaded")
-                        }
+                        S.GenArrangMat(vals,len(nodes),maxS)
+                        S.T()
                     case 1:
-                        whole=int(Prompt("\nS cardinality: "+strconv.FormatFloat(math.Pow(float64(len(vals)),float64(len(nodes))),'f',-1,64)+"\n\nCompute whole S [1], limit to maxS [0] ("+strconv.FormatInt(int64(maxS),10)+")? [0/1] ",Vector{0.0,1.0}))
-                        switch whole {
-                            case 0: S=GenArrangMat(vals,len(nodes),maxS).T()
-                            case 1: S=GenS(vals,len(nodes))
-                        }
-                        fmt.Println("\nINFO: S generated")
-                        save=int(Prompt("\nSave? (optional) [0/1] ",Vector{0.0,1.0}))
-                        if save==1 {
-                            S.Save("S.csv")
-                            fmt.Println("\nINFO: set saved as S.csv")
-                        }
+                        S.GenS(vals,len(nodes))
                 }
+                S.Save("S.csv")
             case 2:
-                if len(S)==0 {
-                    fmt.Println("\nERROR: S must be generated/loaded")
+                if !Exist("S.csv") {
+                    fmt.Println("\nERROR: S must be generated")
                 } else {
                     setting=int(Prompt("\nSetting: physiological [0], pathological [1]? [0/1] ",Vector{0.0,1.0}))
                     switch setting {
                         case 0:
+                            S.Load("S.csv")
                             Aphysio.Compute(fphysio,S,nullb,nullset,0)
                             Aphysio.Report(0,nodes)
                         case 1:
                             if !Exist("A_physio.csv") {
-                                fmt.Println("\nERROR: unable to load A_physio.csv")
+                                fmt.Println("\nERROR: A_physio must be computed")
                             } else {
+                                S.Load("S.csv")
                                 Aphysio.Load(0)
                                 Apatho.Compute(fpatho,S,nullb,Aphysio,1)
                                 Apatho.Report(1,nodes)
@@ -77,46 +66,32 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,ntarg,maxtarg,maxmoda,maxS 
                 }
             case 3:
                 if !Exist("A_patho.csv") {
-                    fmt.Println("\nERROR: unable to load A_patho.csv")
+                    fmt.Println("\nERROR: A_patho must be computed")
                 } else {
                     Apatho.Load(1)
                     Aversus.Versus(Apatho)
                     Aversus.Report(2,nodes)
                 }
             case 4:
-                gen=int(Prompt("\n{Targ,Moda}: load [0], generate [1]? [0/1] ",Vector{0.0,1.0}))
-                switch gen {
-                    case 0:
-                        if !(Exist("Targ.csv") && Exist("Moda.csv")) {
-                            fmt.Println("\nERROR: unable to load Targ.csv, Moda.csv")
-                        } else {
-                            Targ.Load("Targ.csv")
-                            Moda.Load("Moda.csv")
-                            fmt.Println("\nINFO: {Targ,Moda} loaded")
-                        }
-                    case 1:
-                        Targ=GenCombiMat(ItoV(Range(0,len(nodes))),ntarg,maxtarg)
-                        Moda=GenArrangMat(vals,ntarg,maxmoda)
-                        fmt.Println("\nINFO: {Targ,Moda} generated")
-                        save=int(Prompt("\nSave? (optional) [0/1] ",Vector{0.0,1.0}))
-                        if save==1 {
-                            Targ.Save("Targ.csv")
-                            Moda.Save("Moda.csv")
-                            fmt.Println("\nINFO: sets saved as Targ.csv, Moda.csv")
-                        }
-                }
+                Targ.GenCombiMat(ItoV(Range(0,len(nodes))),ntarg,maxtarg)
+                Targ.Save("Targ.csv")
+                Moda.GenArrangMat(vals,ntarg,maxmoda)
+                Moda.Save("Moda.csv")
             case 5:
-                if len(S)==0 {
-                    fmt.Println("\nERROR: S must be generated/loaded")
-                } else if len(Targ)==0 || len(Moda)==0 {
-                    fmt.Println("\nERROR: {Targ,Moda} must be generated/loaded")
+                if !Exist("S.csv") {
+                    fmt.Println("\nERROR: S must be generated")
+                } else if !(Exist("Targ.csv") && Exist("Moda.csv")) {
+                    fmt.Println("\nERROR: Targ and Moda must be generated")
                 } else if !(Exist("A_physio.csv") && Exist("A_patho.csv") && Exist("A_versus.csv")) {
-                    fmt.Println("\nERROR: unable to load A_physio.csv, A_patho.csv, A_versus.csv")
+                    fmt.Println("\nERROR: A_physio, A_patho and A_versus must be computed")
                 } else {
                     Aversus.Load(2)
                     if len(Aversus)==0 {
                         fmt.Println("\nWARNING: no pathological attractors to remove (A_versus empty)")
                     } else {
+                        S.Load("S.csv")
+                        Targ.Load("Targ.csv")
+                        Moda.Load("Moda.csv")
                         Aphysio.Load(0)
                         Apatho.Load(1)
                         Btherap.Compute(fpatho,S,Targ,Moda,Aphysio,Apatho,Aversus)
@@ -138,13 +113,13 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,ntarg,maxtarg,maxmoda,maxS 
                     switch tochange {
                         case 1:
                             ntarg=int(Prompt("\nntarg=",ItoV(Range(1,len(nodes)+1))))
-                            fmt.Println("\nWARNING: you should regenerate {Targ,Moda}, if any")
+                            fmt.Println("\nWARNING: you should regenerate Targ and Moda, if any")
                         case 2:
                             maxtarg=int(Prompt("\nmaxtarg=",Vector{}))
-                            fmt.Println("\nWARNING: you should regenerate {Targ,Moda}, if any")
+                            fmt.Println("\nWARNING: you should regenerate Targ and Moda, if any")
                         case 3:
                             maxmoda=int(Prompt("\nmaxmoda=",Vector{}))
-                            fmt.Println("\nWARNING: you should regenerate {Targ,Moda}, if any")
+                            fmt.Println("\nWARNING: you should regenerate Targ and Moda, if any")
                         case 4:
                             maxS=int(Prompt("\nmaxS=",Vector{}))
                             fmt.Println("\nWARNING: you should regenerate S, if any")
@@ -167,37 +142,22 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,ntarg,maxtarg,maxmoda,maxS 
             case 8:
                 fmt.Println(strings.Join([]string{
                     "\nHow to use the algorithm:",
-                    "    1) read my article, it explains:",
-                    "        * the algorithm",
-                    "        * its purpose",
-                    "        * how it works (illustrated with the example)",
-                    "        * its applications (illustrated with a Boolean model of Fanconi anemia)",
-                    "        * its strengths and weaknesses",
-                    "        * its possible further improvements/contributions",
-                    "       freely available on arXiv and HAL:",
+                    "    1) read my article (all is explained inside), freely available at:",
                     "        * http://arxiv.org/abs/1407.4374",
                     "        * https://hal.archives-ouvertes.fr/hal-01024788",
-                    "    2) generate/load the state space (S): [1]",
-                    "        * you can regenerate/reload S whenever you want",
-                    "        * when prompted, you can save S (optional)",
-                    "    3) compute the physiological attractor set (A_physio): [2]",
+                    "    2) generate the state space (S)",
+                    "    3) compute the physiological attractor set (A_physio)",
                     "        * when prompted, set the setting to physiological",
-                    "        * when prompted, save A_physio (required for the next steps)",
-                    "    4) compute the pathological attractor set (A_patho): [2]",
+                    "    4) compute the pathological attractor set (A_patho)",
                     "        * when prompted, set the setting to pathological",
-                    "        * when prompted, save A_patho (required for the next steps)",
-                    "    5) compute the pathological attractors (A_versus): [3]",
-                    "        * when prompted, save A_versus (required for the next steps)",
-                    "    6) generate/load the bullets to test ({Targ,Moda}): [4]",
-                    "        * you can regenerate/reload {Targ,Moda} whenever you want",
-                    "        * when prompted, you can save {Targ,Moda} (optional)",
-                    "    7) compute therapeutic bullets (B_therap): [5]",
-                    "        * when prompted, you can save B_therap (optional)",
+                    "    5) compute the pathological attractors (A_versus)",
+                    "    6) generate the bullets to test (Targ and Moda)",
+                    "    7) compute therapeutic bullets (B_therap)",
                     "        * therapeutic bullets are reported as follow:",
                     "              x1[y1] x2[y2] x3[y3] ...",
                     "          meaning that the variable x has to be set to the value y",
-                    "    * you can change parameter values (ntarg, maxtarg, maxmoda, maxS): [6]",
-                    "    * you can check what is already saved (S, A_physio, A_patho, A_versus, Targ, Moda, B_therap): [7]",
+                    "    * you can change parameter values (ntarg, maxtarg, maxmoda or maxS)",
+                    "    * you can check what is already saved (S, A_physio, A_patho, A_versus, Targ, Moda and B_therap)",
                     "\nIf you rename, move or delete the csv files created by the algorithm then it will not recognize them when required, if any.",
                     "\nThe algorithm is tested with Go version go1.6 linux/amd64 (Arch Linux).",
                 },"\n"))

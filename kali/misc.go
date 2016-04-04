@@ -6,9 +6,9 @@ import "fmt"
 import "os"
 import "strings"
 //#### Exist #################################################################//
-func Exist(file string) bool {
+func Exist(filename string) bool {
     var err error
-    _,err=os.Stat(file)
+    _,err=os.Stat(filename)
     return !os.IsNotExist(err)
 }
 //#### FillToMaxLen ##########################################################//

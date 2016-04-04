@@ -61,11 +61,11 @@ func (b Bullet) Copy() Bullet {
 }
 //#### Report ################################################################//
 func (B Bset) Report(nodes []string,Aphysio,Aversus Aset) {
-    var i1,i2,save int
+    var i1,i2 int
     var report string
     var z []string
     var file *os.File
-    report=""
+    report="B_therap\n"+strings.Repeat("-",80)+"\n"
     for i1=range B {
         report+="Bullet: "
         z=[]string{}
@@ -82,15 +82,15 @@ func (B Bset) Report(nodes []string,Aphysio,Aversus Aset) {
         }
         report+=strings.Repeat("-",80)+"\n"
     }
-    report+="Found therapeutic bullets: "+strconv.FormatInt(int64(len(B)),10)+"\n"
+    report+="Found therapeutic bullets: "+strconv.FormatInt(int64(len(B)),10)
     fmt.Println("\n"+report)
-    save=int(Prompt("Save? (optional) [0/1] ",Vector{0.0,1.0}))
-    if save==1 {
-        file,_=os.Create("B_therap.txt")
-        file.WriteString(report)
-        file.Close()
-        fmt.Println("\nINFO: report saved as B_therap.txt")
+    if Exist("B_therap.txt") {
+        fmt.Println("\nWARNING: B_therap.txt will be overwritten")
     }
+    file,_=os.Create("B_therap.txt")
+    file.WriteString(report+"\n")
+    file.Close()
+    fmt.Println("\nINFO: saved as B_therap.txt")
 }
 //#### Sort ##################################################################//
 func (B *Bset) Sort() {
