@@ -6,89 +6,92 @@ import "math"
 import "math/rand"
 import "sort"
 //#### GenArrang #############################################################//
-func (v *Vector) GenArrang(deck Vector,k int) {
+func GenArrang(deck Vector,k int) Vector {
     var i int
-    (*v)=Vector{}
+    var arrang Vector
     if len(deck)>0 && k>0 {
         for i=0;i<k;i++ {
-            (*v)=append((*v),deck[rand.Intn(len(deck))])
+            arrang=append(arrang,deck[rand.Intn(len(deck))])
         }
     }
+    return arrang
 }
 //#### GenArrangMat ##########################################################//
-func (m *Matrix) GenArrangMat(deck Vector,k,narrang int) {
-    var inMat bool
+func GenArrangMat(deck Vector,k,narrang int) Matrix {
+    var inArrang bool
     var i1,i2 int
     var arrang Vector
-    (*m)=Matrix{}
+    var Arrang Matrix
     if len(deck)>0 && k>0 && narrang>0 {
         for i1=0;i1<int(math.Min(float64(narrang),math.Pow(float64(len(deck)),float64(k))));i1++ {
             for {
-                arrang.GenArrang(deck,k)
-                inMat=false
-                for i2=range (*m) {
-                    if (*m)[i2].Equal(arrang) {
-                        inMat=true
+                arrang=GenArrang(deck,k)
+                inArrang=false
+                for i2=range Arrang {
+                    if Arrang[i2].Equal(arrang) {
+                        inArrang=true
                         break
                     }
                 }
-                if !inMat {
-                    (*m)=append((*m),arrang.Copy())
+                if !inArrang {
+                    Arrang=append(Arrang,arrang.Copy())
                     break
                 }
             }
         }
     }
+    return Arrang
 }
 //#### GenCombi ##############################################################//
-func (v *Vector) GenCombi(deck Vector,k int) {
+func GenCombi(deck Vector,k int) Vector {
     var i int
     var z []int
-    (*v)=Vector{}
+    var combi Vector
     if len(deck)>0 && k>0 {
         z=rand.Perm(len(deck))
         for i=range z[:k] {
-            (*v)=append((*v),deck[z[i]])
+            combi=append(combi,deck[z[i]])
         }
-        sort.Float64s(*v)
+        sort.Float64s(combi)
     }
+    return combi
 }
 //#### GenCombiMat ###########################################################//
-func (m *Matrix) GenCombiMat(deck Vector,k,ncombi int) {
-    var inMat bool
+func GenCombiMat(deck Vector,k,ncombi int) Matrix {
+    var inCombi bool
     var i1,i2 int
     var combi Vector
-    (*m)=Matrix{}
+    var Combi Matrix
     if len(deck)>0 && k>0 && ncombi>0 {
         for i1=0;i1<int(math.Min(float64(ncombi),math.Gamma(float64(len(deck)+1))/(math.Gamma(float64(k+1))*math.Gamma(float64(len(deck)-k+1)))));i1++ {
             for {
-                combi.GenCombi(deck,k)
-                inMat=false
-                for i2=range (*m) {
-                    if (*m)[i2].Equal(combi) {
-                        inMat=true
+                combi=GenCombi(deck,k)
+                inCombi=false
+                for i2=range Combi {
+                    if Combi[i2].Equal(combi) {
+                        inCombi=true
                         break
                     }
                 }
-                if !inMat  {
-                    (*m)=append((*m),combi.Copy())
+                if !inCombi {
+                    Combi=append(Combi,combi.Copy())
                     break
                 }
             }
         }
     }
+    return Combi
 }
 //#### GenS ##################################################################//
-func (m *Matrix) GenS(deck Vector,n int) {
+func GenS(deck Vector,n int) Matrix {
     var i1,i2,i3 int
     var z Vector
-    var Z Matrix
-    (*m)=Matrix{}
+    var Z,S Matrix
     if len(deck)>0 && n>0 {
         for i1=0;i1<n;i1++ {
-            Z=(*m).Copy()
+            Z=S.Copy()
             for i2=0;i2<len(deck)-1;i2++ {
-                (*m).Cat(Z,2)
+                S.Cat(Z,2)
             }
             z=Vector{}
             for i2=range deck {
@@ -96,7 +99,8 @@ func (m *Matrix) GenS(deck Vector,n int) {
                     z=append(z,deck[i2])
                 }
             }
-            (*m)=append((*m),z.Copy())
+            S=append(S,z.Copy())
         }
     }
+    return S
 }

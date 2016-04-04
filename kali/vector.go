@@ -114,8 +114,8 @@ func (v Vector) Sum() float64 {
     }
     return y
 }
-//#### VtoI ##################################################################//
-func (v Vector) VtoI() []int {
+//#### ToI ###################################################################//
+func (v Vector) ToI() []int {
     var i int
     var y []int
     for i=range v {
@@ -123,8 +123,8 @@ func (v Vector) VtoI() []int {
     }
     return y
 }
-//#### VtoM ##################################################################//
-func (v Vector) VtoM(d int) Matrix {
+//#### ToM ###################################################################//
+func (v Vector) ToM(d int) Matrix {
     var i int
     var y Matrix
     if len(v)>0 {
@@ -139,8 +139,8 @@ func (v Vector) VtoM(d int) Matrix {
     }
     return y
 }
-//#### VtoS ##################################################################//
-func (v Vector) VtoS() []string {
+//#### ToS ###################################################################//
+func (v Vector) ToS() []string {
     var i int
     var y []string
     for i=range v {

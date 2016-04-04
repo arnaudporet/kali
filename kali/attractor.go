@@ -20,7 +20,7 @@ func (a *Attractor) Compute(f func(Matrix,int) Vector,x0 Vector,b Bullet) {
     var y Vector
     var x Matrix
     (*a)=Attractor{}
-    x=x0.VtoM(2)
+    x=x0.ToM(2)
     k=0
     for {
         y=f(x,k)
@@ -33,7 +33,7 @@ func (a *Attractor) Compute(f func(Matrix,int) Vector,x0 Vector,b Bullet) {
             (*a).Sort()
             break
         } else {
-            x.Cat(y.VtoM(2),2)
+            x.Cat(y.ToM(2),2)
             k+=1
         }
     }
@@ -199,7 +199,7 @@ func (A Aset) Report(setting int,nodes []string) {
         }
         report+="Name: "+A[i1].Name+"\nBasin: "+strconv.FormatFloat(A[i1].Basin,'f',-1,64)+"%\nMatrix:\n"
         for i2=range A[i1].Mat {
-            report+="    "+nodesfilled[i2]+" "+strings.Join(A[i1].Mat[i2].VtoS()," ")+"\n"
+            report+="    "+nodesfilled[i2]+" "+strings.Join(A[i1].Mat[i2].ToS()," ")+"\n"
         }
         report+=strings.Repeat("-",80)+"\n"
     }
@@ -229,7 +229,7 @@ func (A Aset) Save(setting int) {
         s=append(s,[]string{A[i1].Name})
         s=append(s,[]string{strconv.FormatFloat(A[i1].Basin,'f',-1,64)})
         for i2=range A[i1].Mat {
-            s=append(s,A[i1].Mat[i2].VtoS())
+            s=append(s,A[i1].Mat[i2].ToS())
         }
     }
     switch setting {
@@ -254,7 +254,7 @@ func (a *Attractor) Sort() {
     var jmin Vector
     jmin=ItoV(Range(0,(*a).Mat.Size(2)))
     for i=range (*a).Mat {
-        jmin=jmin.Pos((*a).Mat[i].Pos(jmin.VtoI()).MinPos())
+        jmin=jmin.Pos((*a).Mat[i].Pos(jmin.ToI()).MinPos())
         if len(jmin)==1 {
             (*a).Mat.CircShift(int(jmin[0]))
             break

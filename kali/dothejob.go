@@ -37,10 +37,9 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,ntarg,maxtarg,maxmoda,maxS 
                 whole=int(Prompt("\nS cardinality: "+strconv.FormatFloat(math.Pow(float64(len(vals)),float64(len(nodes))),'f',-1,64)+"\n\nCompute whole S [1], limit to maxS [0] ("+strconv.FormatInt(int64(maxS),10)+")? [0/1] ",Vector{0.0,1.0}))
                 switch whole {
                     case 0:
-                        S.GenArrangMat(vals,len(nodes),maxS)
-                        S.T()
+                        S=GenArrangMat(vals,len(nodes),maxS).T()
                     case 1:
-                        S.GenS(vals,len(nodes))
+                        S=GenS(vals,len(nodes))
                 }
                 S.Save("S.csv")
             case 2:
@@ -73,9 +72,9 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,ntarg,maxtarg,maxmoda,maxS 
                     Aversus.Report(2,nodes)
                 }
             case 4:
-                Targ.GenCombiMat(ItoV(Range(0,len(nodes))),ntarg,maxtarg)
+                Targ=GenCombiMat(ItoV(Range(0,len(nodes))),ntarg,maxtarg)
                 Targ.Save("Targ.csv")
-                Moda.GenArrangMat(vals,ntarg,maxmoda)
+                Moda=GenArrangMat(vals,ntarg,maxmoda)
                 Moda.Save("Moda.csv")
             case 5:
                 if !Exist("S.csv") {
@@ -156,7 +155,7 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,ntarg,maxtarg,maxmoda,maxS 
                     "        * therapeutic bullets are reported as follow:",
                     "              x1[y1] x2[y2] x3[y3] ...",
                     "          meaning that the variable x has to be set to the value y",
-                    "    * you can change parameter values (ntarg, maxtarg, maxmoda or maxS)",
+                    "    * you can change parameter values (ntarg, maxtarg, maxmoda and maxS)",
                     "    * you can check what is already saved (S, A_physio, A_patho, A_versus, Targ, Moda and B_therap)",
                     "\nIf you rename, move or delete the csv files created by the algorithm then it will not recognize them when required, if any.",
                     "\nThe algorithm is tested with Go version go1.6 linux/amd64 (Arch Linux).",

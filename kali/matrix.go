@@ -106,15 +106,6 @@ func (m *Matrix) Load(filename string) {
         fmt.Println("\nINFO: "+filename+" loaded")
     }
 }
-//#### MtoS ##################################################################//
-func (m Matrix) MtoS() [][]string {
-    var i int
-    var y [][]string
-    for i=range m {
-        y=append(y,m[i].VtoS())
-    }
-    return y
-}
 //#### Save ##################################################################//
 func (m Matrix) Save(filename string) {
     var file *os.File
@@ -126,7 +117,7 @@ func (m Matrix) Save(filename string) {
     writer=csv.NewWriter(file)
     writer.Comma=','
     writer.UseCRLF=false
-    writer.WriteAll(m.MtoS())
+    writer.WriteAll(m.ToS())
     file.Close()
     fmt.Println("\nINFO: saved as "+filename)
 }
@@ -177,6 +168,15 @@ func (m Matrix) T() Matrix {
         for j=range m[0] {
             y=append(y,m.Col(j))
         }
+    }
+    return y
+}
+//#### ToS ###################################################################//
+func (m Matrix) ToS() [][]string {
+    var i int
+    var y [][]string
+    for i=range m {
+        y=append(y,m[i].ToS())
     }
     return y
 }

@@ -60,7 +60,7 @@ func main() {
     // automatically decrease it to its maximal possible value.
     // Can be changed at run-time.
     maxmoda=int(1e2)
-    // The maximum number of initial conditions to test.
+    // The maximum number of initial states to test.
     // If it exceeds its maximal possible value then the algorithm will
     // automatically decrease it to its maximal possible value.
     // Can be changed at run-time.
