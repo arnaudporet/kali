@@ -25,7 +25,7 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,ntarg,maxtarg,maxmoda,maxS 
             "    [3] compute the pathological attractors (A_versus)",
             "    [4] generate the bullets to test (Targ and Moda)",
             "    [5] compute therapeutic bullets (B_therap)",
-            "    [6] change parameter values (ntarg, maxtarg, maxmoda or maxS)",
+            "    [6] change parameter values (ntarg, maxtarg, maxmoda and maxS)",
             "    [7] check what is already saved (S, A_physio, A_patho, A_versus, Targ, Moda and B_therap)",
             "    [8] help",
             "    [9] license",
