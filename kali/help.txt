@@ -17,6 +17,24 @@ How to use the algorithm:
     * you can change parameter values (ntarg, maxtarg, maxmoda and maxS)
     * you can check what is already saved (S, A_physio, A_patho, A_versus, Targ, Moda and B_therap)
 
-If you rename, move or delete the csv files created by the algorithm then it will not recognize them when required, if any.
+The algorithm automatically save/load the files it creates/uses.
+
+These files are:
+    * S.csv
+    * A_physio.csv
+    * A_physio.txt
+    * A_patho.csv
+    * A_patho.txt
+    * A_versus.csv
+    * A_versus.txt
+    * Targ.csv
+    * Moda.csv
+    * B_therap.txt
+
+The csv files are for the algorithm while the txt files are for you.
+
+If a file already exists then the algorithm overwrites it.
+
+If you rename, move or delete the csv files created by the algorithm then it will not be able to load them when required.
 
 The algorithm is tested with Go version go1.6 linux/amd64 (Arch Linux).

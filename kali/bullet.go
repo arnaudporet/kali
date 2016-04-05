@@ -87,7 +87,6 @@ func (B Bset) Report(nodes []string,Aphysio,Aversus Aset) {
     file,_=os.Create("B_therap.txt")
     file.WriteString(report+"\n")
     file.Close()
-    fmt.Println("\nINFO: saved as B_therap.txt")
 }
 //#### Sort ##################################################################//
 func (B *Bset) Sort() {

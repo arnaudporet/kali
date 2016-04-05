@@ -104,7 +104,6 @@ func (m *Matrix) Load(filename string) {
         s,_=reader.ReadAll()
         file.Close()
         (*m)=StoM(s)
-        fmt.Println("\nINFO: "+filename+" loaded")
     }
 }
 //#### Save ##################################################################//
@@ -117,7 +116,6 @@ func (m Matrix) Save(filename string) {
     writer.UseCRLF=false
     writer.WriteAll(m.ToS())
     file.Close()
-    fmt.Println("\nINFO: saved as "+filename)
 }
 //#### Size ##################################################################//
 func (m Matrix) Size(d int) int {

@@ -148,7 +148,6 @@ func (A *Aset) Load(setting int) {
             (*A)=append((*A),a.Copy())
         }
         file.Close()
-        fmt.Println("\nINFO: "+filename+" loaded")
     }
 }
 //#### Name ##################################################################//
@@ -208,7 +207,6 @@ func (A Aset) Report(setting int,nodes []string) {
     file,_=os.Create(filename)
     file.WriteString(report+"\n")
     file.Close()
-    fmt.Println("\nINFO: saved as "+filename)
     A.Save(setting)
 }
 //#### Save ##################################################################//
@@ -240,7 +238,6 @@ func (A Aset) Save(setting int) {
     writer.UseCRLF=false
     writer.WriteAll(s)
     file.Close()
-    fmt.Println("\nINFO: saved as "+filename)
 }
 //#### Sort ##################################################################//
 func (a *Attractor) Sort() {

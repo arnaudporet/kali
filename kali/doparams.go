@@ -22,16 +22,16 @@ func DoParams(ntarg,maxtarg,maxmoda,maxS *int,n int) {
         switch tochange {
             case 1:
                 (*ntarg)=int(Prompt("\nntarg=",ItoV(Range(1,n+1))))
-                fmt.Println("\nWARNING: you should regenerate Targ and Moda, if any")
+                fmt.Println("\nWARNING: you should regenerate Targ and Moda")
             case 2:
                 (*maxtarg)=int(Prompt("\nmaxtarg=",Vector{}))
-                fmt.Println("\nWARNING: you should regenerate Targ and Moda, if any")
+                fmt.Println("\nWARNING: you should regenerate Targ and Moda")
             case 3:
                 (*maxmoda)=int(Prompt("\nmaxmoda=",Vector{}))
-                fmt.Println("\nWARNING: you should regenerate Targ and Moda, if any")
+                fmt.Println("\nWARNING: you should regenerate Targ and Moda")
             case 4:
                 (*maxS)=int(Prompt("\nmaxS=",Vector{}))
-                fmt.Println("\nWARNING: you should regenerate S, if any")
+                fmt.Println("\nWARNING: you should regenerate S")
             case 0:
                 fmt.Println("\nINFO: OK!")
         }

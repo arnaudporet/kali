@@ -23,7 +23,7 @@
 //############################################################################//
 
 package main
-import "./kali"//import the algorithm, change the path if you move it
+import "./kali"// import the algorithm, change the path if you move it
 func main() {
     var ntarg,maxtarg,maxmoda,maxS int
     var nodes []string
