@@ -49,7 +49,7 @@ func GenCombi(deck Vector,k int) Vector {
     var combi Vector
     if len(deck)>0 && k>0 {
         z=rand.Perm(len(deck))
-        for i=range z[:k] {
+        for i=0;i<k;i++ {
             combi=append(combi,deck[z[i]])
         }
         sort.Float64s(combi)

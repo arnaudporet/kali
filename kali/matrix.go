@@ -90,6 +90,7 @@ func (m *Matrix) Load(filename string) {
     var s [][]string
     var file *os.File
     var reader *csv.Reader
+    (*m)=Matrix{}
     if !Exist(filename) {
         fmt.Println("\nERROR: unable to load "+filename)
     } else {

@@ -113,6 +113,7 @@ func (A *Aset) Load(setting int) {
     var a Attractor
     var file *os.File
     var reader *csv.Reader
+    (*A)=Aset{}
     switch setting {
         case 0: filename="A_physio.csv"
         case 1: filename="A_patho.csv"
@@ -121,7 +122,6 @@ func (A *Aset) Load(setting int) {
     if !Exist(filename) {
         fmt.Println("\nERROR: unable to load "+filename)
     } else {
-        (*A)=Aset{}
         file,_=os.Open(filename)
         reader=csv.NewReader(file)
         reader.Comma=','

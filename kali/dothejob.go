@@ -11,11 +11,13 @@ import "time"
 //#### DoTheJob ##############################################################//
 func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,ntarg,maxtarg,maxmoda,maxS int,nodes []string,vals Vector) {
     var todo,whole,setting,tochange int
+    var cardS float64
     var S,Targ,Moda Matrix
     var nullb Bullet
     var Aphysio,Apatho,Aversus,nullset Aset
     var Btherap Bset
     rand.Seed(int64(time.Now().Nanosecond()))
+    cardS=math.Pow(float64(len(vals)),float64(len(nodes)))
     todo=-1
     for todo!=0 {// TODO case 0 does not break it...
         todo=int(Prompt(strings.Join([]string{
@@ -34,12 +36,14 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,ntarg,maxtarg,maxmoda,maxS 
         },"\n"),ItoV(Range(0,10))))
         switch todo {
             case 1:
-                whole=int(Prompt("\nS cardinality: "+strconv.FormatFloat(math.Pow(float64(len(vals)),float64(len(nodes))),'f',-1,64)+"\n\nCompute whole S [1], limit to maxS [0] ("+strconv.FormatInt(int64(maxS),10)+")? [0/1] ",Vector{0.0,1.0}))
+                if cardS>float64(maxS) {
+                    whole=int(Prompt("\nS cardinality ("+strconv.FormatFloat(cardS,'f',-1,64)+") > maxS ("+strconv.FormatInt(int64(maxS),10)+")\n\nCompute whole S [1], limit to maxS [0]? [0/1] ",Vector{0.0,1.0}))
+                } else {
+                    whole=1
+                }
                 switch whole {
-                    case 0:
-                        S=GenArrangMat(vals,len(nodes),maxS).T()
-                    case 1:
-                        S=GenS(vals,len(nodes))
+                    case 0: S=GenArrangMat(vals,len(nodes),maxS).T()
+                    case 1: S=GenS(vals,len(nodes))
                 }
                 S.Save("S.csv")
             case 2:
