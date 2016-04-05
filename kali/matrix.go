@@ -111,9 +111,6 @@ func (m *Matrix) Load(filename string) {
 func (m Matrix) Save(filename string) {
     var file *os.File
     var writer *csv.Writer
-    if Exist(filename) {
-        fmt.Println("\nWARNING: "+filename+" will be overwritten")
-    }
     file,_=os.Create(filename)
     writer=csv.NewWriter(file)
     writer.Comma=','

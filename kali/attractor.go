@@ -205,9 +205,6 @@ func (A Aset) Report(setting int,nodes []string) {
     }
     report+="Found attractors: "+strconv.FormatInt(int64(len(A)),10)+"\n    points: "+strconv.FormatInt(int64(npoint),10)+"\n    cycles: "+strconv.FormatInt(int64(ncycle),10)
     fmt.Println("\n"+report)
-    if Exist(filename) {
-        fmt.Println("\nWARNING: "+filename+" will be overwritten")
-    }
     file,_=os.Create(filename)
     file.WriteString(report+"\n")
     file.Close()
@@ -236,9 +233,6 @@ func (A Aset) Save(setting int) {
         case 0: filename="A_physio.csv"
         case 1: filename="A_patho.csv"
         case 2: filename="A_versus.csv"
-    }
-    if Exist(filename) {
-        fmt.Println("\nWARNING: "+filename+" will be overwritten")
     }
     file,_=os.Create(filename)
     writer=csv.NewWriter(file)

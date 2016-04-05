@@ -84,9 +84,6 @@ func (B Bset) Report(nodes []string,Aphysio,Aversus Aset) {
     }
     report+="Found therapeutic bullets: "+strconv.FormatInt(int64(len(B)),10)
     fmt.Println("\n"+report)
-    if Exist("B_therap.txt") {
-        fmt.Println("\nWARNING: B_therap.txt will be overwritten")
-    }
     file,_=os.Create("B_therap.txt")
     file.WriteString(report+"\n")
     file.Close()

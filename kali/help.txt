@@ -1,0 +1,22 @@
+
+How to use the algorithm:
+    1) read my article (all is explained inside), freely available at:
+        * http://arxiv.org/abs/1407.4374
+        * https://hal.archives-ouvertes.fr/hal-01024788
+    2) generate the state space (S)
+    3) compute the physiological attractor set (A_physio)
+        * when prompted, set the setting to physiological
+    4) compute the pathological attractor set (A_patho)
+        * when prompted, set the setting to pathological
+    5) compute the pathological attractors (A_versus)
+    6) generate the bullets to test (Targ and Moda)
+    7) compute therapeutic bullets (B_therap)
+        * therapeutic bullets are reported as follow:
+              x1[y1] x2[y2] x3[y3] ...
+          meaning that the variable x has to be set to the value y
+    * you can change parameter values (ntarg, maxtarg, maxmoda and maxS)
+    * you can check what is already saved (S, A_physio, A_patho, A_versus, Targ, Moda and B_therap)
+
+If you rename, move or delete the csv files created by the algorithm then it will not recognize them when required, if any.
+
+The algorithm is tested with Go version go1.6 linux/amd64 (Arch Linux).
