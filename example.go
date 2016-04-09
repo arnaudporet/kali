@@ -4,12 +4,12 @@
 
 //#### HOWTO #################################################################//
 
-// 1) read my article (all is explained inside), freely available at:
-//        * http://arxiv.org/abs/1407.4374
-//        * https://hal.archives-ouvertes.fr/hal-01024788
+// 1) read my article (all is explained inside), freely available on:
+//        * arXiv: http://arxiv.org/abs/1407.4374
+//        * HAL: http://hal.archives-ouvertes.fr/hal-01024788
 // 2) read the following comments
 // 3) replace the contents with your own stuff
-// 4) run (tested with Go version go1.6 linux/amd64 (Arch Linux)):
+// 4) run (tested with Go version 1.6 under Arch Linux):
 //        go run example.go
 //    it is possible that the Go package has a different name depending on your
 //    OS/Linux distribution

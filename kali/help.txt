@@ -1,8 +1,8 @@
 
 How to use the algorithm:
-    1) read my article (all is explained inside), freely available at:
-        * http://arxiv.org/abs/1407.4374
-        * https://hal.archives-ouvertes.fr/hal-01024788
+    1) read my article (all is explained inside), freely available on:
+        * arXiv: http://arxiv.org/abs/1407.4374
+        * HAL: http://hal.archives-ouvertes.fr/hal-01024788
     2) generate the state space (S)
     3) compute the physiological attractor set (A_physio)
         * when prompted, set the setting to physiological
@@ -37,4 +37,4 @@ If a file already exists then the algorithm overwrites it.
 
 If you rename, move or delete the csv files created by the algorithm then it will not be able to load them when required.
 
-The algorithm is tested with Go version go1.6 linux/amd64 (Arch Linux).
+The algorithm is tested with Go version 1.6 under Arch Linux.
