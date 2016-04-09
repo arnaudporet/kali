@@ -1,6 +1,7 @@
 # Therapeutic target discovery using Boolean network attractors: avoiding pathological phenotypes
 
 Copyright (C) 2013-2016 [Arnaud Poret](http://github.com/arnaudporet)
+
 This work is licensed under the [GNU General Public License](http://www.gnu.org/licenses/gpl.html).
 
 ## How to
