@@ -86,10 +86,8 @@ func (v Vector) MinPos() []int {
 func (v Vector) Pos(x []int) Vector {
     var i int
     var y Vector
-    if len(v)>0 {
-        for i=range x {
-            y=append(y,v[x[i]])
-        }
+    for i=range x {
+        y=append(y,v[x[i]])
     }
     return y
 }

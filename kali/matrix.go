@@ -36,8 +36,12 @@ func (m *Matrix) CircShift(n int) {
 func (m Matrix) Col(j int) Vector {
     var i int
     var y Vector
-    for i=range m {
-        y=append(y,m[i][j])
+    if len(m)==0 {
+        panic("m.Col(j): m is empty")
+    } else {
+        for i=range m {
+            y=append(y,m[i][j])
+        }
     }
     return y
 }
