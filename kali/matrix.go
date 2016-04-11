@@ -3,7 +3,6 @@
 // To view a copy of this license, visit http://www.gnu.org/licenses/gpl.html
 package kali
 import "encoding/csv"
-import "fmt"
 import "os"
 //#### Types #################################################################//
 type Matrix []Vector
@@ -92,13 +91,14 @@ func (m Matrix) Find(v Vector,d int) int {
 //#### Load ##################################################################//
 func (m *Matrix) Load(filename string) {
     var s [][]string
+    var err error
     var file *os.File
     var reader *csv.Reader
-    (*m)=Matrix{}
-    if !Exist(filename) {
-        fmt.Println("\nERROR: unable to load "+filename)
+    file,err=os.Open(filename)
+    if os.IsNotExist(err) {
+        panic("m.Load("+filename+"): "+filename+" not found")
     } else {
-        file,_=os.Open(filename)
+        (*m)=Matrix{}
         reader=csv.NewReader(file)
         reader.Comma=','
         reader.Comment=0
@@ -149,7 +149,9 @@ func (m Matrix) Sub(rows,cols []int) Matrix {
     var i,j int
     var z Vector
     var y Matrix
-    if len(m)>0 && len(cols)>0 {
+    if len(m)==0 {
+        panic("m.Sub(rows,cols): m is empty")
+    } else if len(cols)>0 {
         for i=range rows {
             z=Vector{}
             for j=range cols {
