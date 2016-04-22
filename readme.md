@@ -23,6 +23,4 @@ Most [Linux distributions](http://distrowatch.com) provide Go in their official 
 
 # Forthcoming
 
-* a version of Kali based on [BoolNet](https://cran.r-project.org/web/packages/BoolNet/index.html)
-    * BoolNet is an [R package](https://cran.r-project.org/) coded in [ANSI C](https://en.wikipedia.org/wiki/ANSI_C) (for time consuming tasks) and [R](https://www.r-project.org/) itself
-    * BoolNet is able to compute Boolean network attractors, thus allowing Kali to focus on its main task: searching for therapeutic bullets
+* none, for the time being
