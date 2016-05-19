@@ -1,15 +1,15 @@
 // Copyright (C) 2013-2016 Arnaud Poret
 // This work is licensed under the GNU General Public License.
-// To view a copy of this license, visit http://www.gnu.org/licenses/gpl.html
+// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 
 //#### HOWTO #################################################################//
 
 // 1) read my article (all is explained inside), freely available on:
-//        * arXiv: http://arxiv.org/abs/1407.4374
-//        * HAL: http://hal.archives-ouvertes.fr/hal-01024788
+//        * arXiv: https://arxiv.org/abs/1407.4374
+//        * HAL: https://hal.archives-ouvertes.fr/hal-01024788
 // 2) read the following comments
-// 3) replace the contents with your own stuff
-// 4) run (tested with Go version 1.6 under Arch Linux):
+// 3) replace the content with your own stuff
+// 4) run (tested with Go version 1.6.2 under Arch Linux):
 //        go run example.go
 //    it is possible that the Go package has a different name depending on your
 //    OS/Linux distribution
@@ -84,7 +84,7 @@ func fphysio(x kali.Matrix,k int) kali.Vector {
     var y kali.Vector
     min=kali.Min
     max=kali.Max
-    y=make(kali.Vector,x.Size(1))
+    y=make(kali.Vector,len(x))
     // replace the following equations with your own stuff
     // your equations coded in the same way: y[i]=f(x[0][k],x[1][k],x[2][k],...)
     // note that the numbering starts at 0
@@ -109,7 +109,7 @@ func fpatho(x kali.Matrix,k int) kali.Vector {
     var y kali.Vector
     min=kali.Min
     max=kali.Max
-    y=make(kali.Vector,x.Size(1))
+    y=make(kali.Vector,len(x))
     // replace the following equations with your own stuff
     // your equations coded in the same way: y[i]=f(x[0][k],x[1][k],x[2][k],...)
     // note that the numbering starts at 0

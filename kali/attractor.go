@@ -1,6 +1,6 @@
 // Copyright (C) 2013-2016 Arnaud Poret
 // This work is licensed under the GNU General Public License.
-// To view a copy of this license, visit http://www.gnu.org/licenses/gpl.html
+// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 package kali
 import "encoding/csv"
 import "fmt"
@@ -29,7 +29,7 @@ func (a *Attractor) Compute(f func(Matrix,int) Vector,x0 Vector,b Bullet) {
         }
         j=x.Find(y,2)
         if j>-1 {
-            (*a).Mat=x.Sub(Range(0,x.Size(1)),Range(j,k+1))
+            (*a).Mat=x.Sub(Range(0,len(x)),Range(j,k+1))
             (*a).Sort()
             break
         } else {
@@ -100,16 +100,13 @@ func (A Aset) GetNames() []string {
     }
     return names
 }
-//#### IsPatho ###############################################################//
-func (a Attractor) IsPatho() bool {
-    return strings.Contains(a.Name,"patho")
-}
 //#### Load ##################################################################//
 func (A *Aset) Load(setting int) {
     var i1,i2 int
     var n,m int64
     var filename string
     var s []string
+    var err error
     var a Attractor
     var file *os.File
     var reader *csv.Reader
@@ -119,10 +116,10 @@ func (A *Aset) Load(setting int) {
         case 1: filename="A_patho.csv"
         case 2: filename="A_versus.csv"
     }
-    if !Exist(filename) {
-        fmt.Println("\nERROR: unable to load "+filename)
+    file,err=os.Open(filename)
+    if os.IsNotExist(err) {
+        panic("A.Load(setting): "+filename+" not found")
     } else {
-        file,_=os.Open(filename)
         reader=csv.NewReader(file)
         reader.Comma=','
         reader.Comment=0
@@ -147,8 +144,8 @@ func (A *Aset) Load(setting int) {
             }
             (*A)=append((*A),a.Copy())
         }
-        file.Close()
     }
+    file.Close()
 }
 //#### Name ##################################################################//
 func (A *Aset) Name(Ref Aset,setting int) {
@@ -218,7 +215,7 @@ func (A Aset) Save(setting int) {
     var writer *csv.Writer
     s=append(s,[]string{strconv.FormatInt(int64(len(A)),10)})
     if len(A)>0 {
-        s=append(s,[]string{strconv.FormatInt(int64(A[0].Mat.Size(1)),10)})
+        s=append(s,[]string{strconv.FormatInt(int64(len(A[0].Mat)),10)})
     }
     for i1=range A {
         s=append(s,[]string{A[i1].Name})
@@ -245,9 +242,9 @@ func (a *Attractor) Sort() {
     var jmin Vector
     jmin=ItoV(Range(0,(*a).Mat.Size(2)))
     for i=range (*a).Mat {
-        jmin=jmin.Pos((*a).Mat[i].Pos(jmin.ToI()).MinPos())
+        jmin=jmin.Sub((*a).Mat[i].Sub(jmin.ToI()).MinPos())
         if len(jmin)==1 {
-            (*a).Mat.CircShift(int(jmin[0]))
+            (*a).Mat.CircShift(int(jmin[0]),2)
             break
         }
     }
@@ -282,30 +279,16 @@ func (A *Aset) Sort() {
 //#### Swap ##################################################################//
 func (A *Aset) Swap(i1,i2 int) {
     var a Attractor
-    if len(*A)>0 {
-        a=(*A)[i1].Copy()
-        (*A)[i1]=(*A)[i2].Copy()
-        (*A)[i2]=a
-    }
-}
-//#### Union #################################################################//
-func Union(A1,A2 Aset) Aset {
-    var i int
-    var A Aset
-    for i=range A1 {
-        A=append(A,A1[i].Copy())
-    }
-    for i=range A2 {
-        A=append(A,A2[i].Copy())
-    }
-    return A
+    a=(*A)[i1].Copy()
+    (*A)[i1]=(*A)[i2].Copy()
+    (*A)[i2]=a.Copy()
 }
 //#### Versus ################################################################//
 func (Aversus *Aset) Versus(Apatho Aset) {
     var i int
     (*Aversus)=Aset{}
     for i=range Apatho {
-        if Apatho[i].IsPatho() {
+        if strings.Contains(Apatho[i].Name,"patho") {
             (*Aversus)=append((*Aversus),Apatho[i].Copy())
         }
     }

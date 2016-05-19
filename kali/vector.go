@@ -1,24 +1,23 @@
 // Copyright (C) 2013-2016 Arnaud Poret
 // This work is licensed under the GNU General Public License.
-// To view a copy of this license, visit http://www.gnu.org/licenses/gpl.html
+// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 package kali
 import "strconv"
 //#### Types #################################################################//
 type Vector []float64
-//#### Cat ###################################################################//
-func (v1 *Vector) Cat(v2 Vector) {
-    var i int
-    for i=range v2 {
-        (*v1)=append((*v1),v2[i])
-    }
-}
 //#### CircShift #############################################################//
 func (v *Vector) CircShift(n int) {
     var i int
     var y Vector
     y=make(Vector,len(*v))
-    for i=range (*v) {
-        y[i]=(*v)[(i+n)%len(*v)]
+    if n>=0 {
+        for i=range (*v) {
+            y[i]=(*v)[(i+n)%len(*v)]
+        }
+    } else {
+        for i=range (*v) {
+            y[(i-n)%len(*v)]=(*v)[i]
+        }
     }
     copy((*v),y)
 }
@@ -82,15 +81,6 @@ func (v Vector) MinPos() []int {
     }
     return y
 }
-//#### Pos ##################################################################//
-func (v Vector) Pos(x []int) Vector {
-    var i int
-    var y Vector
-    for i=range x {
-        y=append(y,v[x[i]])
-    }
-    return y
-}
 //#### StoV ##################################################################//
 func StoV(s []string) Vector {
     var i int
@@ -99,6 +89,15 @@ func StoV(s []string) Vector {
     for i=range s {
         x,_=strconv.ParseFloat(s[i],64)
         y=append(y,x)
+    }
+    return y
+}
+//#### Sub ###################################################################//
+func (v Vector) Sub(x []int) Vector {
+    var i int
+    var y Vector
+    for i=range x {
+        y=append(y,v[x[i]])
     }
     return y
 }

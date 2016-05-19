@@ -1,6 +1,6 @@
 // Copyright (C) 2013-2016 Arnaud Poret
 // This work is licensed under the GNU General Public License.
-// To view a copy of this license, visit http://www.gnu.org/licenses/gpl.html
+// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 package kali
 import "fmt"
 import "math/rand"
@@ -10,8 +10,7 @@ import "time"
 func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,ntarg,maxtarg,maxmoda,maxS int,nodes []string,vals Vector) {
     var todo int
     rand.Seed(int64(time.Now().Nanosecond()))
-    todo=-1
-    for todo!=0 {
+    for {
         todo=int(Prompt(strings.Join([]string{
             "\nWhat to do:",
             "    [1] generate the state space (S)",
@@ -26,17 +25,17 @@ func DoTheJob(fphysio,fpatho func(Matrix,int) Vector,ntarg,maxtarg,maxmoda,maxS 
             "    [0] quit",
             "\nTo do [0-9] ",
         },"\n"),ItoV(Range(0,10))))
-        switch todo {
-            case 1: DoS(len(nodes),maxS,vals)
-            case 2: DoAset(fphysio,fpatho,nodes)
-            case 3: DoVersus(nodes)
-            case 4: DoBtest(len(nodes),ntarg,maxtarg,maxmoda,vals)
-            case 5: DoBtherap(fpatho,nodes)
-            case 6: DoParams(&ntarg,&maxtarg,&maxmoda,&maxS,len(nodes))
-            case 7: DoSaved()
-            case 8: DoHelp()
-            case 9: DoNotice()
-            case 0: fmt.Println("\nINFO: Goodbye!\n")
-        }
+        // "switch todo case 0: break" does not break the "for" loop...
+        if todo==1 {DoS(len(nodes),maxS,vals)}
+        if todo==2 {DoAset(fphysio,fpatho,nodes)}
+        if todo==3 {DoVersus(nodes)}
+        if todo==4 {DoBtest(len(nodes),ntarg,maxtarg,maxmoda,vals)}
+        if todo==5 {DoBtherap(fpatho,nodes)}
+        if todo==6 {DoParams(&ntarg,&maxtarg,&maxmoda,&maxS,len(nodes))}
+        if todo==7 {DoSaved()}
+        if todo==8 {DoHelp()}
+        if todo==9 {DoNotice()}
+        if todo==0 {break}
     }
+    fmt.Println("\nINFO: Goodbye!\n")
 }

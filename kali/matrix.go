@@ -1,6 +1,6 @@
 // Copyright (C) 2013-2016 Arnaud Poret
 // This work is licensed under the GNU General Public License.
-// To view a copy of this license, visit http://www.gnu.org/licenses/gpl.html
+// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 package kali
 import "encoding/csv"
 import "os"
@@ -11,13 +11,11 @@ func (m1 *Matrix) Cat(m2 Matrix,d int) {
     var i int
     switch d {
         case 1:
-            for i=range m2 {
-                (*m1)=append((*m1),m2[i].Copy())
-            }
+            (*m1)=append((*m1),m2.Copy()...)
         case 2:
             if len(*m1)>0 {
                 for i=range m2 {
-                    (*m1)[i].Cat(m2[i])
+                    (*m1)[i]=append((*m1)[i],m2[i].Copy()...)
                 }
             } else {
                 (*m1)=m2.Copy()
@@ -25,10 +23,19 @@ func (m1 *Matrix) Cat(m2 Matrix,d int) {
     }
 }
 //#### CircShift #############################################################//
-func (m *Matrix) CircShift(n int) {
+func (m *Matrix) CircShift(n,d int) {
     var i int
-    for i=range (*m) {
-        (*m)[i].CircShift(n)
+    switch d {
+        case 1:
+            (*m).T()
+            for i=range (*m) {
+                (*m)[i].CircShift(n)
+            }
+            (*m).T()
+        case 2:
+            for i=range (*m) {
+                (*m)[i].CircShift(n)
+            }
     }
 }
 //#### Col ###################################################################//
@@ -96,9 +103,8 @@ func (m *Matrix) Load(filename string) {
     var reader *csv.Reader
     file,err=os.Open(filename)
     if os.IsNotExist(err) {
-        panic("m.Load("+filename+"): "+filename+" not found")
+        panic("m.Load(filename): "+filename+" not found")
     } else {
-        (*m)=Matrix{}
         reader=csv.NewReader(file)
         reader.Comma=','
         reader.Comment=0
@@ -149,9 +155,7 @@ func (m Matrix) Sub(rows,cols []int) Matrix {
     var i,j int
     var z Vector
     var y Matrix
-    if len(m)==0 {
-        panic("m.Sub(rows,cols): m is empty")
-    } else if len(cols)>0 {
+    if len(cols)>0 {
         for i=range rows {
             z=Vector{}
             for j=range cols {
@@ -163,15 +167,15 @@ func (m Matrix) Sub(rows,cols []int) Matrix {
     return y
 }
 //#### T #####################################################################//
-func (m Matrix) T() Matrix {
+func (m *Matrix) T() {
     var j int
     var y Matrix
-    if len(m)>0 {
-        for j=range m[0] {
-            y=append(y,m.Col(j))
+    if len(*m)>0 {
+        for j=range (*m)[0] {
+            y=append(y,(*m).Col(j))
         }
+        (*m)=y.Copy()
     }
-    return y
 }
 //#### ToS ###################################################################//
 func (m Matrix) ToS() [][]string {

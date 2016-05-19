@@ -1,6 +1,6 @@
 // Copyright (C) 2013-2016 Arnaud Poret
 // This work is licensed under the GNU General Public License.
-// To view a copy of this license, visit http://www.gnu.org/licenses/gpl.html
+// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 package kali
 import "fmt"
 import "os"
@@ -32,18 +32,6 @@ func FillToMaxLen(s []string) []string {
     }
     return z
 }
-//#### Min ###################################################################//
-func Min(x ...float64) float64 {
-    var i int
-    var y float64
-    y=x[0]
-    for i=1;i<len(x);i++ {
-        if y>x[i] {
-            y=x[i]
-        }
-    }
-    return y
-}
 //#### Max ###################################################################//
 func Max(x ...float64) float64 {
     var i int
@@ -51,6 +39,18 @@ func Max(x ...float64) float64 {
     y=x[0]
     for i=1;i<len(x);i++ {
         if y<x[i] {
+            y=x[i]
+        }
+    }
+    return y
+}
+//#### Min ###################################################################//
+func Min(x ...float64) float64 {
+    var i int
+    var y float64
+    y=x[0]
+    for i=1;i<len(x);i++ {
+        if y>x[i] {
             y=x[i]
         }
     }

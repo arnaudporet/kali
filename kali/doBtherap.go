@@ -1,6 +1,6 @@
 // Copyright (C) 2013-2016 Arnaud Poret
 // This work is licensed under the GNU General Public License.
-// To view a copy of this license, visit http://www.gnu.org/licenses/gpl.html
+// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 package kali
 import "fmt"
 //#### DoBtherap #############################################################//
@@ -17,7 +17,7 @@ func DoBtherap(fpatho func(Matrix,int) Vector,nodes []string) {
     } else {
         Aversus.Load(2)
         if len(Aversus)==0 {
-            fmt.Println("\nWARNING: no pathological attractors to remove (A_versus empty)")
+            fmt.Println("\nWARNING: no pathological attractors to remove (A_versus is empty)")
         } else {
             S.Load("S.csv")
             Targ.Load("Targ.csv")

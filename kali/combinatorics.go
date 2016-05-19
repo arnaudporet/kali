@@ -1,6 +1,6 @@
 // Copyright (C) 2013-2016 Arnaud Poret
 // This work is licensed under the GNU General Public License.
-// To view a copy of this license, visit http://www.gnu.org/licenses/gpl.html
+// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 package kali
 import "math"
 import "math/rand"
@@ -91,7 +91,7 @@ func GenS(deck Vector,n int) Matrix {
         for i1=0;i1<n;i1++ {
             Z=S.Copy()
             for i2=0;i2<len(deck)-1;i2++ {
-                S.Cat(Z,2)
+                S.Cat(Z.Copy(),2)
             }
             z=Vector{}
             for i2=range deck {

@@ -1,6 +1,6 @@
 // Copyright (C) 2013-2016 Arnaud Poret
 // This work is licensed under the GNU General Public License.
-// To view a copy of this license, visit http://www.gnu.org/licenses/gpl.html
+// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 package kali
 import "fmt"
 import "os"
@@ -19,7 +19,7 @@ func (b Bullet) Assess(Atest,Aversus Aset) bool {
     var i int
     if b.Gain[1]>b.Gain[0]+1.0 {// +1% to avoid round-off errors
         for i=range Atest {
-            if Atest[i].IsPatho() && Aversus.Find(Atest[i])<0 {
+            if strings.Contains(Atest[i].Name,"patho") && Aversus.Find(Atest[i])<0 {
                 return false
             }
         }
@@ -43,7 +43,7 @@ func (B *Bset) Compute(fpatho func(Matrix,int) Vector,S,Targ,Moda Matrix,Aphysio
             Atest.Compute(fpatho,S,b,Aphysio,1)
             b.Gain[1]=Aphysio.Covers(Atest).Sum()
             if b.Assess(Atest,Aversus) {
-                b.Cover=Union(Aphysio,Aversus).Covers(Atest)
+                b.Cover=append(Aphysio,Aversus...).Covers(Atest)
                 (*B)=append((*B),b.Copy())
             }
         }
@@ -125,9 +125,7 @@ func (B *Bset) Sort() {
 //#### Swap ##################################################################//
 func (B *Bset) Swap(i1,i2 int) {
     var b Bullet
-    if len(*B)>0 {
-        b=(*B)[i1].Copy()
-        (*B)[i1]=(*B)[i2].Copy()
-        (*B)[i2]=b
-    }
+    b=(*B)[i1].Copy()
+    (*B)[i1]=(*B)[i2].Copy()
+    (*B)[i2]=b.Copy()
 }
