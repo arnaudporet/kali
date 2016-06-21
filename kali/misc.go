@@ -2,40 +2,54 @@
 // This work is licensed under the GNU General Public License.
 // To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 package kali
-import "fmt"
-import "os"
-import "strings"
-//#### Exist #################################################################//
+import (
+    "fmt"
+    "os"
+    "strings"
+)
+func Align(s []string,filler string) []string {
+    var (
+        wmax,i int
+        y []string
+    )
+    wmax=len(s[0])
+    for i=1;i<len(s);i++ {
+        if wmax<len(s[i]) {
+            wmax=len(s[i])
+        }
+    }
+    y=make([]string,len(s))
+    for i=range s {
+        y[i]=s[i]+strings.Repeat(filler,wmax-len(s[i]))
+    }
+    return y
+}
 func Exist(filename string) bool {
     var err error
     _,err=os.Stat(filename)
     return !os.IsNotExist(err)
 }
-//#### FillToMaxLen ##########################################################//
-func FillToMaxLen(s []string) []string {
-    var wmax,i int
-    var z []string
-    if len(s)>0 {
-        z=make([]string,len(s))
-        copy(z,s)
-        wmax=len(z[0])
-        for i=1;i<len(z);i++ {
-            if wmax<len(z[i]) {
-                wmax=len(z[i])
-            }
-        }
-        for i=range z {
-            for len(z[i])<wmax {
-                z[i]+=" "
-            }
+func GetInt(message string,deck []int) int {
+    var (
+        x int
+        v Vector
+    )
+    v=IntToVector(deck)
+    for {
+        fmt.Print(message)
+        fmt.Scan(&x)
+        if len(deck)==0 || v.Find(float64(x))!=-1 {
+            return x
+        } else {
+            fmt.Println("\nERROR: must be in ["+strings.Join(v.ToString(),",")+"]")
         }
     }
-    return z
 }
-//#### Max ###################################################################//
 func Max(x ...float64) float64 {
-    var i int
-    var y float64
+    var (
+        i int
+        y float64
+    )
     y=x[0]
     for i=1;i<len(x);i++ {
         if y<x[i] {
@@ -44,10 +58,11 @@ func Max(x ...float64) float64 {
     }
     return y
 }
-//#### Min ###################################################################//
 func Min(x ...float64) float64 {
-    var i int
-    var y float64
+    var (
+        i int
+        y float64
+    )
     y=x[0]
     for i=1;i<len(x);i++ {
         if y>x[i] {
@@ -56,25 +71,14 @@ func Min(x ...float64) float64 {
     }
     return y
 }
-//#### Prompt ################################################################//
-func Prompt(message string,deck Vector) float64 {
-    var x float64
-    for {
-        fmt.Print(message)
-        fmt.Scan(&x)
-        if len(deck)==0 || deck.Find(x)>-1 {
-            return x
-        } else {
-            fmt.Println("\nERROR: must be in ["+strings.Join(deck.ToS(),",")+"]")
-        }
-    }
-}
-//#### Range #################################################################//
 func Range(a,b int) []int {
-    var i int
-    var y []int
-    for i=0;i<b-a;i++ {
-        y=append(y,a+i)
+    var (
+        i int
+        y []int
+    )
+    y=make([]int,b-a)
+    for i=range y {
+        y[i]=a+i
     }
     return y
 }

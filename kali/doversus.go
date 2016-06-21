@@ -3,14 +3,10 @@
 // To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 package kali
 import "fmt"
-//#### DoVersus ##############################################################//
 func DoVersus(nodes []string) {
-    var Apatho,Aversus Aset
     if !Exist("A_patho.csv") {
         fmt.Println("\nERROR: A_patho must be computed")
     } else {
-        Apatho.Load(1)
-        Aversus.Versus(Apatho)
-        Aversus.Report(2,nodes)
+        LoadAttractorSet(1).GetVersus().Report(nodes,2)
     }
 }

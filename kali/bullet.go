@@ -2,24 +2,24 @@
 // This work is licensed under the GNU General Public License.
 // To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 package kali
-import "fmt"
-import "os"
-import "strconv"
-import "strings"
-//#### Types #################################################################//
+import (
+    "fmt"
+    "os"
+    "strconv"
+    "strings"
+)
 type Bullet struct {
     Targ Vector
     Moda Vector
     Gain Vector
     Cover Vector
 }
-type Bset []Bullet
-//#### Assess ################################################################//
-func (b Bullet) Assess(Atest,Aversus Aset) bool {
+type BulletSet []Bullet
+func (b Bullet) Assess(Atest,Aversus AttractorSet,threshold int) bool {
     var i int
-    if b.Gain[1]>b.Gain[0]+1.0 {// +1% to avoid round-off errors
+    if b.Gain[1]-b.Gain[0]>=float64(threshold) {
         for i=range Atest {
-            if strings.Contains(Atest[i].Name,"patho") && Aversus.Find(Atest[i])<0 {
+            if strings.Contains(Atest[i].Name,"patho") && Aversus.Find(Atest[i])==-1 {
                 return false
             }
         }
@@ -28,29 +28,29 @@ func (b Bullet) Assess(Atest,Aversus Aset) bool {
         return false
     }
 }
-//#### Compute ###############################################################//
-func (B *Bset) Compute(fpatho func(Matrix,int) Vector,S,Targ,Moda Matrix,Aphysio,Apatho,Aversus Aset) {
-    var i1,i2 int
-    var b Bullet
-    var Atest Aset
-    (*B)=Bset{}
+func ComputeTherapeuticBullets(fpatho func(Matrix,int) Vector,S,Targ,Moda Matrix,Aphysio,Apatho,Aversus AttractorSet,threshold int) BulletSet {
+    var (
+        i1,i2 int
+        Atest AttractorSet
+        b Bullet
+        Btherap BulletSet
+    )
     b.Gain=make(Vector,2)
-    b.Gain[0]=Aphysio.Covers(Apatho).Sum()
+    b.Gain[0]=Aphysio.Cover(Apatho).Sum()
     for i1=range Targ {
         for i2=range Moda {
             b.Targ=Targ[i1].Copy()
             b.Moda=Moda[i2].Copy()
-            Atest.Compute(fpatho,S,b,Aphysio,1)
-            b.Gain[1]=Aphysio.Covers(Atest).Sum()
-            if b.Assess(Atest,Aversus) {
-                b.Cover=append(Aphysio,Aversus...).Covers(Atest)
-                (*B)=append((*B),b.Copy())
+            Atest=ComputeAttractorSet(fpatho,S,b,Aphysio,1)
+            b.Gain[1]=Aphysio.Cover(Atest).Sum()
+            if b.Assess(Atest,Aversus,threshold) {
+                b.Cover=Aphysio.Cat(Aversus).Cover(Atest)
+                Btherap=append(Btherap,b.Copy())
             }
         }
     }
-    (*B).Sort()
+    return Btherap.Sort()
 }
-//#### Copy ##################################################################//
 func (b Bullet) Copy() Bullet {
     var y Bullet
     y.Targ=b.Targ.Copy()
@@ -59,73 +59,88 @@ func (b Bullet) Copy() Bullet {
     y.Cover=b.Cover.Copy()
     return y
 }
-//#### Report ################################################################//
-func (B Bset) Report(nodes []string,Aphysio,Aversus Aset) {
-    var i1,i2 int
-    var report string
-    var z []string
-    var file *os.File
+func (B BulletSet) Copy() BulletSet {
+    var (
+        i int
+        y BulletSet
+    )
+    y=make(BulletSet,len(B))
+    for i=range B {
+        y[i]=B[i].Copy()
+    }
+    return y
+}
+func (Btherap BulletSet) Report(nodes,physionames,pathonames []string) {
+    var (
+        i1,i2 int
+        report string
+        s []string
+        file *os.File
+    )
     report="B_therap\n"+strings.Repeat("-",80)+"\n"
-    for i1=range B {
+    for i1=range Btherap {
         report+="Bullet: "
-        z=[]string{}
-        for i2=range B[i1].Targ {
-            z=append(z,nodes[int(B[i1].Targ[i2])]+"["+strconv.FormatFloat(B[i1].Moda[i2],'f',-1,64)+"]")
+        s=make([]string,len(Btherap[i1].Targ))
+        for i2=range Btherap[i1].Targ {
+            s[i2]=nodes[int(Btherap[i1].Targ[i2])]+"["+strconv.FormatFloat(Btherap[i1].Moda[i2],'f',-1,64)+"]"
         }
-        report+=strings.Join(z," ")+"\nGain: "+strconv.FormatFloat(B[i1].Gain[0],'f',-1,64)+"% --> "+strconv.FormatFloat(B[i1].Gain[1],'f',-1,64)+"%\nPhysiological basins:\n"
-        for i2=range Aphysio {
-            report+="    "+Aphysio[i2].Name+": "+strconv.FormatFloat(B[i1].Cover[i2],'f',-1,64)+"%\n"
+        report+=strings.Join(s," ")+"\nGain: "+strconv.FormatFloat(Btherap[i1].Gain[0],'f',-1,64)+"% --> "+strconv.FormatFloat(Btherap[i1].Gain[1],'f',-1,64)+"%\nPhysiological basins:\n"
+        for i2=range physionames {
+            report+="    "+physionames[i2]+": "+strconv.FormatFloat(Btherap[i1].Cover[i2],'f',-1,64)+"%\n"
         }
         report+="Pathological basins:\n"
-        for i2=range Aversus {
-            report+="    "+Aversus[i2].Name+": "+strconv.FormatFloat(B[i1].Cover[len(Aphysio)+i2],'f',-1,64)+"%\n"
+        for i2=range pathonames {
+            report+="    "+pathonames[i2]+": "+strconv.FormatFloat(Btherap[i1].Cover[len(physionames)+i2],'f',-1,64)+"%\n"
         }
         report+=strings.Repeat("-",80)+"\n"
     }
-    report+="Found therapeutic bullets: "+strconv.FormatInt(int64(len(B)),10)
+    report+="Found therapeutic bullets: "+strconv.FormatInt(int64(len(Btherap)),10)
     fmt.Println("\n"+report)
     file,_=os.Create("B_therap.txt")
     file.WriteString(report+"\n")
     file.Close()
 }
-//#### Sort ##################################################################//
-func (B *Bset) Sort() {
-    var repass bool
-    var i1,i2 int
+func (B BulletSet) Sort() BulletSet {
+    var (
+        repass bool
+        i1,i2 int
+        y BulletSet
+    )
+    y=B.Copy()
     for {
         repass=false
-        for i1=0;i1<len(*B)-1;i1++ {
-            if (*B)[i1].Targ.Equal((*B)[i1+1].Targ) {
-                for i2=range (*B)[i1].Moda {
-                    if (*B)[i1].Moda[i2]>(*B)[i1+1].Moda[i2] {
-                        (*B).Swap(i1,i1+1)
+        for i1=0;i1<len(y)-1;i1++ {
+            if y[i1].Targ.Equal(y[i1+1].Targ) {
+                for i2=range y[i1].Moda {
+                    if y[i1].Moda[i2]>y[i1+1].Moda[i2] {
+                        y=y.Swap(i1,i1+1)
                         repass=true
                         break
-                    } else if (*B)[i1].Moda[i2]<(*B)[i1+1].Moda[i2] {
+                    } else if y[i1].Moda[i2]<y[i1+1].Moda[i2] {
                         break
                     }
                 }
             } else {
-                for i2=range (*B)[i1].Targ {
-                    if (*B)[i1].Targ[i2]>(*B)[i1+1].Targ[i2] {
-                        (*B).Swap(i1,i1+1)
+                for i2=range y[i1].Targ {
+                    if y[i1].Targ[i2]>y[i1+1].Targ[i2] {
+                        y=y.Swap(i1,i1+1)
                         repass=true
                         break
-                    } else if (*B)[i1].Targ[i2]<(*B)[i1+1].Targ[i2] {
+                    } else if y[i1].Targ[i2]<y[i1+1].Targ[i2] {
                         break
                     }
                 }
             }
         }
         if !repass {
-            break
+            return y
         }
     }
 }
-//#### Swap ##################################################################//
-func (B *Bset) Swap(i1,i2 int) {
-    var b Bullet
-    b=(*B)[i1].Copy()
-    (*B)[i1]=(*B)[i2].Copy()
-    (*B)[i2]=b.Copy()
+func (B BulletSet) Swap(i,j int) BulletSet {
+    var y BulletSet
+    y=B.Copy()
+    y[i]=B[j].Copy()
+    y[j]=B[i].Copy()
+    return y
 }

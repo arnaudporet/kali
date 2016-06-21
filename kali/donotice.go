@@ -2,9 +2,10 @@
 // This work is licensed under the GNU General Public License.
 // To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 package kali
-import "fmt"
-import "strings"
-//#### DoNotice ##############################################################//
+import (
+    "fmt"
+    "strings"
+)
 func DoNotice() {
     fmt.Println(strings.Join([]string{
         "\nkali: a tool for in silico therapeutic target discovery",
