@@ -7,65 +7,26 @@ import (
     "os"
 )
 type Matrix []Vector
-func (m Matrix) Append(v Vector,d int) Matrix {
+func (m Matrix) AddCol(v Vector) Matrix {
     var (
         i int
         y Matrix
     )
-    y=m.Copy()
-    if d==1 {
-        y=append(y,v.Copy())
-    } else if d==2 {
-        for i=range v {
-            y[i]=append(y[i],v[i])
-        }
+    y=make(Matrix,len(m))
+    for i=range v {
+        y[i]=append(m[i].Copy(),v[i])
     }
     return y
 }
-func (m1 Matrix) Cat(m2 Matrix,d int) Matrix {
-    var (
-        i int
-        y Matrix
-    )
-    y=m1.Copy()
-    if d==1 {
-        for i=range m2 {
-            y=append(y,m2[i].Copy())
-        }
-    } else if d==2 {
-        for i=range m2 {
-            y[i]=y[i].Cat(m2[i])
-        }
-    }
-    return y
-}
-func (m Matrix) CircShift(n,d int) Matrix {
-    var (
-        i int
-        y Matrix
-    )
-    if d==1 {
-        y=m.T()
-        for i=range y {
-            y[i]=y[i].CircShift(n)
-        }
-        y=y.T()
-    } else if d==2 {
-        y=m.Copy()
-        for i=range y {
-            y[i]=y[i].CircShift(n)
-        }
-    }
-    return y
-}
-func (m Matrix) Cols(pos []int) Matrix {
+func (m Matrix) CircRows(n int) Matrix {
+    // n>0
     var (
         i int
         y Matrix
     )
     y=make(Matrix,len(m))
     for i=range m {
-        y[i]=m[i].Sub(pos)
+        y[i]=m[(i+n)%len(m)].Copy()
     }
     return y
 }
@@ -80,52 +41,29 @@ func (m Matrix) Copy() Matrix {
     }
     return y
 }
-func (m1 Matrix) Equal(m2 Matrix) bool {
+func (m1 Matrix) Eq(m2 Matrix) bool {
     var i int
     if len(m1)!=len(m2) {
         return false
     } else {
         for i=range m1 {
-            if !m1[i].Equal(m2[i]) {
+            if !m1[i].Eq(m2[i]) {
                 return false
             }
         }
         return true
     }
 }
-func (m Matrix) Find(v Vector,d int) int {
-    var (
-        i int
-        z Matrix
-    )
-    if d==1 {
-        for i=range m {
-            if m[i].Equal(v) {
-                return i
-            }
-        }
-    } else if d==2 {
-        z=m.T()
-        for i=range z {
-            if z[i].Equal(v) {
-                return i
-            }
+func (m Matrix) FindRow(v Vector) int {
+    var i int
+    for i=range m {
+        if m[i].Eq(v) {
+            return i
         }
     }
     return -1
 }
-func IntToMatrix(x [][]int) Matrix {
-    var (
-        i int
-        y Matrix
-    )
-    y=make(Matrix,len(x))
-    for i=range x {
-        y[i]=IntToVector(x[i])
-    }
-    return y
-}
-func LoadMatrix(filename string) Matrix {
+func LoadMat(filename string) Matrix {
     var (
         z [][]string
         reader *csv.Reader
@@ -140,9 +78,9 @@ func LoadMatrix(filename string) Matrix {
     reader.TrimLeadingSpace=true
     z,_=reader.ReadAll()
     file.Close()
-    return StringToMatrix(z)
+    return StrToMat(z)
 }
-func MakeMatrix(n,m int) Matrix {
+func MakeMat(n,m int) Matrix {
     var (
         i int
         y Matrix
@@ -153,6 +91,17 @@ func MakeMatrix(n,m int) Matrix {
     }
     return y
 }
+func (m Matrix) MinRow() int {
+    // according to the lexicographical order
+    var i,imin int
+    imin=0
+    for i=1;i<len(m);i++ {
+        if m[imin].Sup(m[i]) {
+            imin=i
+        }
+    }
+    return imin
+}
 func (m Matrix) Save(filename string) {
     var (
         writer *csv.Writer
@@ -162,25 +111,32 @@ func (m Matrix) Save(filename string) {
     writer=csv.NewWriter(file)
     writer.Comma=','
     writer.UseCRLF=false
-    writer.WriteAll(m.ToString())
+    writer.WriteAll(m.ToStr())
     file.Close()
 }
-func (m Matrix) Size(d int) int {
-    if d==1 {
-        return len(m)
-    } else if d==2 {
-        return len(m[0])
+func (m Matrix) SortRows() Matrix {
+    // according to the lexicographical order
+    var (
+        i,imin int
+        y,z Matrix
+    )
+    y=make(Matrix,len(m))
+    z=m.Copy()
+    for i=range y {
+        imin=z.MinRow()
+        y[i]=z[imin].Copy()
+        z=append(z[:imin],z[imin+1:]...)
     }
-    return -1// here for "missing return at end of function"
+    return y
 }
-func StringToMatrix(s [][]string) Matrix {
+func StrToMat(s [][]string) Matrix {
     var (
         i int
         y Matrix
     )
     y=make(Matrix,len(s))
     for i=range s {
-        y[i]=StringToVector(s[i])
+        y[i]=StrToVect(s[i])
     }
     return y
 }
@@ -189,7 +145,7 @@ func (m Matrix) T() Matrix {
         i,j int
         y Matrix
     )
-    y=MakeMatrix(m.Size(2),m.Size(1))
+    y=MakeMat(len(m[0]),len(m))
     for i=range m {
         for j=range m[i] {
             y[j][i]=m[i][j]
@@ -197,25 +153,14 @@ func (m Matrix) T() Matrix {
     }
     return y
 }
-func (m Matrix) ToInt() [][]int {
-    var (
-        i int
-        y [][]int
-    )
-    y=make([][]int,len(m))
-    for i=range m {
-        y[i]=m[i].ToInt()
-    }
-    return y
-}
-func (m Matrix) ToString() [][]string {
+func (m Matrix) ToStr() [][]string {
     var (
         i int
         y [][]string
     )
     y=make([][]string,len(m))
     for i=range m {
-        y[i]=m[i].ToString()
+        y[i]=m[i].ToStr()
     }
     return y
 }

@@ -15,36 +15,24 @@ type Bullet struct {
     Cover Vector
 }
 type BulletSet []Bullet
-func (b Bullet) Assess(Atest,Aversus AttractorSet,threshold int) bool {
-    var i int
-    if b.Gain[1]-b.Gain[0]>=float64(threshold) {
-        for i=range Atest {
-            if strings.Contains(Atest[i].Name,"patho") && Aversus.Find(Atest[i])==-1 {
-                return false
-            }
-        }
-        return true
-    } else {
-        return false
-    }
-}
-func ComputeTherapeuticBullets(fpatho func(Matrix,int) Vector,S,Targ,Moda Matrix,Aphysio,Apatho,Aversus AttractorSet,threshold int) BulletSet {
+func ComputeTherapeuticBullets(fpatho func(Vector) Vector,S,Targ,Moda Matrix,kmax,threshold,sync int,Aphysio,Apatho,Aversus AttractorSet) BulletSet {
     var (
         i1,i2 int
-        Atest AttractorSet
+        Aphyrsus,Atest AttractorSet
         b Bullet
         Btherap BulletSet
     )
+    Aphyrsus=append(Aphysio.Copy(),Aversus.Copy()...)
     b.Gain=make(Vector,2)
     b.Gain[0]=Aphysio.Cover(Apatho).Sum()
     for i1=range Targ {
         for i2=range Moda {
             b.Targ=Targ[i1].Copy()
             b.Moda=Moda[i2].Copy()
-            Atest=ComputeAttractorSet(fpatho,S,b,Aphysio,1)
+            Atest=ComputeAttractorSet(fpatho,S,b,kmax,1,sync,Aphysio)
             b.Gain[1]=Aphysio.Cover(Atest).Sum()
-            if b.Assess(Atest,Aversus,threshold) {
-                b.Cover=Aphysio.Cat(Aversus).Cover(Atest)
+            if b.IsTherapeutic(Atest,Aversus,threshold) {
+                b.Cover=Aphyrsus.Cover(Atest)
                 Btherap=append(Btherap,b.Copy())
             }
         }
@@ -70,21 +58,34 @@ func (B BulletSet) Copy() BulletSet {
     }
     return y
 }
+func (b Bullet) IsTherapeutic(Atest,Aversus AttractorSet,threshold int) bool {
+    var i int
+    if b.Gain[1]-b.Gain[0]>=float64(threshold) {
+        for i=range Atest {
+            if strings.Contains(Atest[i].Name,"patho") && Aversus.Find(Atest[i])==-1 {
+                return false
+            }
+        }
+        return true
+    } else {
+        return false
+    }
+}
 func (Btherap BulletSet) Report(nodes,physionames,pathonames []string) {
     var (
         i1,i2 int
         report string
-        s []string
+        bullet []string
         file *os.File
     )
     report="B_therap\n"+strings.Repeat("-",80)+"\n"
     for i1=range Btherap {
         report+="Bullet: "
-        s=make([]string,len(Btherap[i1].Targ))
-        for i2=range Btherap[i1].Targ {
-            s[i2]=nodes[int(Btherap[i1].Targ[i2])]+"["+strconv.FormatFloat(Btherap[i1].Moda[i2],'f',-1,64)+"]"
+        bullet=make([]string,len(Btherap[i1].Targ))
+        for i2=range bullet {
+            bullet[i2]=nodes[int(Btherap[i1].Targ[i2])]+"["+strconv.FormatFloat(Btherap[i1].Moda[i2],'f',-1,64)+"]"
         }
-        report+=strings.Join(s," ")+"\nGain: "+strconv.FormatFloat(Btherap[i1].Gain[0],'f',-1,64)+"% --> "+strconv.FormatFloat(Btherap[i1].Gain[1],'f',-1,64)+"%\nPhysiological basins:\n"
+        report+=strings.Join(bullet," ")+"\nGain: "+strconv.FormatFloat(Btherap[i1].Gain[0],'f',-1,64)+"% --> "+strconv.FormatFloat(Btherap[i1].Gain[1],'f',-1,64)+"%\nPhysiological basins:\n"
         for i2=range physionames {
             report+="    "+physionames[i2]+": "+strconv.FormatFloat(Btherap[i1].Cover[i2],'f',-1,64)+"%\n"
         }
@@ -103,33 +104,16 @@ func (Btherap BulletSet) Report(nodes,physionames,pathonames []string) {
 func (B BulletSet) Sort() BulletSet {
     var (
         repass bool
-        i1,i2 int
+        i int
         y BulletSet
     )
     y=B.Copy()
     for {
         repass=false
-        for i1=0;i1<len(y)-1;i1++ {
-            if y[i1].Targ.Equal(y[i1+1].Targ) {
-                for i2=range y[i1].Moda {
-                    if y[i1].Moda[i2]>y[i1+1].Moda[i2] {
-                        y=y.Swap(i1,i1+1)
-                        repass=true
-                        break
-                    } else if y[i1].Moda[i2]<y[i1+1].Moda[i2] {
-                        break
-                    }
-                }
-            } else {
-                for i2=range y[i1].Targ {
-                    if y[i1].Targ[i2]>y[i1+1].Targ[i2] {
-                        y=y.Swap(i1,i1+1)
-                        repass=true
-                        break
-                    } else if y[i1].Targ[i2]<y[i1+1].Targ[i2] {
-                        break
-                    }
-                }
+        for i=0;i<len(y)-1;i++ {
+            if y[i].Targ.Sup(y[i+1].Targ) || (y[i].Targ.Eq(y[i+1].Targ) && y[i].Moda.Sup(y[i+1].Moda)) {
+                y=y.Swap(i,i+1)
+                repass=true
             }
         }
         if !repass {

@@ -12,42 +12,24 @@ import (
 type Attractor struct {
     Name string
     Basin float64
-    Matrix Matrix
+    States Matrix
 }
 type AttractorSet []Attractor
-func (A1 AttractorSet) Cat(A2 AttractorSet) AttractorSet {
-    var (
-        i int
-        y AttractorSet
-    )
-    y=A1.Copy()
-    for i=range A2 {
-        y=append(y,A2[i].Copy())
-    }
-    return y
-}
-func ComputeAttractor(f func(Matrix,int) Vector,x0 Vector,b Bullet) Attractor {
-    var (
-        k,j int
-        z Vector
-        x Matrix
-        a Attractor
-    )
-    x=x0.ToMatrix(2)
-    k=0
-    for {
-        z=f(x,k).Shoot(b)
-        j=x.Find(z,2)
-        if j!=-1 {
-            a.Matrix=x.Cols(Range(j,k+1))
-            return a.Sort()
-        } else {
-            x=x.Append(z,2)
-            k+=1
+func ComputeAttractor(f func(Vector) Vector,x0 Vector,b Bullet,kmax,sync int) Attractor {
+    var a Attractor
+    if sync==1 {
+        a.States=ReachCycle(f,x0,b)
+    } else if sync==0 {
+        for {
+            a.States=GoForward(f,Walk(f,x0,b,kmax),b)
+            if a.IsTerminal(f,b) {
+                break
+            }
         }
     }
+    return a
 }
-func ComputeAttractorSet(f func(Matrix,int) Vector,S Matrix,b Bullet,Ref AttractorSet,setting int) AttractorSet {
+func ComputeAttractorSet(f func(Vector) Vector,S Matrix,b Bullet,kmax,setting,sync int,RefSet AttractorSet) AttractorSet {
     var (
         i,inA int
         name string
@@ -60,7 +42,7 @@ func ComputeAttractorSet(f func(Matrix,int) Vector,S Matrix,b Bullet,Ref Attract
         name="a_patho"
     }
     for i=range S {
-        a=ComputeAttractor(f,S[i],b)
+        a=ComputeAttractor(f,S[i],b,kmax,sync)
         inA=A.Find(a)
         if inA!=-1 {
             A[inA].Basin+=1.0
@@ -72,13 +54,13 @@ func ComputeAttractorSet(f func(Matrix,int) Vector,S Matrix,b Bullet,Ref Attract
     for i=range A {
         A[i].Basin=100.0*A[i].Basin/float64(len(S))
     }
-    return A.Sort().SetNames(Ref,name)
+    return A.Sort().SetNames(name,RefSet)
 }
 func (a Attractor) Copy() Attractor {
     var y Attractor
     y.Name=a.Name
     y.Basin=a.Basin
-    y.Matrix=a.Matrix.Copy()
+    y.States=a.States.Copy()
     return y
 }
 func (A AttractorSet) Copy() AttractorSet {
@@ -111,7 +93,7 @@ func (A1 AttractorSet) Cover(A2 AttractorSet) Vector {
 func (A AttractorSet) Find(a Attractor) int {
     var i int
     for i=range A {
-        if A[i].Matrix.Equal(a.Matrix) {
+        if A[i].States.Eq(a.States) {
             return i
         }
     }
@@ -140,13 +122,22 @@ func (Apatho AttractorSet) GetVersus() AttractorSet {
     }
     return Aversus
 }
+func (a Attractor) IsTerminal(f func(Vector) Vector,b Bullet) bool {
+    // asynchronous only
+    var i int
+    for i=range a.States {
+        if !GoForward(f,a.States[i],b).Eq(a.States) {
+            return false
+        }
+    }
+    return true
+}
 func LoadAttractorSet(setting int) AttractorSet {
     var (
         i1,i2 int
         n int64
         filename string
         s []string
-        a Attractor
         A AttractorSet
         reader *csv.Reader
         file *os.File
@@ -170,17 +161,17 @@ func LoadAttractorSet(setting int) AttractorSet {
     A=make(AttractorSet,int(n))
     s,_=reader.Read()
     n,_=strconv.ParseInt(s[0],10,0)
-    a.Matrix=make(Matrix,int(n))
     for i1=range A {
+        A[i1].States=make(Matrix,int(n))
         s,_=reader.Read()
-        a.Name=s[0]
+        A[i1].Name=s[0]
         s,_=reader.Read()
-        a.Basin,_=strconv.ParseFloat(s[0],64)
-        for i2=range a.Matrix {
+        A[i1].Basin,_=strconv.ParseFloat(s[0],64)
+        for i2=range A[i1].States {
             s,_=reader.Read()
-            a.Matrix[i2]=StringToVector(s)
+            A[i1].States[i2]=StrToVect(s)
         }
-        A[i1]=a.Copy()
+        A[i1].States=A[i1].States.T()
     }
     file.Close()
     return A
@@ -190,6 +181,7 @@ func (A AttractorSet) Report(nodes []string,setting int) {
         npoint,ncycle,i1,i2 int
         name,report string
         aligned []string
+        states [][]string
         file *os.File
     )
     if setting==0 {
@@ -204,14 +196,15 @@ func (A AttractorSet) Report(nodes []string,setting int) {
     ncycle=0
     report=name+"={"+strings.Join(A.GetNames(),",")+"}\n"+strings.Repeat("-",80)+"\n"
     for i1=range A {
-        if A[i1].Matrix.Size(2)==1 {
+        if len(A[i1].States)==1 {
             npoint+=1
         } else {
             ncycle+=1
         }
         report+="Name: "+A[i1].Name+"\nBasin: "+strconv.FormatFloat(A[i1].Basin,'f',-1,64)+"%\nMatrix:\n"
-        for i2=range A[i1].Matrix {
-            report+="    "+aligned[i2]+" "+strings.Join(A[i1].Matrix[i2].ToString()," ")+"\n"
+        states=A[i1].States.T().ToStr()
+        for i2=range states {
+            report+="    "+aligned[i2]+" "+strings.Join(states[i2]," ")+"\n"
         }
         report+=strings.Repeat("-",80)+"\n"
     }
@@ -227,6 +220,7 @@ func (A AttractorSet) Save(setting int) {
         i1,i2 int
         filename string
         s [][]string
+        states Matrix
         writer *csv.Writer
         file *os.File
     )
@@ -241,13 +235,14 @@ func (A AttractorSet) Save(setting int) {
     if len(A)==0 {
         s=append(s,[]string{"0"})
     } else {
-        s=append(s,[]string{strconv.FormatInt(int64(len(A[0].Matrix)),10)})
+        s=append(s,[]string{strconv.FormatInt(int64(len(A[0].States[0])),10)})
     }
     for i1=range A {
         s=append(s,[]string{A[i1].Name})
         s=append(s,[]string{strconv.FormatFloat(A[i1].Basin,'f',-1,64)})
-        for i2=range A[i1].Matrix {
-            s=append(s,A[i1].Matrix[i2].ToString())
+        states=A[i1].States.T()
+        for i2=range states {
+            s=append(s,states[i2].ToStr())
         }
     }
     file,_=os.Create(filename)
@@ -257,17 +252,17 @@ func (A AttractorSet) Save(setting int) {
     writer.WriteAll(s)
     file.Close()
 }
-func (A AttractorSet) SetNames(Ref AttractorSet,name string) AttractorSet {
+func (A AttractorSet) SetNames(name string,RefSet AttractorSet) AttractorSet {
     var (
         k,i,inRef int
         y AttractorSet
     )
     y=A.Copy()
     k=1
-    for i=range A {
-        inRef=Ref.Find(A[i])
+    for i=range y {
+        inRef=RefSet.Find(y[i])
         if inRef!=-1 {
-            y[i].Name=Ref[inRef].Name
+            y[i].Name=RefSet[inRef].Name
         } else {
             y[i].Name=name+strconv.FormatInt(int64(k),10)
             k+=1
@@ -275,46 +270,19 @@ func (A AttractorSet) SetNames(Ref AttractorSet,name string) AttractorSet {
     }
     return y
 }
-func (a Attractor) Sort() Attractor {
-    var (
-        i int
-        jmin Vector
-        y Attractor
-    )
-    y=a.Copy()
-    jmin=IntToVector(Range(0,y.Matrix.Size(2)))
-    for i=range y.Matrix {
-        jmin=jmin.Sub(y.Matrix[i].Sub(jmin.ToInt()).MinPos())
-        if len(jmin)==1 {
-            y.Matrix=y.Matrix.CircShift(int(jmin[0]),2)
-            break
-        }
-    }
-    return y
-}
 func (A AttractorSet) Sort() AttractorSet {
     var (
         repass bool
-        i1,i2 int
+        i int
         y AttractorSet
     )
     y=A.Copy()
     for {
         repass=false
-        for i1=0;i1<len(y)-1;i1++ {
-            if y[i1].Matrix.Size(2)>y[i1+1].Matrix.Size(2) {
-                y=y.Swap(i1,i1+1)
+        for i=0;i<len(y)-1;i++ {
+            if len(y[i].States)>len(y[i+1].States) || (len(y[i].States)==len(y[i+1].States) && y[i].States[0].Sup(y[i+1].States[0])) {
+                y=y.Swap(i,i+1)
                 repass=true
-            } else if y[i1].Matrix.Size(2)==y[i1+1].Matrix.Size(2) {
-                for i2=range y[i1].Matrix {
-                    if y[i1].Matrix[i2][0]>y[i1+1].Matrix[i2][0] {
-                        y=y.Swap(i1,i1+1)
-                        repass=true
-                        break
-                    } else if y[i1].Matrix[i2][0]<y[i1+1].Matrix[i2][0] {
-                        break
-                    }
-                }
             }
         }
         if !repass {

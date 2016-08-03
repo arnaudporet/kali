@@ -3,7 +3,7 @@
 // To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 package kali
 import "fmt"
-func DoTherapeuticBullets(fpatho func(Matrix,int) Vector,threshold int,nodes []string) {
+func DoTherapeuticBullets(fpatho func(Vector) Vector,kmax,threshold,sync int,nodes []string) {
     var Aphysio,Apatho,Aversus AttractorSet
     if !Exist("S.csv") {
         fmt.Println("\nERROR: S must be generated")
@@ -18,7 +18,7 @@ func DoTherapeuticBullets(fpatho func(Matrix,int) Vector,threshold int,nodes []s
         } else {
             Aphysio=LoadAttractorSet(0)
             Apatho=LoadAttractorSet(1)
-            ComputeTherapeuticBullets(fpatho,LoadMatrix("S.csv"),LoadMatrix("Targ.csv"),LoadMatrix("Moda.csv"),Aphysio,Apatho,Aversus,threshold).Report(nodes,Align(Aphysio.GetNames()," "),Align(Aversus.GetNames()," "))
+            ComputeTherapeuticBullets(fpatho,LoadMat("S.csv"),LoadMat("Targ.csv"),LoadMat("Moda.csv"),kmax,threshold,sync,Aphysio,Apatho,Aversus).Report(nodes,Align(Aphysio.GetNames()," "),Align(Aversus.GetNames()," "))
         }
     }
 }

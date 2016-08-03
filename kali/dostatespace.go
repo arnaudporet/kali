@@ -3,7 +3,6 @@
 // To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 package kali
 import (
-    "fmt"
     "math"
     "strconv"
 )
@@ -19,9 +18,8 @@ func DoStateSpace(n,maxS int,vals Vector) {
         wholeS=1
     }
     if wholeS==0 {
-        vals.GenArrangMat(n,maxS).Save("S.csv")
+        vals.Arrangs(n,maxS).Save("S.csv")
     } else if wholeS==1 {
-        vals.GenS(n).Save("S.csv")
+        vals.Space(n).Save("S.csv")
     }
-    fmt.Println("\nINFO: S generated")
 }
