@@ -47,7 +47,6 @@ func GoForward(f func(Vector) Vector,x0 Vector,b Bullet) Matrix {
         i int
         x,y,z Vector
         fwd,stack Matrix
-
     )
     fwd=Matrix{x0.Copy()}
     stack=Matrix{x0.Copy()}
