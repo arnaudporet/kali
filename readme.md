@@ -6,7 +6,7 @@ This work is licensed under the [GNU General Public License](https://www.gnu.org
 
 ## How to
 
-1. read my article (all is explained inside), freely available on [arXiv](https://arxiv.org) and [HAL](https://hal.archives-ouvertes.fr):
+1. read my article (all is explained inside), freely available (and up to date) on [arXiv](https://arxiv.org) and [HAL](https://hal.archives-ouvertes.fr):
     * https://arxiv.org/abs/1407.4374
     * https://hal.archives-ouvertes.fr/hal-01024788
 2. clone kali (or [download](https://github.com/arnaudporet/kali/archive/master.zip) it if you do not use [Git](https://git-scm.com)):

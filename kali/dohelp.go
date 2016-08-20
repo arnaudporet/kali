@@ -9,7 +9,7 @@ import (
 func DoHelp() {
     fmt.Println(strings.Join([]string{
         "\nHow to use kali:",
-        "    1) read my article (all is explained inside), freely available at:",
+        "    1) read my article (all is explained inside), freely available (and up to date) at:",
         "        * arXiv: https://arxiv.org/abs/1407.4374",
         "        * HAL:   https://hal.archives-ouvertes.fr/hal-01024788",
         "    2) generate the state space (S)",
