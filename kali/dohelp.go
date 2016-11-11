@@ -9,9 +9,7 @@ import (
 func DoHelp() {
     fmt.Println(strings.Join([]string{
         "\nHow to use kali:",
-        "    1) read my article (all is explained inside), freely available (and up to date) at:",
-        "        * arXiv: https://arxiv.org/abs/1407.4374",
-        "        * HAL:   https://hal.archives-ouvertes.fr/hal-01024788",
+        "    1) read my article, freely available at: https://arxiv.org/abs/1611.03144",
         "    2) generate the state space (S)",
         "    3) compute the attractor set of the physiological variant (A_physio)",
         "        * when prompted, set the setting to physiological",
@@ -23,8 +21,8 @@ func DoHelp() {
         "        * therapeutic bullets are reported as follow:",
         "              x1[y1] x2[y2] x3[y3] ...",
         "          meaning that the variable x has to be set to the value y",
-        "    * you can change parameter values (ntarg, maxtarg, maxmoda, maxS, kmax, threshold and sync)",
-        "    * you can check/clear what is saved (S, A_physio, A_patho, A_versus, Targ, Moda and B_therap)\n",
+        "    * you can change parameter values (ntarg, maxtarg, maxmoda, maxS, kmax, threshold, sync)",
+        "    * you can check/clear what is saved (S, A_physio, A_patho, A_versus, Targ, Moda, B_therap)\n",
         "kali automatically saves/loads the files it creates/uses.\n",
         "These files are:",
         "    * S.csv",
@@ -40,6 +38,5 @@ func DoHelp() {
         "The csv files are for kali while the txt files are for you.\n",
         "If a file already exists then kali will overwrite it.\n",
         "If you rename, move or delete the csv files created by kali then it will not be able to load them when required.\n",
-        "kali is tested with Go version go1.6.3 linux/amd64 (Arch Linux).",
     },"\n"))
 }

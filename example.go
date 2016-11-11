@@ -4,27 +4,24 @@
 
 //#### HOWTO #################################################################//
 
-// 1) read my article (all is explained inside), freely available (and up to
-//    date) at:
-//        * arXiv: https://arxiv.org/abs/1407.4374
-//        * HAL:   https://hal.archives-ouvertes.fr/hal-01024788
+// 1) read my article, freely available at: https://arxiv.org/abs/1611.03144
 // 2) read the following comments
 // 3) replace the content of this file with your own stuff
-// 4) run (tested with Go version go1.6.3 linux/amd64 under Arch Linux):
-//        go run example.go
-//    it is possible that the Go package has a different name depending on your
-//    OS/Linux distribution
-//    for example, with Ubuntu, it is named "golang", so it may be
-//    "golang-go run yourfile.go" instead of "go run yourfile.go"
+// 4) run (in a terminal emulator): ``go run example.go''
 // 5) check the help proposed by kali at runtime
 
-// This example is a Boolean model of the ErbB receptor-regulated G1/S
-// transition by Ozgur Sahin and colleagues [1].
+// It is possible that the Go package has a different name depending on your
+// operating system. For example, with Ubuntu it is named golang, so it might be
+// ``golang-go run yourfile.go'' instead of ``go run yourfile.go'' with Arch
+// Linux.
+
+// This example is a fictive network. It is specifically designed for
+// illustration and is not intended to model a real biological phenomenon.
 
 //############################################################################//
 
 package main
-// Import kali, change the path if you move it.
+// import kali, change the path if you move it
 import "./kali"
 func main() {
     var (
@@ -35,43 +32,33 @@ func main() {
     // nodes: the node names
     //     * nodes is an array of at least one string
     nodes=[]string{
-        "ERBB1",
-        "ERBB2",
-        "ERBB3",
-        "ERBB1_2",
-        "ERBB1_3",
-        "ERBB2_3",
-        "IGF1R",
-        "ER_alpha",
-        "c_MYC",
-        "AKT1",
-        "MEK1",
-        "CDK2",
-        "CDK4",
-        "CDK6",
-        "Cyclin_D1",
-        "Cyclin_E1",
-        "p21",
-        "p27",
-        "pRB",
+        "do",
+        "factory",
+        "energy",
+        "locker",
+        "releaser",
+        "sequester",
+        "activator",
+        "effector",
+        "task",
     }
     // vals: the domain of value
     //     * vals is an array of at least two real numbers in [0;1]
-    //     * {0,1} for Boolean logic or for example {0,0.5,1} for three-valued
+    //     * {0,1} for Boolean logic or, for example, {0,0.5,1} for three-valued
     //       logic
     vals=kali.Vector{0.0,1.0}
-    // sync: the updating scheme
+    // sync: the updating method for the variables
     //     * sync is an integer in {0,1}
-    //     * sync=0: an asynchronous updating scheme is used (one randomly-
-    //       selected variable is updated at each iteration following a uniform
+    //     * sync=0: an asynchronous updating is used (one randomly selected
+    //       variable is updated at each iteration, according to a uniform
     //       distribution)
-    //     * sync=1: a synchronous updating scheme is used (all the variables
-    //       are updated simultaneously at each iteration)
+    //     * sync=1: a synchronous updating is used (all the variables are
+    //       updated simultaneously at each iteration)
     //     * can be changed at runtime
     sync=0
-    // maxS: the maximum number of initial states
+    // maxS: the maximum number of initial states to use
     //     * maxS is an integer > 0
-    //     * maxS is the maximum number of initial states to test when computing
+    //     * maxS is the maximum number of initial states to use when computing
     //       an attractor set
     //     * if it exceeds its maximal possible value then kali will
     //       automatically decrease it to its maximal possible value
@@ -80,10 +67,10 @@ func main() {
     // kmax: the number of iterations performed during a random walk
     //     * only relevant in the asynchronous case
     //     * kmax is an integer > 0 (recommended to be > 1000)
-    //     * when searching for an attractor along an asynchronous updating
-    //       scheme, a long random walk is performed in order to reach an
-    //       attractor with a high probability (this candidate attractor will
-    //       then be validated, or not)
+    //     * when searching for an attractor according to an asynchronous
+    //       updating, a long random walk is performed in order to reach an
+    //       attractor with high probability (this candidate attractor will then
+    //       be subjected to validation)
     //     * the smallest is kmax the smallest is the probability to reach an
     //       attractor: this will cause kali to run for a too long time
     //     * on the other hand, if kmax is too big then kali will also run for a
@@ -111,8 +98,8 @@ func main() {
     maxmoda=100
     // threshold: the threshold for a bullet to be considered therapeutic
     //     * threshold is an integer in [0;100]
-    //     * the goal of therapeutic bullets is to increase the coverage of the
-    //       pathological state space by the physiological one
+    //     * the goal of therapeutic bullets is to increase the basin of the
+    //       physiological attractors in the pathological state space
     //     * to be therapeutic, this increase must be >= threshold (in percents
     //       of the pathological state space)
     //     * can be changed at runtime
@@ -133,61 +120,34 @@ func fphysio(x kali.Vector) kali.Vector {
         // replace the following equations with your own stuff
         // your equations encoded in the same way
         // note that the variable numbering starts at 0
-        1.0,// ERBB1 (also stands for the homodimer)
-        1.0,// ERBB2 (also stands for the homodimer)
-        1.0,// ERBB3 (also stands for the homodimer)
-        kali.Min(x[0],x[1]),// ERBB1:2
-        kali.Min(x[0],x[2]),// ERBB1:3
-        kali.Min(x[1],x[2]),// ERBB2:3
-        kali.Min(kali.Max(x[7],x[9]),1.0-x[5]),// IGF1R
-        kali.Max(x[9],x[10]),// ER alpha
-        kali.Max(x[9],x[10],x[7]),// cMYC
-        kali.Max(x[0],x[3],x[4],x[5],x[6]),// Akt1
-        kali.Max(x[0],x[3],x[4],x[5],x[6]),// MEK1
-        kali.Min(x[15],1.0-x[16],1.0-x[17]),// CDK2
-        kali.Min(x[14],1.0-x[16],1.0-x[17]),// CDK4
-        x[14],// CDK6
-        kali.Min(x[7],x[8],kali.Max(x[9],x[10])),// Cyclin D1
-        x[8],// Cyclin E1
-        kali.Min(x[7],1.0-x[9],1.0-x[8],1.0-x[12]),// p21
-        kali.Min(x[7],1.0-x[12],1.0-x[11],1.0-x[9],1.0-x[8]),// p27
-        kali.Min(x[12],x[13]),// pRB
+        x[0],// do
+        x[1],// factory
+        kali.Max(kali.Min(x[2],1.0-x[8]),x[1]),// energy
+        1.0-x[2],// locker
+        x[0],// releaser
+        1.0-x[4],// sequester
+        kali.Min(x[0],1.0-x[3]),// activator
+        kali.Min(x[6],1.0-x[5]),// effector
+        x[7],// task
     }
 }
 
 // fpatho: the transition function of the pathological variant
 //     * fpatho is a vector function from vals^{number of nodes} to itself
-//     * in this example, fpatho is obtained by knocking out Akt1, but the
-//       authors have tested a wide range of knockouts
+//     * in this example, fpatho is obtained by knocking down the locker
 func fpatho(x kali.Vector) kali.Vector {
     return kali.Vector{
         // replace the following equations with your own stuff
         // your equations encoded in the same way
         // note that the variable numbering starts at 0
-        1.0,// ERBB1 (also stands for the homodimer)
-        1.0,// ERBB2 (also stands for the homodimer)
-        1.0,// ERBB3 (also stands for the homodimer)
-        kali.Min(x[0],x[1]),// ERBB1:2
-        kali.Min(x[0],x[2]),// ERBB1:3
-        kali.Min(x[1],x[2]),// ERBB2:3
-        kali.Min(kali.Max(x[7],x[9]),1.0-x[5]),// IGF1R
-        kali.Max(x[9],x[10]),// ER alpha
-        kali.Max(x[9],x[10],x[7]),// cMYC
-        0.0,// Akt1
-        kali.Max(x[0],x[3],x[4],x[5],x[6]),// MEK1
-        kali.Min(x[15],1.0-x[16],1.0-x[17]),// CDK2
-        kali.Min(x[14],1.0-x[16],1.0-x[17]),// CDK4
-        x[14],// CDK6
-        kali.Min(x[7],x[8],kali.Max(x[9],x[10])),// Cyclin D1
-        x[8],// Cyclin E1
-        kali.Min(x[7],1.0-x[9],1.0-x[8],1.0-x[12]),// p21
-        kali.Min(x[7],1.0-x[12],1.0-x[11],1.0-x[9],1.0-x[8]),// p27
-        kali.Min(x[12],x[13]),// pRB
+        x[0],// do
+        x[1],// factory
+        kali.Max(kali.Min(x[2],1.0-x[8]),x[1]),// energy
+        0.0,// locker (knocked down)
+        x[0],// releaser
+        1.0-x[4],// sequester
+        kali.Min(x[0],1.0-x[3]),// activator
+        kali.Min(x[6],1.0-x[5]),// effector
+        x[7],// task
     }
 }
-
-// [1] O. Sahin, H. Frohlich, C. Lobke, U. Korf, S. Burmester, M. Majety,
-// J. Mattern, I. Schupp, C. Chaouiya, D. Thieffry, A. Poustka, S. Wiemann,
-// T. Beissbarth, D. Arlt (2009) Modeling ERBB receptor-regulated G1/S
-// transition to find novel targets for de novo trastuzumab resistance.
-// BMC Systems Biology 3(1).
