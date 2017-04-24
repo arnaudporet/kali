@@ -1,4 +1,4 @@
-// Copyright (C) 2013-2016 Arnaud Poret
+// Copyright (C) 2013-2017 Arnaud Poret
 // This work is licensed under the GNU General Public License.
 // To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 
