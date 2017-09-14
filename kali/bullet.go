@@ -83,7 +83,7 @@ func (Btherap BulletSet) Report(nodes,physionames,pathonames []string) {
         report+="Bullet: "
         bullet=make([]string,len(Btherap[i1].Targ))
         for i2=range bullet {
-            bullet[i2]=nodes[int(Btherap[i1].Targ[i2])]+"["+strconv.FormatFloat(Btherap[i1].Moda[i2],'f',-1,64)+"]"
+            bullet[i2]=nodes[NearInt(Btherap[i1].Targ[i2])]+"["+strconv.FormatFloat(Btherap[i1].Moda[i2],'f',-1,64)+"]"
         }
         report+=strings.Join(bullet," ")+"\nGain: "+strconv.FormatFloat(Btherap[i1].Gain[0],'f',-1,64)+"% --> "+strconv.FormatFloat(Btherap[i1].Gain[1],'f',-1,64)+"%\nPhysiological basins:\n"
         for i2=range physionames {

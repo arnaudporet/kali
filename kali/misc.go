@@ -105,6 +105,15 @@ func Min(x ...float64) float64 {
     }
     return y
 }
+func NearInt(x float64) int {
+    var y int
+    y=int(x)
+    if x<float64(y)+0.5 {
+        return y
+    } else {
+        return y+1
+    }
+}
 func Range(a,b int) []int {
     var (
         i int

@@ -26,7 +26,7 @@ func (v Vector) Arrangs(k,narrang int) Matrix {
         i int
         y Matrix
     )
-    y=make(Matrix,int(math.Min(float64(narrang),math.Pow(float64(len(v)),float64(k)))))
+    y=make(Matrix,NearInt(math.Min(float64(narrang),math.Pow(float64(len(v)),float64(k)))))
     for i=range y {
         for {
             y[i]=v.Arrang(k)
@@ -57,7 +57,7 @@ func (v Vector) Combis(k,ncombi int) Matrix {
         i int
         y Matrix
     )
-    y=make(Matrix,int(math.Min(float64(ncombi),math.Gamma(float64(len(v)+1))/(math.Gamma(float64(k+1))*math.Gamma(float64(len(v)-k+1))))))
+    y=make(Matrix,NearInt(math.Min(float64(ncombi),math.Gamma(float64(len(v)+1))/(math.Gamma(float64(k+1))*math.Gamma(float64(len(v)-k+1))))))
     for i=range y {
         for {
             y[i]=v.Combi(k)
@@ -137,7 +137,7 @@ func (v Vector) Space(n int) Matrix {
     )
     y=v.ToCol()
     for i1=1;i1<n;i1++ {
-        m=int(math.Pow(float64(len(v)),float64(i1)))
+        m=NearInt(math.Pow(float64(len(v)),float64(i1)))
         for i2=0;i2<len(v)-1;i2++ {
             y=append(y,y[:m].Copy()...)
         }
@@ -174,7 +174,7 @@ func (v Vector) Sum() float64 {
 func (v1 Vector) Sup(v2 Vector) bool {
     // according to the lexicographical order
     var i int
-    for i=0;i<int(math.Min(float64(len(v1)),float64(len(v2))));i++ {
+    for i=0;i<NearInt(math.Min(float64(len(v1)),float64(len(v2))));i++ {
         if v1[i]<v2[i] {
             return false
         } else if v1[i]>v2[i] {
@@ -201,7 +201,7 @@ func (v Vector) ToInt() []int {
     )
     y=make([]int,len(v))
     for i=range v {
-        y[i]=int(v[i])
+        y[i]=NearInt(v[i])
     }
     return y
 }
