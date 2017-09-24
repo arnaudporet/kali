@@ -19,6 +19,9 @@ Most [Linux distributions](https://distrowatch.com) provide Go in their official
 
 # Forthcoming
 
+* a biological case study
+* updating the article accordingly
+
 # References
 
 The functions used to handle the asynchronous updating are adapted from [BoolNet](https://cran.r-project.org/web/packages/BoolNet/) [1].
