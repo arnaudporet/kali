@@ -1,0 +1,101 @@
+A_physio={a_physio1,a_physio2,a_physio3}
+--------------------------------------------------------------------------------
+Name: a_physio1
+Basin: 10.7%
+Phenotype: growth arrest
+Matrix:
+    AKT          0
+    ATM_lvl1     0
+    ATM_lvl2     0
+    CDC25A       0
+    CHEK1_2_lvl1 0
+    CHEK1_2_lvl2 0
+    CyclinA      0
+    CyclinD1     0
+    CyclinE1     0
+    E2F1_lvl1    0
+    E2F1_lvl2    0
+    E2F3_lvl1    0
+    E2F3_lvl2    0
+    EGFR         0
+    FGFR3        1
+    GRB2         0
+    MDM2         0
+    p14ARF       0
+    p16INK4a     0
+    p21CIP       1
+    PI3K         0
+    PTEN         0
+    RAS          1
+    RB1          1
+    RBL2         1
+    SPRY         1
+    TP53         0
+--------------------------------------------------------------------------------
+Name: a_physio2
+Basin: 74.5%
+Phenotype: growth arrest
+Matrix:
+    AKT          0
+    ATM_lvl1     0
+    ATM_lvl2     0
+    CDC25A       0
+    CHEK1_2_lvl1 0
+    CHEK1_2_lvl2 0
+    CyclinA      0
+    CyclinD1     0
+    CyclinE1     0
+    E2F1_lvl1    0
+    E2F1_lvl2    0
+    E2F3_lvl1    1
+    E2F3_lvl2    0
+    EGFR         0
+    FGFR3        1
+    GRB2         0
+    MDM2         0
+    p14ARF       0
+    p16INK4a     1
+    p21CIP       1
+    PI3K         0
+    PTEN         0
+    RAS          1
+    RB1          0
+    RBL2         1
+    SPRY         1
+    TP53         0
+--------------------------------------------------------------------------------
+Name: a_physio3
+Basin: 14.8%
+Phenotype: proliferation
+Matrix:
+    AKT          0
+    ATM_lvl1     0
+    ATM_lvl2     0
+    CDC25A       1
+    CHEK1_2_lvl1 0
+    CHEK1_2_lvl2 0
+    CyclinA      1
+    CyclinD1     0
+    CyclinE1     1
+    E2F1_lvl1    1
+    E2F1_lvl2    0
+    E2F3_lvl1    1
+    E2F3_lvl2    0
+    EGFR         0
+    FGFR3        1
+    GRB2         0
+    MDM2         0
+    p14ARF       1
+    p16INK4a     1
+    p21CIP       0
+    PI3K         0
+    PTEN         0
+    RAS          1
+    RB1          0
+    RBL2         0
+    SPRY         1
+    TP53         0
+--------------------------------------------------------------------------------
+Found attractors: 3
+    points: 3
+    cycles: 0

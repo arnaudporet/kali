@@ -12,13 +12,13 @@ func DoParameters(ntarg,maxtarg,maxmoda,maxS,kmax,threshold,sync *int,n int) {
     for {
         tochange=GetInt(strings.Join([]string{
             "\nWhat to change:",
-            "    [1] ntarg        ("+strconv.FormatInt(int64(*ntarg),10)+")",
-            "    [2] maxtarg      ("+strconv.FormatInt(int64(*maxtarg),10)+")",
-            "    [3] maxmoda      ("+strconv.FormatInt(int64(*maxmoda),10)+")",
-            "    [4] maxS         ("+strconv.FormatInt(int64(*maxS),10)+")",
-            "    [5] kmax         ("+strconv.FormatInt(int64(*kmax),10)+")",
-            "    [6] threshold    ("+strconv.FormatInt(int64(*threshold),10)+")",
-            "    [7] sync         ("+strconv.FormatInt(int64(*sync),10)+")",
+            "    [1] ntarg     ("+strconv.FormatInt(int64(*ntarg),10)+")",
+            "    [2] maxtarg   ("+strconv.FormatInt(int64(*maxtarg),10)+")",
+            "    [3] maxmoda   ("+strconv.FormatInt(int64(*maxmoda),10)+")",
+            "    [4] maxS      ("+strconv.FormatInt(int64(*maxS),10)+")",
+            "    [5] kmax      ("+strconv.FormatInt(int64(*kmax),10)+")",
+            "    [6] threshold ("+strconv.FormatInt(int64(*threshold),10)+")",
+            "    [7] sync      ("+strconv.FormatInt(int64(*sync),10)+")",
             "    [0] done",
             "\nTo change [0-7] ",
         },"\n"),Range(0,8))

@@ -1,0 +1,1569 @@
+B_therap
+--------------------------------------------------------------------------------
+Bullet: AKT[0] ATM_lvl1[0]
+Gain: 65.4% --> 86.7%
+Physiological basins:
+    a_physio1: 86.7%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 13.3%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] ATM_lvl2[0]
+Gain: 65.4% --> 87.7%
+Physiological basins:
+    a_physio1: 87.7%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 12.3%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] CDC25A[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] CHEK1_2_lvl1[0]
+Gain: 65.4% --> 87.7%
+Physiological basins:
+    a_physio1: 87.7%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 12.3%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] CHEK1_2_lvl2[0]
+Gain: 65.4% --> 84.8%
+Physiological basins:
+    a_physio1: 84.8%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 15.2%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] CyclinE1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] E2F1_lvl2[0]
+Gain: 65.4% --> 87.6%
+Physiological basins:
+    a_physio1: 87.6%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 12.4%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] E2F3_lvl2[0]
+Gain: 65.4% --> 89.1%
+Physiological basins:
+    a_physio1: 89.1%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 10.9%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] EGFR[0]
+Gain: 65.4% --> 89.8%
+Physiological basins:
+    a_physio1: 89.8%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 10.2%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] FGFR3[1]
+Gain: 65.4% --> 87.1%
+Physiological basins:
+    a_physio1: 87.1%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 12.9%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] MDM2[0]
+Gain: 65.4% --> 90.7%
+Physiological basins:
+    a_physio1: 90.7%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 9.3%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] p14ARF[0]
+Gain: 65.4% --> 89.3%
+Physiological basins:
+    a_physio1: 89.3%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 10.7%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] p16INK4a[0]
+Gain: 65.4% --> 89.4%
+Physiological basins:
+    a_physio1: 89.4%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 10.6%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] PI3K[0]
+Gain: 65.4% --> 91%
+Physiological basins:
+    a_physio1: 91%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 9%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] PTEN[0]
+Gain: 65.4% --> 89.5%
+Physiological basins:
+    a_physio1: 89.5%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 10.5%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] RAS[1]
+Gain: 65.4% --> 87.3%
+Physiological basins:
+    a_physio1: 87.3%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 12.7%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] SPRY[1]
+Gain: 65.4% --> 89.6%
+Physiological basins:
+    a_physio1: 89.6%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 10.4%
+--------------------------------------------------------------------------------
+Bullet: AKT[0] TP53[0]
+Gain: 65.4% --> 88.9%
+Physiological basins:
+    a_physio1: 88.9%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 11.1%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl1[0] CDC25A[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl1[0] CyclinE1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl1[0] EGFR[0]
+Gain: 65.4% --> 73.4%
+Physiological basins:
+    a_physio1: 73.4%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 26.6%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl1[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl1[0] PI3K[0]
+Gain: 65.4% --> 83.7%
+Physiological basins:
+    a_physio1: 83.7%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 16.3%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl1[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl1[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl2[0] CDC25A[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl2[0] CyclinE1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl2[0] EGFR[0]
+Gain: 65.4% --> 75.3%
+Physiological basins:
+    a_physio1: 75.3%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 24.7%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl2[0] FGFR3[1]
+Gain: 65.4% --> 71.2%
+Physiological basins:
+    a_physio1: 71.2%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 28.8%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl2[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl2[0] PI3K[0]
+Gain: 65.4% --> 86%
+Physiological basins:
+    a_physio1: 86%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 14%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl2[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: ATM_lvl2[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] CHEK1_2_lvl1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] CHEK1_2_lvl2[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] CyclinA[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] CyclinD1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] CyclinE1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] E2F1_lvl1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] E2F1_lvl2[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] E2F3_lvl1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] E2F3_lvl2[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] EGFR[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] FGFR3[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] MDM2[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] p14ARF[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] p16INK4a[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] p16INK4a[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 0%
+    a_physio2: 100%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] PI3K[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] PTEN[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] RAS[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] SPRY[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0] TP53[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CHEK1_2_lvl1[0] CyclinE1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CHEK1_2_lvl1[0] EGFR[0]
+Gain: 65.4% --> 72.6%
+Physiological basins:
+    a_physio1: 72.6%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 27.4%
+--------------------------------------------------------------------------------
+Bullet: CHEK1_2_lvl1[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CHEK1_2_lvl1[0] PI3K[0]
+Gain: 65.4% --> 85.5%
+Physiological basins:
+    a_physio1: 85.5%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 14.5%
+--------------------------------------------------------------------------------
+Bullet: CHEK1_2_lvl1[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CHEK1_2_lvl1[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CHEK1_2_lvl2[0] CyclinE1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CHEK1_2_lvl2[0] EGFR[0]
+Gain: 65.4% --> 73.1%
+Physiological basins:
+    a_physio1: 73.1%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 26.9%
+--------------------------------------------------------------------------------
+Bullet: CHEK1_2_lvl2[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CHEK1_2_lvl2[0] PI3K[0]
+Gain: 65.4% --> 79.5%
+Physiological basins:
+    a_physio1: 79.5%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 20.5%
+--------------------------------------------------------------------------------
+Bullet: CHEK1_2_lvl2[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CHEK1_2_lvl2[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinA[0] CyclinE1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinA[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinA[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinA[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinD1[0] CyclinE1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinD1[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinD1[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinD1[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] E2F1_lvl1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] E2F1_lvl2[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] E2F3_lvl1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] E2F3_lvl2[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] EGFR[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] FGFR3[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] MDM2[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] p14ARF[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] p16INK4a[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] p16INK4a[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 0%
+    a_physio2: 100%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] PI3K[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] PTEN[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] RAS[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] SPRY[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0] TP53[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: E2F1_lvl1[0] E2F3_lvl1[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: E2F1_lvl1[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: E2F1_lvl1[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: E2F1_lvl1[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: E2F1_lvl2[0] EGFR[0]
+Gain: 65.4% --> 77.5%
+Physiological basins:
+    a_physio1: 77.5%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 22.5%
+--------------------------------------------------------------------------------
+Bullet: E2F1_lvl2[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: E2F1_lvl2[0] PI3K[0]
+Gain: 65.4% --> 88.3%
+Physiological basins:
+    a_physio1: 88.3%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 11.7%
+--------------------------------------------------------------------------------
+Bullet: E2F1_lvl2[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: E2F1_lvl2[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: E2F3_lvl1[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: E2F3_lvl1[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: E2F3_lvl1[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: E2F3_lvl2[0] EGFR[0]
+Gain: 65.4% --> 78.7%
+Physiological basins:
+    a_physio1: 78.7%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 21.3%
+--------------------------------------------------------------------------------
+Bullet: E2F3_lvl2[0] FGFR3[1]
+Gain: 65.4% --> 71.1%
+Physiological basins:
+    a_physio1: 71.1%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 28.9%
+--------------------------------------------------------------------------------
+Bullet: E2F3_lvl2[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: E2F3_lvl2[0] PI3K[0]
+Gain: 65.4% --> 86.6%
+Physiological basins:
+    a_physio1: 86.6%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 13.4%
+--------------------------------------------------------------------------------
+Bullet: E2F3_lvl2[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: E2F3_lvl2[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: E2F3_lvl2[0] SPRY[1]
+Gain: 65.4% --> 70.5%
+Physiological basins:
+    a_physio1: 70.5%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 29.5%
+--------------------------------------------------------------------------------
+Bullet: EGFR[0] FGFR3[1]
+Gain: 65.4% --> 72.9%
+Physiological basins:
+    a_physio1: 72.9%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 27.1%
+--------------------------------------------------------------------------------
+Bullet: EGFR[0] GRB2[0]
+Gain: 65.4% --> 81.9%
+Physiological basins:
+    a_physio1: 81.9%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 18.1%
+--------------------------------------------------------------------------------
+Bullet: EGFR[0] MDM2[0]
+Gain: 65.4% --> 77%
+Physiological basins:
+    a_physio1: 77%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 23%
+--------------------------------------------------------------------------------
+Bullet: EGFR[0] p14ARF[0]
+Gain: 65.4% --> 76.3%
+Physiological basins:
+    a_physio1: 76.3%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 23.7%
+--------------------------------------------------------------------------------
+Bullet: EGFR[0] p16INK4a[0]
+Gain: 65.4% --> 78.6%
+Physiological basins:
+    a_physio1: 78.6%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 21.4%
+--------------------------------------------------------------------------------
+Bullet: EGFR[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: EGFR[0] PI3K[0]
+Gain: 65.4% --> 86.7%
+Physiological basins:
+    a_physio1: 86.7%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 13.3%
+--------------------------------------------------------------------------------
+Bullet: EGFR[0] PTEN[0]
+Gain: 65.4% --> 76.7%
+Physiological basins:
+    a_physio1: 76.7%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 23.3%
+--------------------------------------------------------------------------------
+Bullet: EGFR[0] RAS[1]
+Gain: 65.4% --> 74.6%
+Physiological basins:
+    a_physio1: 74.6%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 25.4%
+--------------------------------------------------------------------------------
+Bullet: EGFR[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: EGFR[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: EGFR[0] SPRY[1]
+Gain: 65.4% --> 79.8%
+Physiological basins:
+    a_physio1: 79.8%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 20.2%
+--------------------------------------------------------------------------------
+Bullet: EGFR[0] TP53[0]
+Gain: 65.4% --> 75.5%
+Physiological basins:
+    a_physio1: 75.5%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 24.5%
+--------------------------------------------------------------------------------
+Bullet: FGFR3[1] GRB2[0]
+Gain: 65.4% --> 78.7%
+Physiological basins:
+    a_physio1: 78.7%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 21.3%
+--------------------------------------------------------------------------------
+Bullet: FGFR3[1] MDM2[0]
+Gain: 65.4% --> 72.1%
+Physiological basins:
+    a_physio1: 72.1%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 27.9%
+--------------------------------------------------------------------------------
+Bullet: FGFR3[1] p16INK4a[0]
+Gain: 65.4% --> 70.8%
+Physiological basins:
+    a_physio1: 70.8%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 29.2%
+--------------------------------------------------------------------------------
+Bullet: FGFR3[1] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: FGFR3[1] PI3K[0]
+Gain: 65.4% --> 84.1%
+Physiological basins:
+    a_physio1: 84.1%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 15.9%
+--------------------------------------------------------------------------------
+Bullet: FGFR3[1] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: FGFR3[1] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: FGFR3[1] SPRY[1]
+Gain: 65.4% --> 75.5%
+Physiological basins:
+    a_physio1: 75.5%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 24.5%
+--------------------------------------------------------------------------------
+Bullet: MDM2[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: MDM2[0] PI3K[0]
+Gain: 65.4% --> 85.6%
+Physiological basins:
+    a_physio1: 85.6%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 14.4%
+--------------------------------------------------------------------------------
+Bullet: MDM2[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: MDM2[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: MDM2[0] SPRY[1]
+Gain: 65.4% --> 71.7%
+Physiological basins:
+    a_physio1: 71.7%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 28.3%
+--------------------------------------------------------------------------------
+Bullet: p14ARF[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: p14ARF[0] PI3K[0]
+Gain: 65.4% --> 87.3%
+Physiological basins:
+    a_physio1: 87.3%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 12.7%
+--------------------------------------------------------------------------------
+Bullet: p14ARF[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: p14ARF[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: p16INK4a[0] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: p16INK4a[1] p21CIP[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 0%
+    a_physio2: 100%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: p16INK4a[0] PI3K[0]
+Gain: 65.4% --> 85%
+Physiological basins:
+    a_physio1: 85%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 15%
+--------------------------------------------------------------------------------
+Bullet: p16INK4a[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: p16INK4a[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: p16INK4a[1] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 0%
+    a_physio2: 100%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: p21CIP[1] PI3K[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: p21CIP[1] PTEN[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: p21CIP[1] RAS[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: p21CIP[1] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: p21CIP[1] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: p21CIP[1] SPRY[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: p21CIP[1] TP53[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: PI3K[0] PTEN[0]
+Gain: 65.4% --> 88.3%
+Physiological basins:
+    a_physio1: 88.3%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 11.7%
+--------------------------------------------------------------------------------
+Bullet: PI3K[0] RAS[1]
+Gain: 65.4% --> 81%
+Physiological basins:
+    a_physio1: 81%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 19%
+--------------------------------------------------------------------------------
+Bullet: PI3K[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: PI3K[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: PI3K[0] SPRY[1]
+Gain: 65.4% --> 86%
+Physiological basins:
+    a_physio1: 86%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 14%
+--------------------------------------------------------------------------------
+Bullet: PI3K[0] TP53[0]
+Gain: 65.4% --> 85.3%
+Physiological basins:
+    a_physio1: 85.3%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 14.7%
+--------------------------------------------------------------------------------
+Bullet: PTEN[0] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: PTEN[0] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: RAS[1] RB1[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: RAS[1] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: RB1[1] RBL2[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: RB1[1] SPRY[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: RB1[1] TP53[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: RBL2[1] SPRY[1]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: RBL2[1] TP53[0]
+Gain: 65.4% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Found therapeutic bullets: 174

@@ -4,10 +4,10 @@
 
 //#### HOWTO #################################################################//
 
-// 1) read my article, freely available at: https://arxiv.org/abs/1611.03144
+// 1) read my article, freely available at https://arxiv.org/abs/1611.03144
 // 2) read the following comments
 // 3) replace the content of this file with your own stuff
-// 4) run (in a terminal emulator): ``go run example.go''
+// 4) run ``go run example.go'' in a terminal emulator
 // 5) check the help proposed by kali at runtime
 
 // It is possible that the Go package has a different name depending on your
@@ -15,13 +15,16 @@
 // ``golang-go run yourfile.go'' instead of ``go run yourfile.go'' with Arch
 // Linux.
 
-// This example is a fictive network. It is specifically designed for
-// illustration and is not intended to model a real biological phenomenon.
+// This example is a simple and fictive Boolean network used to conveniently
+// illustrate kali.
+
+// A biological case study is also proposed to address a concrete case: a
+// published logic-based model of bladder tumorigenesis.
 
 //############################################################################//
 
 package main
-// import kali, change the path if you move it
+// import kali, change the path if you move it, but must be a relative path
 import "./kali"
 func main() {
     var (
@@ -42,73 +45,81 @@ func main() {
         "effector",
         "task",
     }
-    // vals: the domain of value
+    // vals: the domain of value of the used logic
     //     * vals is an array of at least two real numbers in [0;1]
     //     * {0,1} for Boolean logic or, for example, {0,0.5,1} for three-valued
     //       logic
     vals=kali.Vector{0.0,1.0}
     // sync: the updating method for the variables
     //     * sync is an integer in {0,1}
-    //     * sync=0: an asynchronous updating is used (one randomly selected
+    //     * sync=0: an asynchronous updating is used, one randomly selected
     //       variable is updated at each iteration, according to a uniform
-    //       distribution)
-    //     * sync=1: a synchronous updating is used (all the variables are
-    //       updated simultaneously at each iteration)
+    //       distribution
+    //     * sync=1: a synchronous updating is used, all the variables are
+    //       updated simultaneously at each iteration
     //     * can be changed at runtime
     sync=0
     // maxS: the maximum number of initial states to use
     //     * maxS is an integer > 0
     //     * maxS is the maximum number of initial states to use when computing
     //       an attractor set
-    //     * if it exceeds its maximal possible value then kali will
-    //       automatically decrease it to its maximal possible value
+    //     * if it exceeds its maximal possible value then kali automatically
+    //       decreases it to its maximal possible value
     //     * can be changed at runtime
     maxS=1000
     // kmax: the number of iterations performed during a random walk
-    //     * only relevant in the asynchronous case
-    //     * kmax is an integer > 0 (recommended to be > 1000)
+    //     * only relevant in the asynchronous case (sync=0)
+    //     * kmax is an integer > 0 (recommended to be > 1 000)
     //     * when searching for an attractor according to an asynchronous
     //       updating, a long random walk is performed in order to reach an
-    //       attractor with high probability (this candidate attractor will then
-    //       be subjected to validation)
+    //       attractor with high probability, this candidate attractor is then
+    //       subjected to validation
     //     * the smallest is kmax the smallest is the probability to reach an
     //       attractor: this will cause kali to run for a too long time
     //     * on the other hand, if kmax is too big then kali will also run for a
     //       too long time
-    //     * a good compromise could be 1000 < kmax < 10000
+    //     * a compromise could be 1 000 < kmax < 10 000
     //     * can be changed at runtime
     kmax=1000
     // ntarg: the number of targets per bullet
     //     * ntarg is an integer in [1;number of nodes]
+    //     * a bullet is a couple of:
+    //           * one combination without repetition of ntarg targets
+    //           * one arrangement with repetition of ntarg modalities
+    //     * modalities are the perturbations to apply on the targets, typically
+    //       inhibition or stimulation
     //     * can be changed at runtime
     ntarg=1
     // maxtarg: the maximum number of target combinations to test
     //     * maxtarg is an integer > 0
-    //     * if it exceeds its maximal possible value then kali will
-    //       automatically decrease it to its maximal possible value
+    //     * if it exceeds its maximal possible value then kali automatically
+    //       decreases it to its maximal possible value
     //     * can be changed at runtime
     maxtarg=100
     // maxmoda: the maximum number of modality arrangements to test
     //     * maxmoda is an integer > 0
     //     * maxmoda is the maximum number of modality arrangements to test for
     //       each target combination
-    //     * if it exceeds its maximal possible value then kali will
-    //       automatically decrease it to its maximal possible value
+    //     * if it exceeds its maximal possible value then kali automatically
+    //       decreases it to its maximal possible value
+    //     * there are consequently maxtarg*maxmoda bullets to test, where
+    //       maxtarg and maxmoda are the true maximal possible values
     //     * can be changed at runtime
     maxmoda=100
     // threshold: the threshold for a bullet to be considered therapeutic
     //     * threshold is an integer in [0;100]
-    //     * the goal of therapeutic bullets is to increase the basin of the
-    //       physiological attractors in the pathological state space
-    //     * to be therapeutic, this increase must be >= threshold (in percents
-    //       of the pathological state space)
+    //     * the goal of therapeutic bullets is to increase the union of the
+    //       physiological basins, namely the basins of the physiological
+    //       attractors
+    //     * to be therapeutic, this increase must be >= threshold, in percents
+    //       of the state space
     //     * can be changed at runtime
     threshold=5
     kali.DoTheJob(fphysio,fpatho,ntarg,maxtarg,maxmoda,maxS,kmax,threshold,sync,nodes,vals)
 }
 
-// To cope with both Boolean and multivalued logic, the Zadeh fuzzy logic
-// operators are used:
+// To cope with both Boolean and multivalued logic, the Zadeh operators are
+// used:
 //     x AND y = min(x,y)
 //     x OR y  = max(x,y)
 //     NOT x   = 1-x
@@ -131,7 +142,6 @@ func fphysio(x kali.Vector) kali.Vector {
         x[7],// task
     }
 }
-
 // fpatho: the transition function of the pathological variant
 //     * fpatho is a vector function from vals^{number of nodes} to itself
 //     * in this example, fpatho is obtained by knocking down the locker
