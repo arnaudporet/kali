@@ -18,7 +18,7 @@ func DoHelp() {
         "    5) get the pathological attractors (A_versus)",
         "    6) generate the bullets to test (Targ and Moda)",
         "    7) compute therapeutic bullets (B_therap)",
-        "       therapeutic bullets are reported as follow: x1[y1] x2[y2] x3[y3] ...",
+        "       therapeutic bullets are reported as follows: x1[y1] x2[y2] x3[y3] ...",
         "       meaning that the variable x has to be set to the value y",
         "    you can change parameter values (ntarg, maxtarg, maxmoda, maxS, kmax, threshold, sync)",
         "    you can check/clear what is saved (S, A_physio, A_patho, A_versus, Targ, Moda, B_therap)\n",

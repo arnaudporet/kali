@@ -7,20 +7,19 @@ This work is licensed under the [GNU General Public License](https://www.gnu.org
 ## How to
 
 1. read my [article](https://arxiv.org/abs/1611.03144)
-2. clone kali (or [download](https://github.com/arnaudporet/kali/archive/master.zip) it if you do not use [Git](https://git-scm.com)): `git clone https://github.com/arnaudporet/kali.git`
-3. open the file `example.go`
+2. clone kali: run `git clone https://github.com/arnaudporet/kali.git` in a terminal emulator, or [download](https://github.com/arnaudporet/kali/archive/master.zip) it if you do not use [Git](https://git-scm.com)
+3. read the file `example.go`
 
 The file `example.go` contains a simple and fictive Boolean network to conveniently illustrate kali.
 
-The folder `case_study/` contains a biological case study in order to address a concrete case: a published logic-based model of bladder tumorigenesis.
+The folder `case_study/` contains a biological case study in order to address a concrete case, namely a published logic-based model of bladder tumorigenesis.
 
 The technical details about using kali are not recalled in the case study: the example should be consulted first.
 
-kali is implemented in [Go](https://golang.org): https://golang.org/doc/install
-
-Most [Linux distributions](https://distrowatch.com) provide Go in their official repositories. For example:
+kali is implemented in [Go](https://golang.org). Most [Linux distributions](https://distrowatch.com) provide Go in their official repositories. For example:
 * golang ([Ubuntu](https://www.ubuntu.com))
 * go ([Arch Linux](https://www.archlinux.org))
+Otherwise see https://golang.org/doc/install
 
 ## Forthcoming
 

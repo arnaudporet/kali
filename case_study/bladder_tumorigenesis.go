@@ -2,11 +2,11 @@
 // This work is licensed under the GNU General Public License.
 // To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
 
-// This biological case study is proposed to address a concrete case: a
+// This biological case study is proposed to address a concrete case, namely a
 // published logic-based model of bladder tumorigenesis.
 
-// It relates three extracellular input signals and one intracellular input
-// event to three cellular output phenotypes.
+// It links three extracellular input signals and one intracellular input event
+// to three cellular output phenotypes.
 
 // The three extracellular input signals are:
 //     * growth stimulations, represented by the EGFRstimulus and FGFR3stimulus
@@ -22,7 +22,8 @@
 //     * growth arrest
 //     * apoptosis
 
-// The value of the four inputs are directly injected into the concerned
+// The value of the four inputs (i.e. EGFRstimulus, FGFR3stimulus,
+// GrowthInhibitors and DNAdamage) are directly injected into the concerned
 // equations.
 
 // The three output phenotypes can be evaluated from the returned attractors
@@ -34,8 +35,8 @@
 // See my article for a complete description of this case study, freely
 // available at https://arxiv.org/abs/1611.03144
 
-// The comments describing the technical details about using kali are in the
-// file example.go.
+// The technical details about using kali are not recalled: the example
+// contained in the file example.go should be consulted first.
 
 package main
 import "../kali"
@@ -124,9 +125,9 @@ func fphysio(x kali.Vector) kali.Vector {
     }
 }
 // The pathological variant fpatho is the model plus a deletion of the tumor
-// suppressor gene CDKN2A, as observed in bladder cancers. Note that the CDKN2A
-// gene encodes two growth inhibitors: p14ARF and p16INK4a. Consequently, p14ARF
-// and p16INK4a are knocked down in fpatho.
+// suppressor gene CDKN2A, as observed in bladder cancers.
+// Note that the CDKN2A gene encodes two growth inhibitors: p14ARF and p16INK4a.
+// Consequently, p14ARF and p16INK4a are knocked down in fpatho.
 func fpatho(x kali.Vector) kali.Vector {
     return kali.Vector{
         x[20],// AKT

@@ -1,5 +1,5 @@
-// Below are the equations of three output phenotypes of the model. They can be
-// evaluated from the returned attractors once the run terminated.
+// Below are the equations of the three output phenotypes of the case study.
+// They can be evaluated from the returned attractors once the run terminated.
 
 //#### Boolean version #######################################################//
 
