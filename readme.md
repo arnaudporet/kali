@@ -19,6 +19,7 @@ The technical details about using kali are not recalled in the case study: the e
 kali is implemented in [Go](https://golang.org). Most [Linux distributions](https://distrowatch.com) provide Go in their official repositories. For example:
 * golang ([Ubuntu](https://www.ubuntu.com))
 * go ([Arch Linux](https://www.archlinux.org))
+
 Otherwise see https://golang.org/doc/install
 
 ## Forthcoming
