@@ -7,7 +7,9 @@ This work is licensed under the [GNU General Public License](https://www.gnu.org
 ## How to
 
 1. read my [article](https://arxiv.org/abs/1611.03144)
-2. clone kali: run `git clone https://github.com/arnaudporet/kali.git` in a terminal emulator, or [download](https://github.com/arnaudporet/kali/archive/master.zip) it if you do not use [Git](https://git-scm.com)
+2. clone kali:
+    * run `git clone https://github.com/arnaudporet/kali.git` in a terminal emulator
+    * or [download](https://github.com/arnaudporet/kali/archive/master.zip) it if you do not use [Git](https://git-scm.com)
 3. read the file `example.go`
 
 The file `example.go` contains a simple and fictive Boolean network to conveniently illustrate kali.
