@@ -17,23 +17,31 @@ type Bullet struct {
 type BulletSet []Bullet
 func ComputeTherapeuticBullets(fpatho func(Vector) Vector,S,Targ,Moda Matrix,kmax,threshold,sync int,Aphysio,Apatho,Aversus AttractorSet) BulletSet {
     var (
-        i1,i2 int
+        skipped bool
+        i1,i2,maxfwd int
+        sizes []float64
         Aphyrsus,Atest AttractorSet
         b Bullet
         Btherap BulletSet
     )
     Aphyrsus=append(Aphysio.Copy(),Aversus.Copy()...)
+    for i1=range Aphyrsus {
+        sizes=append(sizes,float64(len(Aphyrsus[i1].States)))
+    }
+    maxfwd=NearInt(Max(sizes...))
     b.Gain=make(Vector,2)
     b.Gain[0]=Aphysio.Cover(Apatho).Sum()
     for i1=range Targ {
         for i2=range Moda {
             b.Targ=Targ[i1].Copy()
             b.Moda=Moda[i2].Copy()
-            Atest=ComputeAttractorSet(fpatho,S,b,kmax,1,sync,Aphysio)
-            b.Gain[1]=Aphysio.Cover(Atest).Sum()
-            if b.IsTherapeutic(Atest,Aversus,threshold) {
-                b.Cover=Aphyrsus.Cover(Atest)
-                Btherap=append(Btherap,b.Copy())
+            Atest,skipped=ComputeAttractorSet(fpatho,S,b,kmax,1,sync,maxfwd,Aphysio)
+            if !skipped {
+                b.Gain[1]=Aphysio.Cover(Atest).Sum()
+                if b.IsTherapeutic(Atest,Aversus,threshold) {
+                    b.Cover=Aphyrsus.Cover(Atest)
+                    Btherap=append(Btherap,b.Copy())
+                }
             }
         }
     }

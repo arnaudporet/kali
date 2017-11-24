@@ -41,7 +41,7 @@ func GetInt(prompt string,deck []int) int {
         }
     }
 }
-func GoForward(f func(Vector) Vector,x0 Vector,b Bullet) Matrix {
+func GoForward(f func(Vector) Vector,x0 Vector,b Bullet,maxfwd int) (Matrix,bool) {
     // asynchronous only
     var (
         i int
@@ -60,6 +60,9 @@ func GoForward(f func(Vector) Vector,x0 Vector,b Bullet) Matrix {
             z=z.Shoot(b.Targ.ToInt(),b.Moda)
             if fwd.FindRow(z)==-1 {
                 fwd=append(fwd,z.Copy())
+                if len(fwd)==maxfwd+1 {
+                    return Matrix{},true
+                }
                 stack=append(stack,z.Copy())
             }
         }
@@ -67,7 +70,7 @@ func GoForward(f func(Vector) Vector,x0 Vector,b Bullet) Matrix {
             break
         }
     }
-    return fwd.SortRows()
+    return fwd.SortRows(),false
 }
 func Max(x ...float64) float64 {
     var (

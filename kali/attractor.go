@@ -15,22 +15,29 @@ type Attractor struct {
     States Matrix
 }
 type AttractorSet []Attractor
-func ComputeAttractor(f func(Vector) Vector,x0 Vector,b Bullet,kmax,sync int) Attractor {
-    var a Attractor
+func ComputeAttractor(f func(Vector) Vector,x0 Vector,b Bullet,kmax,sync,maxfwd int) (Attractor,bool) {
+    var (
+        skipped bool
+        a Attractor
+    )
     if sync==1 {
         a.States=ReachCycle(f,x0,b)
     } else if sync==0 {
         for {
-            a.States=GoForward(f,Walk(f,x0,b,kmax),b)
+            a.States,skipped=GoForward(f,Walk(f,x0,b,kmax),b,maxfwd)
+            if skipped {
+                return Attractor{},true
+            }
             if a.IsTerminal(f,b) {
                 break
             }
         }
     }
-    return a
+    return a,false
 }
-func ComputeAttractorSet(f func(Vector) Vector,S Matrix,b Bullet,kmax,setting,sync int,RefSet AttractorSet) AttractorSet {
+func ComputeAttractorSet(f func(Vector) Vector,S Matrix,b Bullet,kmax,setting,sync,maxfwd int,RefSet AttractorSet) (AttractorSet,bool) {
     var (
+        skipped bool
         i,inA int
         name string
         a Attractor
@@ -42,7 +49,10 @@ func ComputeAttractorSet(f func(Vector) Vector,S Matrix,b Bullet,kmax,setting,sy
         name="a_patho"
     }
     for i=range S {
-        a=ComputeAttractor(f,S[i],b,kmax,sync)
+        a,skipped=ComputeAttractor(f,S[i],b,kmax,sync,maxfwd)
+        if skipped {
+            return AttractorSet{},true
+        }
         inA=A.Find(a)
         if inA!=-1 {
             A[inA].Basin+=1.0
@@ -54,7 +64,7 @@ func ComputeAttractorSet(f func(Vector) Vector,S Matrix,b Bullet,kmax,setting,sy
     for i=range A {
         A[i].Basin=100.0*A[i].Basin/float64(len(S))
     }
-    return A.Sort().SetNames(name,RefSet)
+    return A.Sort().SetNames(name,RefSet),false
 }
 func (a Attractor) Copy() Attractor {
     var y Attractor
@@ -124,9 +134,13 @@ func (Apatho AttractorSet) GetVersus() AttractorSet {
 }
 func (a Attractor) IsTerminal(f func(Vector) Vector,b Bullet) bool {
     // asynchronous only
-    var i int
+    var (
+        i int
+        fwd Matrix
+    )
     for i=range a.States {
-        if !GoForward(f,a.States[i],b).Eq(a.States) {
+        fwd,_=GoForward(f,a.States[i],b,-9)
+        if !fwd.Eq(a.States) {
             return false
         }
     }
