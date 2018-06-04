@@ -62,12 +62,12 @@ func main() {
     // maxS: the maximum number of initial states to use
     //     * maxS is an integer > 0
     //     * maxS is the maximum number of initial states to use when computing
-    //       an attractor set, it is the size of the state space sample to use
+    //       an attractor set
     //     * if it exceeds its maximal possible value then kali automatically
     //       decreases it to its maximal possible value
     //     * can be changed at runtime
     maxS=1000
-    // kmax: the number of iterations/steps performed during a random walk
+    // kmax: the number of steps performed during a random walk
     //     * only relevant in the asynchronous case (sync=0)
     //     * kmax is an integer > 0 (recommended to be > 1 000)
     //     * when searching for an attractor according to an asynchronous
@@ -104,7 +104,7 @@ func main() {
     //     * maxmoda is the maximum number of modality arrangements to test for
     //       each target combination
     //     * there are consequently maxtarg*maxmoda bullets to test, where
-    //       maxtarg and maxmoda are the true maximal possible values
+    //       maxtarg and maxmoda are the actual maximal possible values
     //     * if it exceeds its maximal possible value then kali automatically
     //       decreases it to its maximal possible value
     //     * can be changed at runtime
@@ -121,13 +121,13 @@ func main() {
     kali.DoTheJob(fphysio,fpatho,ntarg,maxtarg,maxmoda,maxS,kmax,threshold,sync,nodes,vals)
 }
 
-// To cope with both Boolean and multivalued logic, the Zadeh operators are
-// used:
+// To cope with both Boolean and multivalued logic, the Zadeh logical operators
+// are used:
 //     x AND y = min(x,y)
 //     x OR y  = max(x,y)
 //     NOT x   = 1-x
 
-// fphysio: the transition function of the physiological variant
+// fphysio: the updating function of the physiological variant
 //     * fphysio is a vector function from vals^{number of nodes} to itself
 func fphysio(x kali.Vector) kali.Vector {
     return kali.Vector{
@@ -145,7 +145,7 @@ func fphysio(x kali.Vector) kali.Vector {
         x[7],// task
     }
 }
-// fpatho: the transition function of the pathological variant
+// fpatho: the updating function of the pathological variant
 //     * fpatho is a vector function from vals^{number of nodes} to itself
 //     * in this example, fpatho is obtained by knocking down the locker
 func fpatho(x kali.Vector) kali.Vector {

@@ -28,7 +28,7 @@ This file contains the Boolean version of the model equations.
 
 ### `eq_func.go`
 
-This file contains the functional version of the model equations: the Zadeh operators are used instead of the Boolean ones.
+This file contains the functional version of the model equations: the Zadeh logical operators are used instead of the Boolean ones.
 
 kali only uses the functional version of the model equations since it works with both Boolean and multivalued logic.
 
@@ -36,15 +36,15 @@ kali only uses the functional version of the model equations since it works with
 
 This script takes the file containing the functional version of the model equations, here the file `eq_func.go`, and returns the file `eq_func_xed.go`.
 
-Run `python eq_func.go` in a terminal emulator.
+Run `python xEq.py eq_func.go` in a terminal emulator.
 
 This script is coded in Python3, no warranties that it works with Python2.
 
 ### `eq_func_xed.go`
 
-This file contains the functional version of the model equations contained in the file `eq_func.go` but with the node names replaced by the corresponding positions in the state vector **x**.
+This file contains the functional version of the model equations with the node names replaced by their corresponding position in the state vector **x**.
 
-This is the version of the model equations present in the file `bladder_tumorigenesis.go`.
+This is the version of the model equations used by kali and therefore present in the file `bladder_tumorigenesis.go`.
 
 It also contains the list of the nodes names.
 
@@ -54,11 +54,11 @@ The content of this file is intended to be directly pasted into the file `bladde
 
 This file contains the equations of the three output phenotypes.
 
-Use them to evaluate these output phenotypes from the returned attractors once the run terminated.
+Use them to evaluate these output phenotypes from the returned attractors once the run has terminated.
 
 ## `results/`
 
-This folder contains the results of this case study obtained by using the file `bladder_tumorigenesis.go`.
+This folder contains the results of this case study obtained by running the file `bladder_tumorigenesis.go`.
 
 ### `A_physio.txt`
 

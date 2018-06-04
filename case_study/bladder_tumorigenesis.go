@@ -27,7 +27,7 @@
 // equations.
 
 // The three output phenotypes can be evaluated from the returned attractors
-// once the run terminated using their respective equation:
+// once the run has terminated using their respective equation:
 //     * Proliferation = CyclinE1 OR CyclinA
 //     * GrowthArrest  = p21CIP OR RB1 OR RBL2
 //     * Apoptosis     = TP53 OR E2F1_lvl2
