@@ -26,8 +26,6 @@ Otherwise see https://golang.org/doc/install
 
 ## Forthcoming
 
-* a very much faster implementation is coming
-
 ## References
 
 The functions used to handle the asynchronous updating are adapted from [BoolNet](https://cran.r-project.org/web/packages/BoolNet/) [1].
