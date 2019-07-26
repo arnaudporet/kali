@@ -26,6 +26,8 @@ Otherwise see https://golang.org/doc/install
 
 ## Forthcoming
 
+Major update by mid-August 2019.
+
 ## References
 
 The functions used to handle the asynchronous updating are adapted from [BoolNet](https://cran.r-project.org/web/packages/BoolNet/) [1].
