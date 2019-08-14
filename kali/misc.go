@@ -1,6 +1,12 @@
 // Copyright (C) 2013-2019 Arnaud Poret
 // This work is licensed under the GNU General Public License.
-// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
+// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
+
+// WARNING The functions in the present file do not handle exceptions and
+// errors. Instead, they assume that such handling is performed upstream by the
+// <do*> top-level functions of kali. Consequently, they should not be used as
+// is outside of kali.
+
 package kali
 import (
     "fmt"
@@ -10,67 +16,89 @@ import (
 )
 func Align(s []string,filler string) []string {
     var (
-        wmax,i int
+        wMax,i int
         y []string
     )
-    wmax=MaxLen(s)
+    wMax=MaxLen(s)
     y=make([]string,len(s))
     for i=range s {
-        y[i]=s[i]+strings.Repeat(filler,wmax-len(s[i]))
+        y[i]=s[i]+strings.Repeat(filler,wMax-len(s[i]))
     }
     return y
 }
-func Exist(filename string) bool {
-    var err error
-    _,err=os.Stat(filename)
+func CheckF(f func(Vector) Vector,vals Vector,n int,ok *bool) {
+    var (
+        i int
+    )
+    defer Recover(ok)
+    for i=range vals {
+        _=f(MakeVect(n,vals[i]))
+    }
+}
+func Exist(fileName string) bool {
+    var (
+        err error
+    )
+    _,err=os.Stat(fileName)
     return !os.IsNotExist(err)
 }
 func GetInt(prompt string,deck []int) int {
     var (
+        err error
         x int
-        v Vector
+        vDeck Vector
     )
-    v=IntToVect(deck)
+    vDeck=IntToVect(deck)
     for {
         fmt.Print(prompt)
-        fmt.Scan(&x)
-        if len(deck)==0 || v.Find(float64(x))!=-1 {
-            return x
+        _,err=fmt.Scan(&x)
+        if err!=nil {
+            panic("GetInt(prompt,deck): "+err.Error())
+        } else if (len(vDeck)==0) || (vDeck.Find(float64(x))!=-1) {
+            break
         } else {
-            fmt.Println("\nERROR: must be in ["+strings.Join(v.ToStr(),",")+"]")
+            fmt.Println("must be in ["+strings.Join(vDeck.ToStr(),",")+"]")
         }
     }
+    return x
 }
-func GoForward(f func(Vector) Vector,x0 Vector,b Bullet,maxfwd int) (Matrix,bool) {
-    // asynchronous only
+func GoForward(x0 Vector,f func(Vector) Vector,b Bullet,maxForward int) (Matrix,bool) {
     var (
-        i int
-        x,y,z Vector
-        fwd,stack Matrix
+        skipped bool
+        i,j int
+        forward,newCheck,toCheck,succ Matrix
     )
-    fwd=Matrix{x0.Copy()}
-    stack=Matrix{x0.Copy()}
+    skipped=false
+    forward=append(forward,x0.Copy())
+    newCheck=append(newCheck,x0.Copy())
     for {
-        x=stack[len(stack)-1].Copy()
-        stack=stack[:len(stack)-1]
-        y=f(x)
-        for i=range y {
-            z=x.Copy()
-            z[i]=y[i]
-            z=z.Shoot(b.Targ.ToInt(),b.Moda)
-            if fwd.FindRow(z)==-1 {
-                fwd=append(fwd,z.Copy())
-                if len(fwd)==maxfwd+1 {
-                    return Matrix{},true
+        toCheck=newCheck.Copy()
+        newCheck=Matrix{}
+        for i=range toCheck {
+            succ=toCheck[i].Succ(f,b)
+            for j=range succ {
+                if forward.FindRow(succ[j])==-1 {
+                    forward=append(forward,succ[j].Copy())
+                    if (maxForward>0) && (len(forward)>maxForward) {
+                        skipped=true
+                        break
+                    } else {
+                        newCheck=append(newCheck,succ[j].Copy())
+                    }
                 }
-                stack=append(stack,z.Copy())
+            }
+            if skipped {
+                break
             }
         }
-        if len(stack)==0 {
+        if skipped || (len(newCheck)==0) {
             break
         }
     }
-    return fwd.SortRows(),false
+    if !skipped {
+        forward=forward.SortRows()
+    }
+    return forward,skipped
 }
 func Max(x ...float64) float64 {
     var (
@@ -86,7 +114,9 @@ func Max(x ...float64) float64 {
     return y
 }
 func MaxLen(s []string) int {
-    var i,y int
+    var (
+        y,i int
+    )
     y=len(s[0])
     for i=1;i<len(s);i++ {
         if y<len(s[i]) {
@@ -108,37 +138,32 @@ func Min(x ...float64) float64 {
     }
     return y
 }
-func NearInt(x float64) int {
-    var y int
-    y=int(x)
-    if x<float64(y)+0.5 {
-        return y
-    } else {
-        return y+1
-    }
-}
 func Range(a,b int) []int {
     var (
         i int
         y []int
     )
-    y=make([]int,b-a)
-    for i=range y {
-        y[i]=a+i
+    if a==b {
+        y=[]int{a}
+    } else {
+        y=make([]int,b-a)
+        for i=range y {
+            y[i]=a+i
+        }
     }
     return y
 }
-func ReachCycle(f func(Vector) Vector,x0 Vector,b Bullet) Matrix {
-    // synchronous only
+func ReachCycle(x0 Vector,f func(Vector) Vector,b Bullet) Matrix {
     var (
         i int
         x Vector
         y Matrix
     )
-    y=Matrix{x0.Copy()}
+    y=append(y,x0.Copy())
     x=x0.Copy()
     for {
-        x=f(x).Shoot(b.Targ.ToInt(),b.Moda)
+        x=f(x)
+        x=x.Shoot(b)
         i=y.FindRow(x)
         if i!=-1 {
             y=y[i:]
@@ -149,18 +174,46 @@ func ReachCycle(f func(Vector) Vector,x0 Vector,b Bullet) Matrix {
     }
     return y.CircRows(y.MinRow())
 }
-func Walk(f func(Vector) Vector,x0 Vector,b Bullet,kmax int) Vector {
-    // asynchronous only
+func Recover(ok *bool) {
+    var (
+        recov interface{}
+    )
+    recov=recover()
+    if recov!=nil {
+        fmt.Println(recov)
+        (*ok)=false
+    } else {
+        (*ok)=true
+    }
+}
+func (x Vector) Succ(f func(Vector) Vector,b Bullet) Matrix {
+    var (
+        i int
+        y,z Vector
+        succ Matrix
+    )
+    y=f(x)
+    for i=range y {
+        z=x.Copy()
+        z[i]=y[i]
+        z=z.Shoot(b)
+        if succ.FindRow(z)==-1 {
+            succ=append(succ,z.Copy())
+        }
+    }
+    return succ
+}
+func Walk(x0 Vector,f func(Vector) Vector,b Bullet,nSteps int) Vector {
     var (
         k,i int
         x,y Vector
     )
     x=x0.Copy()
-    for k=0;k<kmax;k++ {
+    for k=0;k<nSteps;k++ {
         y=f(x)
-        i=rand.Intn(len(x))
+        i=rand.Intn(len(y))
         x[i]=y[i]
-        x=x.Shoot(b.Targ.ToInt(),b.Moda)
+        x=x.Shoot(b)
     }
     return x
 }

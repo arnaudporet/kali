@@ -1,81 +1,46 @@
 # Biological case study: bladder tumorigenesis
 
-This folder contains a biological case study in order to address a concrete case, namely a published logic-based model of bladder tumorigenesis.
+This folder contains a biological case study in order to address a concrete case: a published logic-based model of bladder tumorigenesis [1].
 
-The technical details about using kali are not recalled: the example contained in the file `example.go` should be consulted first.
+## Content
 
-## `readme.md`
+* `readme.md`: the file you are reading
+* `bladder_tumorigenesis.go`: the case study
 
-The file you are reading.
+```sh
+go run bladder_tumorigenesis.go -help
+```
 
-## `bladder_tumorigenesis.go`
+### Equations
 
-This file contains the case study.
+The `equations` folder contains the model's equations of the case study in different versions:
 
-Run `go run bladder_tumorigenesis.go` in a terminal emulator.
+* `eq_bool.go`: the Boolean version of the model's equations
+* `eq_func.go`: the functional version of the model's equations (the Zadeh's logical operators are used instead of the Boolean ones)
+* `readouts.go`: the equations of the three output phenotypes, use them to evaluate these output phenotypes from the returned attractors once the run has terminated
 
-## `equations/`
+All the equations are and must be as follows:
 
-This folder contains the model equations of the case study in different versions.
+* `<equation>// <node_name>`
+* ex:
+    * `(RAS || AKT) && !p16INK4a && !p21CIP// CyclinD1` (Boolean version)
+    * `min(max(RAS,AKT),1-p16INK4a,1-p21CIP)// CyclinD1` (functional version)
 
-It also contains a [Python](https://www.python.org) script to generate the version of the model equations present in the file `bladder_tumorigenesis.go`.
+However, kali only uses the functional version of the model's equations because they work with both Boolean and multivalued logic.
 
-All the equations are, and must be, as follows: `equation// node_name`.
+To do so, in the main file `bladder_tumorigenesis.go`:
 
-### `eq_bool.go`
+* the variable names are replaced by their corresponding position in the state vector `x`
+* the variable names are stored in the list `nodes`, respecting the __same order__ as in `x`
 
-This file contains the Boolean version of the model equations.
+### Results
 
-### `eq_func.go`
+The `results` folder contains the results of this case study:
 
-This file contains the functional version of the model equations: the Zadeh logical operators are used instead of the Boolean ones.
+* `A_physio.txt`: the physiological attractor set
+* `A_patho.txt`: the pathological attractor set
+* `A_versus.txt`: the pathological attractors (i.e. those specific to `A_patho`)
+* `B_therap_1.txt`: the found therapeutic bullets made of __one__ target node
+* `B_therap_2.txt`: the found therapeutic bullets made of __two__ target nodes
 
-kali only uses the functional version of the model equations since it works with both Boolean and multivalued logic.
-
-### `xEq.py`
-
-This script takes the file containing the functional version of the model equations, here the file `eq_func.go`, and returns the file `eq_func_xed.go`.
-
-Run `python xEq.py eq_func.go` in a terminal emulator.
-
-This script is coded in Python3, no warranties that it works with Python2.
-
-### `eq_func_xed.go`
-
-This file contains the functional version of the model equations with the node names replaced by their corresponding position in the state vector **x**.
-
-This is the version of the model equations used by kali and therefore present in the file `bladder_tumorigenesis.go`.
-
-It also contains the list of the nodes names.
-
-The content of this file is intended to be directly pasted into the file `bladder_tumorigenesis.go` at the appropriate places.
-
-### `readouts.go`
-
-This file contains the equations of the three output phenotypes.
-
-Use them to evaluate these output phenotypes from the returned attractors once the run has terminated.
-
-## `results/`
-
-This folder contains the results of this case study obtained by running the file `bladder_tumorigenesis.go`.
-
-### `A_physio.txt`
-
-This file contains the physiological attractor set.
-
-### `A_patho.txt`
-
-This file contains the pathological attractor set.
-
-### `A_versus.txt`
-
-This file contains the pathological attractors.
-
-### `B_therap_1.txt`
-
-This file contains the therapeutic bullets made of one target.
-
-### `B_therap_2.txt`
-
-This file contains the therapeutic bullets made of two targets.
+[1] Elisabeth Remy, Sandra Rebouissou, Claudine Chaouiya, Andrei Zinovyev, Francois Radvanyi, Laurence Calzone (2015) A modeling approach to explain mutually exclusive and co-occurring genetic alterations in bladder tumorigenesis. Cancer Research 75(19).

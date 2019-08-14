@@ -1,9 +1,16 @@
 // Copyright (C) 2013-2019 Arnaud Poret
 // This work is licensed under the GNU General Public License.
-// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
+// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
+
+// WARNING The functions in the present file do not handle exceptions and
+// errors. Instead, they assume that such handling is performed upstream by the
+// <do*> top-level functions of kali. Consequently, they should not be used as
+// is outside of kali.
+
 package kali
 import (
     "encoding/csv"
+    "math"
     "os"
 )
 type Matrix []Vector
@@ -12,21 +19,20 @@ func (m Matrix) AddCol(v Vector) Matrix {
         i int
         y Matrix
     )
-    y=make(Matrix,len(m))
+    y=m.Copy()
     for i=range v {
-        y[i]=append(m[i].Copy(),v[i])
+        y[i]=append(y[i],v[i])
     }
     return y
 }
 func (m Matrix) CircRows(n int) Matrix {
-    // n>0
     var (
         i int
         y Matrix
     )
     y=make(Matrix,len(m))
     for i=range m {
-        y[i]=m[(i+n)%len(m)].Copy()
+        y[i]=m[int(math.Mod(float64(i+n),float64(len(m))))].Copy()
     }
     return y
 }
@@ -42,43 +48,53 @@ func (m Matrix) Copy() Matrix {
     return y
 }
 func (m1 Matrix) Eq(m2 Matrix) bool {
-    var i int
+    var (
+        y bool
+        i int
+    )
     if len(m1)!=len(m2) {
-        return false
+        y=false
     } else {
+        y=true
         for i=range m1 {
             if !m1[i].Eq(m2[i]) {
-                return false
+                y=false
+                break
             }
         }
-        return true
     }
+    return y
 }
 func (m Matrix) FindRow(v Vector) int {
-    var i int
+    var (
+        y,i int
+    )
+    y=-1
     for i=range m {
         if m[i].Eq(v) {
-            return i
+            y=i
+            break
         }
     }
-    return -1
+    return y
 }
-func LoadMat(filename string) Matrix {
+func LoadMat(fileName string) Matrix {
     var (
-        z [][]string
-        reader *csv.Reader
+        lines [][]string
         file *os.File
+        reader *csv.Reader
     )
-    file,_=os.Open(filename)
+    file,_=os.Open(fileName)
     reader=csv.NewReader(file)
     reader.Comma=','
     reader.Comment=0
     reader.FieldsPerRecord=-1
     reader.LazyQuotes=false
     reader.TrimLeadingSpace=true
-    z,_=reader.ReadAll()
+    reader.ReuseRecord=true
+    lines,_=reader.ReadAll()
     file.Close()
-    return StrToMat(z)
+    return StrToMat(lines)
 }
 func MakeMat(n,m int) Matrix {
     var (
@@ -92,40 +108,40 @@ func MakeMat(n,m int) Matrix {
     return y
 }
 func (m Matrix) MinRow() int {
-    // according to the lexicographical order
-    var i,imin int
-    imin=0
+    var (
+        iMin,i int
+    )
+    iMin=0
     for i=1;i<len(m);i++ {
-        if m[imin].Sup(m[i]) {
-            imin=i
+        if m[iMin].Sup(m[i]) {
+            iMin=i
         }
     }
-    return imin
+    return iMin
 }
-func (m Matrix) Save(filename string) {
+func (m Matrix) Save(fileName string) {
     var (
-        writer *csv.Writer
         file *os.File
+        writer *csv.Writer
     )
-    file,_=os.Create(filename)
+    file,_=os.Create(fileName)
     writer=csv.NewWriter(file)
     writer.Comma=','
     writer.UseCRLF=false
-    writer.WriteAll(m.ToStr())
+    _=writer.WriteAll(m.ToStr())
     file.Close()
 }
 func (m Matrix) SortRows() Matrix {
-    // according to the lexicographical order
     var (
-        i,imin int
+        i,iMin int
         y,z Matrix
     )
     y=make(Matrix,len(m))
     z=m.Copy()
-    for i=range y {
-        imin=z.MinRow()
-        y[i]=z[imin].Copy()
-        z=append(z[:imin],z[imin+1:]...)
+    for i=range m {
+        iMin=z.MinRow()
+        y[i]=z[iMin].Copy()
+        z=append(z[:iMin],z[iMin+1:]...)
     }
     return y
 }
@@ -137,6 +153,23 @@ func StrToMat(s [][]string) Matrix {
     y=make(Matrix,len(s))
     for i=range s {
         y[i]=StrToVect(s[i])
+    }
+    return y
+}
+func (m1 Matrix) Sup(m2 Matrix) bool {
+    var (
+        y bool
+        i int
+    )
+    y=len(m1)>len(m2)
+    for i=0;i<int(math.Min(float64(len(m1)),float64(len(m2))));i++ {
+        if m2[i].Sup(m1[i]) {
+            y=false
+            break
+        } else if m1[i].Sup(m2[i]) {
+            y=true
+            break
+        }
     }
     return y
 }

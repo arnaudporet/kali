@@ -1,67 +1,157 @@
 // Copyright (C) 2013-2019 Arnaud Poret
 // This work is licensed under the GNU General Public License.
-// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
+// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
 package kali
 import (
+    "flag"
     "fmt"
     "math/rand"
+    "os"
+    "path/filepath"
     "strings"
     "time"
 )
-func DoTheJob(fphysio,fpatho func(Vector) Vector,ntarg,maxtarg,maxmoda,maxS,kmax,threshold,sync int,nodes []string,vals Vector) {
-    var n,todo int
-    n=len(nodes)
-    if n==0 {
-        panic("len(nodes)==0: nodes can not be empty")
+func DoTheJob(vals Vector,nodes []string,Physio,Patho func(Vector) Vector) {
+    var (
+        err error
+        help,usage,license,ok bool
+        fileName string
+        args []string
+        flagSet *flag.FlagSet
+    )
+    fileName=filepath.Base(os.Args[0])
+    flagSet=flag.NewFlagSet("",flag.ContinueOnError)
+    flagSet.Usage=func() {}
+    flagSet.BoolVar(&help,"help",false,"")
+    flagSet.BoolVar(&help,"h",false,"")
+    flagSet.BoolVar(&usage,"usage",false,"")
+    flagSet.BoolVar(&usage,"u",false,"")
+    flagSet.BoolVar(&license,"license",false,"")
+    flagSet.BoolVar(&license,"l",false,"")
+    err=flagSet.Parse(os.Args[1:])
+    if err!=nil {
+        fmt.Println("Error: "+fileName+": "+err.Error())
+    } else if help {
+        fmt.Println(strings.Join([]string{
+            "",
+            "In silico therapeutic target discovery using network attractors.",
+            "",
+            "Currently, kali can operate on qualitative models, namely Boolean networks and",
+            "multi-valued ones (a generalization of Boolean networks).",
+            "",
+            "Usage:",
+            "    * "+fileName+" [options]",
+            "    * "+fileName+" <command> [options] <arguments>",
+            "",
+            "Commands (should be run in that order):",
+            "    * start: generate the set of the start states",
+            "    * attractor: compute an attractor set",
+            "    * versus: get the set of the pathological attractors",
+            "    * bullet: generate the set of the bullets to test",
+            "    * target: compute a set of therapeutic bullets",
+            "",
+            "Positional arguments: see the command-specific help ("+fileName+" <command> -help)",
+            "",
+            "Options:",
+            "    * non command-specific options:",
+            "        * -l/-license: print the GNU General Public License under which kali is",
+            "        * -u/-usage: print usage only",
+            "        * -h/-help: print this help",
+            "    * command-specific options: "+fileName+" <command> -help",
+            "",
+            "Output files: see the command-specific help ("+fileName+" <command> -help)",
+            "",
+            "Cautions:",
+            "    * non command-specific cautions:",
+            "        * kali automatically saves and loads the files it creates and uses",
+            "        * if one of these files already exists then it is overwritten",
+            "        * if one of these files is renamed, moved or deleted then it can not be",
+            "          loaded when required",
+            "    * command-specific cautions: "+fileName+" <command> -help",
+            "",
+            "For command-specific help, run: "+fileName+" <command> -help",
+            "",
+            "For more information, see https://github.com/arnaudporet/kali",
+            "",
+            "For full explanation, see https://arxiv.org/pdf/1611.03144.pdf",
+            "",
+        },"\n"))
+    } else if usage {
+        fmt.Println(strings.Join([]string{
+            "",
+            "Usage:",
+            "    * "+fileName+" [options]",
+            "    * "+fileName+" <command> [options] <arguments>",
+            "",
+            "Commands (should be run in that order):",
+            "    * start: generate the set of the start states",
+            "    * attractor: compute an attractor set",
+            "    * versus: get the set of the pathological attractors",
+            "    * bullet: generate the set of the bullets to test",
+            "    * target: compute a set of therapeutic bullets",
+            "",
+            "Positional arguments: see the command-specific help ("+fileName+" <command> -help)",
+            "",
+            "Options:",
+            "    * non command-specific options:",
+            "        * -l/-license: print the GNU General Public License under which kali is",
+            "        * -u/-usage: print usage only",
+            "        * -h/-help: print help",
+            "    * command-specific options: "+fileName+" <command> -help",
+            "",
+        },"\n"))
+    } else if license {
+        fmt.Println(strings.Join([]string{
+            "",
+            "kali: in silico therapeutic target discovery using network attractors",
+            "",
+            "Copyright (C) 2013-2019 Arnaud Poret",
+            "",
+            "This program is free software: you can redistribute it and/or modify it under",
+            "the terms of the GNU General Public License as published by the Free Software",
+            "Foundation, either version 3 of the License, or (at your option) any later",
+            "version.",
+            "",
+            "This program is distributed in the hope that it will be useful, but WITHOUT ANY",
+            "WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A",
+            "PARTICULAR PURPOSE. See the GNU General Public License for more details.",
+            "",
+            "You should have received a copy of the GNU General Public License along with",
+            "this program. If not, see <https://www.gnu.org/licenses/>.",
+            "",
+        },"\n"))
+    } else if len(flagSet.Args())==0 {
+        fmt.Println("Error: "+fileName+": missing command, expecting one of: start, attractor, versus, bullet, target")
     } else if len(vals)<2 {
-        panic("len(vals)<2: the logic is at least two-valued")
-    } else if sync!=0 && sync!=1 {
-        panic("sync!=0 and sync!=1: sync must be 0 or 1")
-    } else if ntarg<1 || ntarg>n {
-        panic("ntarg<1 or ntarg>len(nodes): ntarg must be an integer in [1;number of nodes]")
-    } else if threshold<0 || threshold>100 {
-        panic("threshold<0 or threshold>100: threshold must be an integer in [0;100]")
-    } else if maxtarg<1 || maxmoda<1 || maxS<1 || kmax<1 {
-        panic("maxtarg<1 or maxmoda<1 or maxS<1 or kmax<1: maxtarg, maxmoda, maxS and kmax must be strictly positive integers")
+        fmt.Println("Error: "+fileName+": the used logic must be at least two-valued (i.e. at least Boolean)")
+    } else if len(nodes)==0 {
+        fmt.Println("Error: "+fileName+": no nodes provided")
     } else {
-        rand.Seed(int64(time.Now().Nanosecond()))
-        for {
-            todo=GetInt(strings.Join([]string{
-                "\nWhat to do:",
-                "    [1] generate the state space (S)",
-                "    [2] compute an attractor set (A_physio or A_patho)",
-                "    [3] get the pathological attractors (A_versus)",
-                "    [4] generate the bullets to test (Targ and Moda)",
-                "    [5] compute therapeutic bullets (B_therap)",
-                "    [6] change parameter values (ntarg, maxtarg, maxmoda, maxS, kmax, threshold, sync)",
-                "    [7] check/clear what is saved (S, A_physio, A_patho, A_versus, Targ, Moda, B_therap)",
-                "    [8] help",
-                "    [9] license",
-                "    [0] quit",
-                "\nTo do [0-9] ",
-            },"\n"),Range(0,10))
-            if todo==1 {
-                DoStateSpace(n,maxS,vals)
-            } else if todo==2 {
-                DoAttractorSet(fphysio,fpatho,kmax,sync,nodes)
-            } else if todo==3 {
-                DoVersus(nodes)
-            } else if todo==4 {
-                DoTestBullets(n,ntarg,maxtarg,maxmoda,vals)
-            } else if todo==5 {
-                DoTherapeuticBullets(fpatho,kmax,threshold,sync,nodes)
-            } else if todo==6 {
-                DoParameters(&ntarg,&maxtarg,&maxmoda,&maxS,&kmax,&threshold,&sync,n)
-            } else if todo==7 {
-                DoSaved()
-            } else if todo==8 {
-                DoHelp()
-            } else if todo==9 {
-                DoNotice()
-            } else if todo==0 {
-                break
+        ok=true
+        CheckF(Physio,vals,len(nodes),&ok)
+        if !ok {
+            fmt.Println("Error: "+fileName+": something is wrong with the physiological function")
+        } else {
+            CheckF(Patho,vals,len(nodes),&ok)
+            if !ok {
+                fmt.Println("Error: "+fileName+": something is wrong with the pathological function")
+            } else {
+                rand.Seed(int64(time.Now().Nanosecond()))
+                args=flagSet.Args()
+                if args[0]=="start" {
+                    DoStartStates(vals,nodes)
+                } else if args[0]=="attractor" {
+                    DoAttractorSet(nodes,Physio,Patho)
+                } else if args[0]=="versus" {
+                    DoVersus(nodes)
+                } else if args[0]=="bullet" {
+                    DoTestBullets(vals,nodes)
+                } else if args[0]=="target" {
+                    DoTherapeuticBullets(nodes,Patho)
+                } else {
+                    fmt.Println("Error: "+fileName+": "+args[0]+": unknown command, expecting one of: start, attractor, versus, bullet, target")
+                }
             }
         }
-        fmt.Println("\nGoodbye!\n")
     }
 }

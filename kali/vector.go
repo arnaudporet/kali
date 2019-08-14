@@ -1,6 +1,12 @@
 // Copyright (C) 2013-2019 Arnaud Poret
 // This work is licensed under the GNU General Public License.
-// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
+// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
+
+// WARNING The functions in the present file do not handle exceptions and
+// errors. Instead, they assume that such handling is performed upstream by the
+// <do*> top-level functions of kali. Consequently, they should not be used as
+// is outside of kali.
+
 package kali
 import (
     "math"
@@ -9,103 +15,89 @@ import (
     "strconv"
 )
 type Vector []float64
-func (v Vector) Arrang(k int) Vector {
-    // with repetitions
+func (v Vector) Arrangs(k,n int) Matrix {
     var (
-        i int
-        y Vector
-    )
-    y=make(Vector,k)
-    for i=range y {
-        y[i]=v[rand.Intn(len(v))]
-    }
-    return y
-}
-func (v Vector) Arrangs(k,narrang int) Matrix {
-    var (
-        i int
+        i,j int
+        z Vector
         y Matrix
     )
-    y=make(Matrix,NearInt(math.Min(float64(narrang),math.Pow(float64(len(v)),float64(k)))))
+    y=make(Matrix,int(math.Min(float64(n),math.Pow(float64(len(v)),float64(k)))))
+    z=make(Vector,k)
     for i=range y {
         for {
-            y[i]=v.Arrang(k)
-            if y[:i].FindRow(y[i])==-1 {
+            for j=range z {
+                z[j]=v[rand.Intn(len(v))]
+            }
+            if y[:i].FindRow(z)==-1 {
                 break
             }
         }
+        y[i]=z.Copy()
     }
     return y
 }
-func (v Vector) Combi(k int) Vector {
-    // without repetitions
+func (v Vector) Combis(k,n int) Matrix {
     var (
-        i int
-        z []int
-        y Vector
-    )
-    y=make(Vector,k)
-    z=rand.Perm(len(v))
-    for i=range y {
-        y[i]=v[z[i]]
-    }
-    sort.Float64s(y)
-    return y
-}
-func (v Vector) Combis(k,ncombi int) Matrix {
-    var (
-        i int
+        i,j int
+        pos []int
+        z Vector
         y Matrix
     )
-    y=make(Matrix,NearInt(math.Min(float64(ncombi),math.Gamma(float64(len(v)+1))/(math.Gamma(float64(k+1))*math.Gamma(float64(len(v)-k+1))))))
+    y=make(Matrix,int(math.Min(float64(n),math.Gamma(float64(len(v)+1))/(math.Gamma(float64(k+1))*math.Gamma(float64(len(v)-k+1))))))
+    z=make(Vector,k)
     for i=range y {
         for {
-            y[i]=v.Combi(k)
-            if y[:i].FindRow(y[i])==-1 {
+            pos=rand.Perm(len(v))
+            for j=range z {
+                z[j]=v[pos[j]]
+            }
+            sort.Float64s(z)
+            if y[:i].FindRow(z)==-1 {
                 break
             }
         }
+        y[i]=z.Copy()
     }
     return y
 }
 func (v Vector) Copy() Vector {
-    var y Vector
+    var (
+        y Vector
+    )
     y=make(Vector,len(v))
     copy(y,v)
     return y
 }
 func (v1 Vector) Eq(v2 Vector) bool {
-    var i int
+    var (
+        y bool
+        i int
+    )
     if len(v1)!=len(v2) {
-        return false
+        y=false
     } else {
+        y=true
         for i=range v1 {
             if v1[i]!=v2[i] {
-                return false
+                y=false
+                break
             }
         }
-        return true
-    }
-}
-func FillVect(n int,x float64) Vector {
-    var (
-        i int
-        y Vector
-    )
-    y=make(Vector,n)
-    for i=range y {
-        y[i]=x
     }
     return y
 }
 func (v Vector) Find(x float64) int {
-    var i int
+    var (
+        y,i int
+    )
+    y=-1
     for i=range v {
         if v[i]==x {
-            return i
+            y=i
+            break
         }
     }
-    return -1
+    return y
 }
 func IntToVect(x []int) Vector {
     var (
@@ -118,32 +110,43 @@ func IntToVect(x []int) Vector {
     }
     return y
 }
-func (v Vector) Shoot(pos []int,val Vector) Vector {
+func MakeVect(n int,x float64) Vector {
+    var (
+        i int
+        y Vector
+    )
+    y=make(Vector,n)
+    for i=range y {
+        y[i]=x
+    }
+    return y
+}
+func (v Vector) Shoot(b Bullet) Vector {
     var (
         i int
         y Vector
     )
     y=v.Copy()
-    for i=range pos {
-        y[pos[i]]=val[i]
+    for i=range b.Targ {
+        y[int(b.Targ[i])]=b.Moda[i]
     }
     return y
 }
 func (v Vector) Space(n int) Matrix {
     var (
-        i1,i2,m int
+        i,j,m int
         z Vector
         y Matrix
     )
     y=v.ToCol()
-    for i1=1;i1<n;i1++ {
-        m=NearInt(math.Pow(float64(len(v)),float64(i1)))
-        for i2=0;i2<len(v)-1;i2++ {
-            y=append(y,y[:m].Copy()...)
+    for i=1;i<n;i++ {
+        m=int(math.Pow(float64(len(v)),float64(i)))
+        for j=0;j<len(v)-1;j++ {
+            y=append(y,y[:m]...)
         }
-        z=FillVect(m,v[0])
-        for i2=1;i2<len(v);i2++ {
-            z=append(z,FillVect(m,v[i2])...)
+        z=MakeVect(m,v[0])
+        for j=1;j<len(v);j++ {
+            z=append(z,MakeVect(m,v[j])...)
         }
         y=y.AddCol(z)
     }
@@ -165,23 +168,28 @@ func (v Vector) Sum() float64 {
         i int
         y float64
     )
-    y=0.0
+    y=0
     for i=range v {
         y+=v[i]
     }
     return y
 }
 func (v1 Vector) Sup(v2 Vector) bool {
-    // according to the lexicographical order
-    var i int
-    for i=0;i<NearInt(math.Min(float64(len(v1)),float64(len(v2))));i++ {
+    var (
+        y bool
+        i int
+    )
+    y=len(v1)>len(v2)
+    for i=0;i<int(math.Min(float64(len(v1)),float64(len(v2))));i++ {
         if v1[i]<v2[i] {
-            return false
+            y=false
+            break
         } else if v1[i]>v2[i] {
-            return true
+            y=true
+            break
         }
     }
-    return len(v1)>len(v2)
+    return y
 }
 func (v Vector) ToCol() Matrix {
     var (
@@ -201,7 +209,7 @@ func (v Vector) ToInt() []int {
     )
     y=make([]int,len(v))
     for i=range v {
-        y[i]=NearInt(v[i])
+        y[i]=int(math.Round(v[i]))
     }
     return y
 }

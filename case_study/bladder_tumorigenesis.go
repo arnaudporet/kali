@@ -1,6 +1,6 @@
 // Copyright (C) 2013-2019 Arnaud Poret
 // This work is licensed under the GNU General Public License.
-// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html
+// To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
 
 // This biological case study is proposed to address a concrete case, namely a
 // published logic-based model of bladder tumorigenesis.
@@ -22,9 +22,9 @@
 //     * growth arrest
 //     * apoptosis
 
-// The value of the four inputs (i.e. EGFRstimulus, FGFR3stimulus,
+// The value of the four input parameters (i.e. EGFRstimulus, FGFR3stimulus,
 // GrowthInhibitors and DNAdamage) are directly injected into the concerned
-// equations.
+// equations (see below).
 
 // The three output phenotypes can be evaluated from the returned attractors
 // once the run has terminated using their respective equation:
@@ -32,21 +32,30 @@
 //     * GrowthArrest  = p21CIP OR RB1 OR RBL2
 //     * Apoptosis     = TP53 OR E2F1_lvl2
 
-// See my article for a complete description of this case study, freely
-// available at https://arxiv.org/abs/1611.03144
-
-// The technical details about using kali are not recalled: the example
-// contained in the file example.go should be consulted first.
+// See my article for a complete description of this case study:
+// https://arxiv.org/pdf/1611.03144.pdf.
 
 package main
-import "../kali"
+
+// Import kali (relative path).
+import (
+    "../kali"
+)
+
+// The four input parameters.
 var EGFRstimulus,FGFR3stimulus,GrowthInhibitors,DNAdamage float64
+
 func main() {
     var (
-        ntarg,maxtarg,maxmoda,maxS,kmax,threshold,sync int
         nodes []string
         vals kali.Vector
     )
+    // Boolean logic
+    vals=kali.Vector{
+        0,
+        1,
+    }
+    // The node names.
     nodes=[]string{
         "AKT",
         "ATM_lvl1",
@@ -76,24 +85,18 @@ func main() {
         "SPRY",
         "TP53",
     }
-    vals=kali.Vector{0,1}
-    sync=0
-    maxS=1000
-    kmax=10000
-    ntarg=1
-    maxtarg=1000
-    maxmoda=1000
-    threshold=5
     // The following input configuration aims at predicting the possible
     // responses of the model to opposite growth instructions.
     EGFRstimulus=1
     FGFR3stimulus=1
     GrowthInhibitors=1
     DNAdamage=0
-    kali.DoTheJob(fphysio,fpatho,ntarg,maxtarg,maxmoda,maxS,kmax,threshold,sync,nodes,vals)
+    // Do the job.
+    kali.DoTheJob(vals,nodes,Physio,Patho)
 }
-// The physiological variant fphysio is the model as is.
-func fphysio(x kali.Vector) kali.Vector {
+
+// The updating function of the physiological variant.
+func Physio(x kali.Vector) kali.Vector {
     return kali.Vector{
         x[20],// AKT
         kali.Min(DNAdamage,1-x[9],1-x[10]),// ATM_lvl1
@@ -124,11 +127,13 @@ func fphysio(x kali.Vector) kali.Vector {
         kali.Min(1-x[16],kali.Max(kali.Min(kali.Max(x[1],x[2]),kali.Max(x[4],x[5])),x[10])),// TP53
     }
 }
-// The pathological variant fpatho is the model plus a deletion of the tumor
-// suppressor gene CDKN2A, as observed in bladder cancers.
-// Note that the CDKN2A gene encodes two growth inhibitors: p14ARF and p16INK4a.
-// Consequently, p14ARF and p16INK4a are knocked down in fpatho.
-func fpatho(x kali.Vector) kali.Vector {
+
+// The updating function of the pathological variant.
+// The pathological variant is obtained by deleting the tumor suppressor gene
+// CDKN2A, as observed in bladder cancers.
+// Note that CDKN2A encodes two growth inhibitors: p14ARF and p16INK4a.
+// Consequently, p14ARF and p16INK4a are here knocked down.
+func Patho(x kali.Vector) kali.Vector {
     return kali.Vector{
         x[20],// AKT
         kali.Min(DNAdamage,1-x[9],1-x[10]),// ATM_lvl1
