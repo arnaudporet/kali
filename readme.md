@@ -1,4 +1,4 @@
-# In silico therapeutic target discovery using network attractors
+# In silico therapeutic target discovery using network attractors: avoiding pathological phenotypes
 
 Copyright 2013-2019 [Arnaud Poret](https://github.com/arnaudporet)
 
@@ -339,7 +339,7 @@ See its own `readme.md` file.
 
 ## Forthcoming
 
-## Credit
+## Credits
 
 The functions used to handle the asynchronous updating are adapted from [BoolNet](https://cran.r-project.org/web/packages/BoolNet/) [1].
 
