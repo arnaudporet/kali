@@ -32,7 +32,7 @@ func (m Matrix) CircRows(n int) Matrix {
     )
     y=make(Matrix,len(m))
     for i=range m {
-        y[i]=m[int(math.Mod(float64(i+n),float64(len(m))))].Copy()
+        y[i]=m[int(math.Round(math.Mod(float64(i+n),float64(len(m)))))].Copy()
     }
     return y
 }
@@ -162,7 +162,7 @@ func (m1 Matrix) Sup(m2 Matrix) bool {
         i int
     )
     y=len(m1)>len(m2)
-    for i=0;i<int(math.Min(float64(len(m1)),float64(len(m2))));i++ {
+    for i=0;i<int(math.Round(math.Min(float64(len(m1)),float64(len(m2)))));i++ {
         if m2[i].Sup(m1[i]) {
             y=false
             break

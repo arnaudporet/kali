@@ -10,6 +10,7 @@
 package kali
 import (
     "fmt"
+    "math"
     "os"
     "strconv"
     "strings"
@@ -34,7 +35,7 @@ func ComputeTherapeuticBullets(S,Targ,Moda Matrix,f func(Vector) Vector,nSteps,m
     for i=range Aphyrsus {
         sizes=append(sizes,float64(len(Aphyrsus[i].States)))
     }
-    maxForward=int(Max(sizes...))
+    maxForward=int(math.Round(Max(sizes...)))
     b.Gain=make(Vector,2)
     b.Gain[0]=Aphysio.Cover(Apatho).Sum()
     for i=range Targ {
@@ -111,7 +112,7 @@ func (B BulletSet) Report(nodes,physioNames,pathoNames []string) {
     for i=range B {
         bullet=make([]string,len(B[i].Targ))
         for j=range bullet {
-            bullet[j]=nodes[int(B[i].Targ[j])]+"["+strconv.FormatFloat(B[i].Moda[j],'f',-1,64)+"]"
+            bullet[j]=nodes[int(math.Round(B[i].Targ[j]))]+"["+strconv.FormatFloat(B[i].Moda[j],'f',-1,64)+"]"
         }
         lines=append(lines,"Bullet: "+strings.Join(bullet," "))
         lines=append(lines,"Gain: "+strconv.FormatFloat(B[i].Gain[0],'f',-1,64)+"% --> "+strconv.FormatFloat(B[i].Gain[1],'f',-1,64)+"%")

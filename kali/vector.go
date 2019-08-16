@@ -21,7 +21,7 @@ func (v Vector) Arrangs(k,n int) Matrix {
         z Vector
         y Matrix
     )
-    y=make(Matrix,int(math.Min(float64(n),math.Pow(float64(len(v)),float64(k)))))
+    y=make(Matrix,int(math.Round(math.Min(float64(n),math.Pow(float64(len(v)),float64(k))))))
     z=make(Vector,k)
     for i=range y {
         for {
@@ -43,7 +43,7 @@ func (v Vector) Combis(k,n int) Matrix {
         z Vector
         y Matrix
     )
-    y=make(Matrix,int(math.Min(float64(n),math.Gamma(float64(len(v)+1))/(math.Gamma(float64(k+1))*math.Gamma(float64(len(v)-k+1))))))
+    y=make(Matrix,int(math.Round(math.Min(float64(n),math.Gamma(float64(len(v)+1))/(math.Gamma(float64(k+1))*math.Gamma(float64(len(v)-k+1)))))))
     z=make(Vector,k)
     for i=range y {
         for {
@@ -128,7 +128,7 @@ func (v Vector) Shoot(b Bullet) Vector {
     )
     y=v.Copy()
     for i=range b.Targ {
-        y[int(b.Targ[i])]=b.Moda[i]
+        y[int(math.Round(b.Targ[i]))]=b.Moda[i]
     }
     return y
 }
@@ -140,7 +140,7 @@ func (v Vector) Space(n int) Matrix {
     )
     y=v.ToCol()
     for i=1;i<n;i++ {
-        m=int(math.Pow(float64(len(v)),float64(i)))
+        m=int(math.Round(math.Pow(float64(len(v)),float64(i))))
         for j=0;j<len(v)-1;j++ {
             y=append(y,y[:m]...)
         }
@@ -180,7 +180,7 @@ func (v1 Vector) Sup(v2 Vector) bool {
         i int
     )
     y=len(v1)>len(v2)
-    for i=0;i<int(math.Min(float64(len(v1)),float64(len(v2))));i++ {
+    for i=0;i<int(math.Round(math.Min(float64(len(v1)),float64(len(v2)))));i++ {
         if v1[i]<v2[i] {
             y=false
             break
