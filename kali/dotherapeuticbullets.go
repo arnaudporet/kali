@@ -12,7 +12,7 @@ import (
 func DoTherapeuticBullets(nodes []string,Patho func(Vector) Vector) {
     var (
         err error
-        help,usage,success bool
+        help,usage,quiet,success bool
         nSteps,maxTry int
         th float64
         fileName,upd string
@@ -27,6 +27,8 @@ func DoTherapeuticBullets(nodes []string,Patho func(Vector) Vector) {
     flagSet.BoolVar(&help,"h",false,"")
     flagSet.BoolVar(&usage,"usage",false,"")
     flagSet.BoolVar(&usage,"u",false,"")
+    flagSet.BoolVar(&quiet,"quiet",false,"")
+    flagSet.BoolVar(&quiet,"q",false,"")
     flagSet.IntVar(&nSteps,"nstep",1000,"")
     flagSet.IntVar(&maxTry,"maxtry",10,"")
     flagSet.StringVar(&upd,"upd","async","")
@@ -48,6 +50,7 @@ func DoTherapeuticBullets(nodes []string,Patho func(Vector) Vector) {
             "               an attractor (default: 10)",
             "    * -upd: the updating method to use (default: async)",
             "    * -th: the threshold for a bullet to be considered therapeutic (default: 5)",
+            "    * -q/-quiet: do not print results (but still save them to files)",
             "    * -u/-usage: print usage only",
             "    * -h/-help: print this help",
             "",
@@ -131,6 +134,7 @@ func DoTherapeuticBullets(nodes []string,Patho func(Vector) Vector) {
             "               an attractor (default: 10)",
             "    * -upd: the updating method to use (default: async)",
             "    * -th: the threshold for a bullet to be considered therapeutic (default: 5)",
+            "    * -q/-quiet: do not print results (but still save them to files)",
             "    * -u/-usage: print usage only",
             "    * -h/-help: print help",
             "",
@@ -167,7 +171,7 @@ func DoTherapeuticBullets(nodes []string,Patho func(Vector) Vector) {
                 Apatho=LoadAttractorSet("patho")
                 Btherap,success=ComputeTherapeuticBullets(LoadMat("S.csv"),LoadMat("Targ.csv"),LoadMat("Moda.csv"),Patho,nSteps,maxTry,th,Aphysio,Apatho,Aversus,upd)
                 if success {
-                    Btherap.Report(nodes,Align(Aphysio.GetNames()," "),Align(Aversus.GetNames()," "))
+                    Btherap.Report(nodes,Align(Aphysio.GetNames()," "),Align(Aversus.GetNames()," "),quiet)
                 } else {
                     fmt.Println("Warning: "+fileName+": target: unable to find therapeutic bullets, try increasing nstep and/or maxtry")
                 }

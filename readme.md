@@ -150,6 +150,7 @@ Options:
 * `-nstep`: the number of steps performed during a random walk when searching for an attractor (default: `1 000`)
 * `-maxtry`: the maximum number of random walks performed when searching for an attractor (default: `10`)
 * `-upd`: the updating method to use (default: `async`)
+* `-q/-quiet`: do not print results (but still save them to files)
 * `-u/-usage`: print usage only
 * `-h/-help`: print this help
 
@@ -200,6 +201,7 @@ Usage: `example versus [options]`
 
 Option:
 
+* `-q/-quiet`: do not print results (but still save them to files)
 * `-u/-usage`: print usage only
 * `-h/-help`: print this help
 
@@ -269,6 +271,7 @@ Options:
 * `-maxtry`: the maximum number of random walks performed when searching for an attractor (default: `10`)
 * `-upd`: the updating method to use (default: `async`)
 * `-th`: the threshold for a bullet to be considered therapeutic (default: `5`)
+* `-q/-quiet`: do not print results (but still save them to files)
 * `-u/-usage`: print usage only
 * `-h/-help`: print this help
 

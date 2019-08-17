@@ -12,7 +12,7 @@ import (
 func DoVersus(nodes []string) {
     var (
         err error
-        help,usage bool
+        help,usage,quiet bool
         fileName string
         flagSet *flag.FlagSet
     )
@@ -23,6 +23,8 @@ func DoVersus(nodes []string) {
     flagSet.BoolVar(&help,"h",false,"")
     flagSet.BoolVar(&usage,"usage",false,"")
     flagSet.BoolVar(&usage,"u",false,"")
+    flagSet.BoolVar(&quiet,"quiet",false,"")
+    flagSet.BoolVar(&quiet,"q",false,"")
     err=flagSet.Parse(os.Args[2:])
     if err!=nil {
         fmt.Println("Error: "+fileName+": versus: "+err.Error())
@@ -34,6 +36,7 @@ func DoVersus(nodes []string) {
             "Usage: "+fileName+" versus [options]",
             "",
             "Option:",
+            "    * -q/-quiet: do not print results (but still save them to files)",
             "    * -u/-usage: print usage only",
             "    * -h/-help: print this help",
             "",
@@ -62,6 +65,7 @@ func DoVersus(nodes []string) {
             "Usage: "+fileName+" versus [options]",
             "",
             "Option:",
+            "    * -q/-quiet: do not print results (but still save them to files)",
             "    * -u/-usage: print usage only",
             "    * -h/-help: print help",
             "",
@@ -72,7 +76,7 @@ func DoVersus(nodes []string) {
         if !Exist("A_patho.csv") {
             fmt.Println("Error: "+fileName+": versus: no pathological attractor set found (A_patho.csv)")
         } else {
-            LoadAttractorSet("patho").GetVersus().Report(nodes,"versus")
+            LoadAttractorSet("patho").GetVersus().Report(nodes,"versus",quiet)
         }
     }
 }

@@ -212,7 +212,7 @@ func LoadAttractorSet(setting string) AttractorSet {
     }
     return A
 }
-func (A AttractorSet) Report(nodes []string,setting string) {
+func (A AttractorSet) Report(nodes []string,setting string,quiet bool) {
     var (
         nPoint,nCycle,i,j int
         name,sep,report string
@@ -252,11 +252,13 @@ func (A AttractorSet) Report(nodes []string,setting string) {
     lines=append(lines,"    points: "+strconv.FormatInt(int64(nPoint),10))
     lines=append(lines,"    cycles: "+strconv.FormatInt(int64(nCycle),10))
     report=strings.Join(lines,"\n")
-    fmt.Println(report)
     file,_=os.Create(name+".txt")
     _,_=file.WriteString(report+"\n")
     file.Close()
     A.Save(len(nodes),setting)
+    if !quiet {
+        fmt.Println(report)
+    }
 }
 func (A AttractorSet) Save(n int,setting string) {
     var (

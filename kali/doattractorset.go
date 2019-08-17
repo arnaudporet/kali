@@ -12,7 +12,7 @@ import (
 func DoAttractorSet(nodes []string,Physio,Patho func(Vector) Vector) {
     var (
         err error
-        help,usage,success bool
+        help,usage,quiet,success bool
         nSteps,maxTry int
         fileName,upd string
         args []string
@@ -27,6 +27,8 @@ func DoAttractorSet(nodes []string,Physio,Patho func(Vector) Vector) {
     flagSet.BoolVar(&help,"h",false,"")
     flagSet.BoolVar(&usage,"usage",false,"")
     flagSet.BoolVar(&usage,"u",false,"")
+    flagSet.BoolVar(&quiet,"quiet",false,"")
+    flagSet.BoolVar(&quiet,"q",false,"")
     flagSet.IntVar(&nSteps,"nstep",1000,"")
     flagSet.IntVar(&maxTry,"maxtry",10,"")
     flagSet.StringVar(&upd,"upd","async","")
@@ -52,6 +54,7 @@ func DoAttractorSet(nodes []string,Physio,Patho func(Vector) Vector) {
             "    * -maxtry: the maximum number of random walks performed when searching for",
             "               an attractor (default: 10)",
             "    * -upd: the updating method to use (default: async)",
+            "    * -q/-quiet: do not print results (but still save them to files)",
             "    * -u/-usage: print usage only",
             "    * -h/-help: print this help",
             "",
@@ -117,6 +120,7 @@ func DoAttractorSet(nodes []string,Physio,Patho func(Vector) Vector) {
             "    * -maxtry: the maximum number of random walks performed when searching for",
             "               an attractor (default: 10)",
             "    * -upd: the updating method to use (default: async)",
+            "    * -q/-quiet: do not print results (but still save them to files)",
             "    * -u/-usage: print usage only",
             "    * -h/-help: print help",
             "",
@@ -147,7 +151,7 @@ func DoAttractorSet(nodes []string,Physio,Patho func(Vector) Vector) {
             }
             A,success=ComputeAttractorSet(LoadMat("S.csv"),f,Bullet{},nSteps,-1,maxTry,upd,args[0],refSet)
             if success {
-                A.Report(nodes,args[0])
+                A.Report(nodes,args[0],quiet)
             } else {
                 fmt.Println("Warning: "+fileName+": attractor: unable to find attractors, try increasing nstep and/or maxtry")
             }

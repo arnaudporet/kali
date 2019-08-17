@@ -99,7 +99,7 @@ func (b Bullet) IsTherapeutic(Atest,Aversus AttractorSet,th float64) bool {
     }
     return y
 }
-func (B BulletSet) Report(nodes,physioNames,pathoNames []string) {
+func (B BulletSet) Report(nodes,physioNames,pathoNames []string,quiet bool) {
     var (
         i,j int
         sep,report string
@@ -128,10 +128,12 @@ func (B BulletSet) Report(nodes,physioNames,pathoNames []string) {
     }
     lines=append(lines,"Found therapeutic bullets: "+strconv.FormatInt(int64(len(B)),10))
     report=strings.Join(lines,"\n")
-    fmt.Println(report)
     file,_=os.Create("B_therap.txt")
     _,_=file.WriteString(report+"\n")
     file.Close()
+    if !quiet {
+        fmt.Println(report)
+    }
 }
 func (B BulletSet) Sort() BulletSet {
     var (
