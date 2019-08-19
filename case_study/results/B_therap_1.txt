@@ -1,0 +1,84 @@
+B_therap
+--------------------------------------------------------------------------------
+Bullet: AKT[0]
+Gain: 64.76% --> 89.37%
+Physiological basins:
+    a_physio1: 89.37%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 10.63%
+--------------------------------------------------------------------------------
+Bullet: CDC25A[0]
+Gain: 64.76% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: CyclinE1[0]
+Gain: 64.76% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: EGFR[0]
+Gain: 64.76% --> 77.44%
+Physiological basins:
+    a_physio1: 77.44%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 22.56%
+--------------------------------------------------------------------------------
+Bullet: FGFR3[1]
+Gain: 64.76% --> 71.43%
+Physiological basins:
+    a_physio1: 71.43%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 28.57%
+--------------------------------------------------------------------------------
+Bullet: p21CIP[1]
+Gain: 64.76% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: PI3K[0]
+Gain: 64.76% --> 86.6%
+Physiological basins:
+    a_physio1: 86.6%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 13.4%
+--------------------------------------------------------------------------------
+Bullet: RB1[1]
+Gain: 64.76% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Bullet: RBL2[1]
+Gain: 64.76% --> 100%
+Physiological basins:
+    a_physio1: 100%
+    a_physio2: 0%
+    a_physio3: 0%
+Pathological basins:
+    a_patho1: 0%
+--------------------------------------------------------------------------------
+Found therapeutic bullets: 9

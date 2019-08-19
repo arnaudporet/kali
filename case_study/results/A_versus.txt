@@ -1,0 +1,36 @@
+A_versus={a_patho1}
+--------------------------------------------------------------------------------
+Name: a_patho1
+Basin: 35.24%
+States:
+    AKT          0
+    ATM_lvl1     0
+    ATM_lvl2     0
+    CDC25A       1
+    CHEK1_2_lvl1 0
+    CHEK1_2_lvl2 0
+    CyclinA      1
+    CyclinD1     1
+    CyclinE1     1
+    E2F1_lvl1    1
+    E2F1_lvl2    0
+    E2F3_lvl1    1
+    E2F3_lvl2    0
+    EGFR         0
+    FGFR3        1
+    GRB2         0
+    MDM2         0
+    p14ARF       0
+    p16INK4a     0
+    p21CIP       0
+    PI3K         0
+    PTEN         0
+    RAS          1
+    RB1          0
+    RBL2         0
+    SPRY         1
+    TP53         0
+--------------------------------------------------------------------------------
+Found attractors: 1
+    points: 1
+    cycles: 0
