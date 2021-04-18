@@ -1,6 +1,7 @@
-// Copyright (C) 2013-2020 Arnaud Poret
+// Copyright (C) 2013-2021 Arnaud Poret
 // This work is licensed under the GNU General Public License.
 // To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
+
 package kali
 import (
     "flag"
@@ -105,7 +106,7 @@ func DoTheJob(vals Vector,nodes []string,Physio,Patho func(Vector) Vector) {
             "",
             "kali: in silico therapeutic target discovery using network attractors",
             "",
-            "Copyright (C) 2013-2020 Arnaud Poret",
+            "Copyright (C) 2013-2021 Arnaud Poret",
             "",
             "This program is free software: you can redistribute it and/or modify it under",
             "the terms of the GNU General Public License as published by the Free Software",

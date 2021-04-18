@@ -1,6 +1,6 @@
 # In silico therapeutic target discovery using network attractors: avoiding pathological phenotypes
 
-Copyright 2013-2020 [Arnaud Poret](https://github.com/arnaudporet)
+Copyright 2013-2021 [Arnaud Poret](https://github.com/arnaudporet)
 
 This work is licensed under the [GNU General Public License](https://www.gnu.org/licenses/gpl.html).
 
@@ -46,7 +46,7 @@ go build example.go
 
 Note that `go run` builds kali each time before running it: safer if the sources are frequently modified.
 
-The Go package can have different names depending on your operating system. For example, with [Ubuntu](https://ubuntu.com) the Go package is named `golang`. Consequently, running a Go file with Ubuntu might be `golang-go run yourfile.go` instead of `go run yourfile.go` with [Arch Linux](https://www.archlinux.org). Otherwise, see https://golang.org/dl/ or https://golang.org/doc/install.
+The Go package can have different names depending on your operating system. For example, with [Ubuntu](https://ubuntu.com) the Go package is named `golang`. Consequently, running a Go file with Ubuntu might be `golang-go run yourfile.go` instead of `go run yourfile.go` with [Arch Linux](https://www.archlinux.org). Otherwise, see https://golang.org/doc/install.
 
 The (template) file `example.go` contains a simple and fictive Boolean network to conveniently illustrate kali. Next, you can replace its content with your own stuff.
 
@@ -358,4 +358,4 @@ Most [Linux distributions](https://distrowatch.com) provide Go in their official
 * `go` (Arch Linux)
 * `golang` (Ubuntu)
 
-Otherwise, see https://golang.org/dl/ or https://golang.org/doc/install
+Otherwise, see https://golang.org/doc/install.

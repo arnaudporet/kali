@@ -1,4 +1,4 @@
-// Copyright (C) 2013-2020 Arnaud Poret
+// Copyright (C) 2013-2021 Arnaud Poret
 // This work is licensed under the GNU General Public License.
 // To view a copy of this license, visit https://www.gnu.org/licenses/gpl.html.
 
@@ -17,7 +17,7 @@
 // The Go package can have different names depending on your operating system.
 // For example, with Ubuntu the Go package is named "golang". Consequently,
 // running a Go file with Ubuntu might be "golang-go run yourfile.go" instead of
-// "go run yourfile.go" with Arch Linux. Otherwise see https://golang.org/dl/ or
+// "go run yourfile.go" with Arch Linux. Otherwise see
 // https://golang.org/doc/install.
 
 // This example is a simple and fictive Boolean model used to conveniently
@@ -32,9 +32,8 @@
 package main
 
 // Import kali.
-// Change the path if you move it, but must be a relative path.
 import (
-    "./kali"
+    "github.com/arnaudporet/kali/kali"
 )
 
 func main() {
